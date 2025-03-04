@@ -12,13 +12,13 @@ class Bot(ABC):
     self, update: Update, context: ContextTypes.DEFAULT_TYPE 
     ) -> None: pass
 
-  # @abstractmethod
-  # async def end(
-  #   self, update: Update, context: ContextTypes.DEFAULT_TYPE 
-  #   ) -> None: pass
+  @abstractmethod
+  async def end(
+    self, update: Update, context: ContextTypes.DEFAULT_TYPE 
+    ) -> None: pass
   
-  # @abstractmethod
-  # async def help(
-  #   self, update: Update, context: ContextTypes.DEFAULT_TYPE 
-  #   ) -> None: pass
+  @abstractmethod
+  async def help(
+    self, update: Update, context: ContextTypes.DEFAULT_TYPE 
+    ) -> None: pass
 
