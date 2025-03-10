@@ -1,6 +1,7 @@
 """ Python general packages """
 import sys as system
 import logging
+from typing import Any
 """ Python-telegram-bot packages """
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
@@ -17,9 +18,11 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Echo the user message."""
-    await update.message.reply_text(update.message.text)
+async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any:
+		if update.message:
+			await update.message.reply_text("There is no such command")
+		elif update.callback_query:
+			await update.callback_query.edit_message_text("There is no sucn command")
 
 class Main:
 	@staticmethod

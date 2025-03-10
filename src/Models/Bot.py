@@ -22,3 +22,10 @@ class Bot(ABC):
     self, update: Update, context: ContextTypes.DEFAULT_TYPE 
     ) -> None: pass
 
+  @abstractmethod
+  async def create_project(
+    self, update: Update, context: ContextTypes.DEFAULT_TYPE
+  ) -> None: pass
+
+  """ TODO: async def add_developer(): -> None """
+  """ TODO: async def """

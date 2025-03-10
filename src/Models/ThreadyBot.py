@@ -6,6 +6,10 @@ from Models.Bot import Bot
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
+""" 
+  Class methods are representation of bot commands.
+  Inherited from abstract class 'Bot'.
+"""
 class ThreadyBot(Bot):
   """
   Command "start" representation in ThreadyBot.
@@ -39,3 +43,10 @@ class ThreadyBot(Bot):
       context: ContextTypes.DEFAULT_TYPE
   ) -> None:
     await HelpHandler.handle(update, context)
+
+  async def create_project(
+      self, 
+      update: Update,
+      context: ContextTypes.DEFAULT_TYPE
+  ) -> None: 
+    pass

@@ -44,6 +44,12 @@ Pass the token explicitly:
 python src/main.py $THREADY_BOT
 ```
 
+Or pass token directly (recomended):
+
+```
+python src/main.py TG_API_TOKEN
+```
+
 ---
 
 ### 5) Debugging Issues
