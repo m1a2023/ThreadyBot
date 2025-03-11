@@ -52,7 +52,8 @@ class ThreadyBot(Bot):
   ) -> None:
     pass
 
-  async def task_menu(self,
+  async def task_menu(
+      self,
       update: Update,
       context: ContextTypes.DEFAULT_TYPE
       ) -> None:

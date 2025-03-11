@@ -46,6 +46,7 @@ class Main:
 		application.add_handler(CommandHandler("start", thready_bot.start))
 		application.add_handler(CommandHandler("help", thready_bot.help))
 		application.add_handler(CommandHandler("end", thready_bot.end))
+		application.add_handler(CommandHandler("task_menu", thready_bot.task_menu))
 
 		# on non command i.e message - echo the message on Telegram
 		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
