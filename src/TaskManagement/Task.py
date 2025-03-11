@@ -45,3 +45,7 @@ class Task():
 
     def edit_status(self, status: Status) -> None:
         self._status = status
+
+
+    def __str__(self):
+        return (f"ID: {self._id}\nName: {self._name}\nDescription: {self._description}\nDeadline: {self._deadline}\nPriority: {self._priority}\nStatus: {self._status}")

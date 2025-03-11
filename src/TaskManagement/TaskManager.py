@@ -16,5 +16,10 @@ class TaskManager:
             return True
         return False
 
+    def show_tasks(self):
+        if not self.tasks:
+            return "Zero tasks"
+        return "\n\n".join(str(task) for task in self.tasks.values())
+
     def delete_task(self, task_id):
         return self.tasks.pop(task_id, None) is not None

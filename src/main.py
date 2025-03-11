@@ -6,7 +6,7 @@ from typing import Any
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 """ Thready packages """
-from Models.ThreadyBot import ThreadyBot 
+from Models.ThreadyBot import ThreadyBot
 
 # Enable logging
 logging.basicConfig(
@@ -26,10 +26,10 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any:
 
 class Main:
 	@staticmethod
-	def main(argv: list[str]) -> None: 
+	def main(argv: list[str]) -> None:
 		"""Start the bot."""
 
-		# pass telegram token through cmd	
+		# pass telegram token through cmd
 		if argv is None:
 			logger.critical("You did not provide the API key to the telegram-bot.\n Insert it and try again.")
 			return
@@ -39,7 +39,7 @@ class Main:
 		# Create the Application and pass it your bot's token.
 		application = Application.builder().token(TG_TOKEN).build()
 
-		#Create the Bot 
+		#Create the Bot
 		thready_bot = ThreadyBot()
 
 		# on different commands - answer in Telegram

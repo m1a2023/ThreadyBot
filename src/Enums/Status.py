@@ -1,5 +1,6 @@
 from enum import Enum
 
 class Status(Enum):
-    IN_PROGRESS = 1
-    DONE = 2
+    TODO = 1
+    IN_PROGRESS = 2
+    DONE = 3
