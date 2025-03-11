@@ -8,6 +8,8 @@ from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandl
 """ Thready packages """
 from Models.ThreadyBot import ThreadyBot
 
+from TaskManagement import TaskCommands
+
 # Enable logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -46,7 +48,10 @@ class Main:
 		application.add_handler(CommandHandler("start", thready_bot.start))
 		application.add_handler(CommandHandler("help", thready_bot.help))
 		application.add_handler(CommandHandler("end", thready_bot.end))
+
 		application.add_handler(CommandHandler("task_menu", thready_bot.task_menu))
+
+		TaskCommands.registration_task_commands(application)
 
 		# on non command i.e message - echo the message on Telegram
 		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
