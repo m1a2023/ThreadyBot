@@ -8,7 +8,7 @@ from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandl
 """ Thready packages """
 from Models.ThreadyBot import ThreadyBot
 
-from TaskManagement import TaskCommands
+from Models.bot_app import BotApp
 
 # Enable logging
 logging.basicConfig(
@@ -39,8 +39,8 @@ class Main:
 		TG_TOKEN = argv[0]
 
 		# Create the Application and pass it your bot's token.
-		application = Application.builder().token(TG_TOKEN).build()
-
+		bot_app = BotApp(TG_TOKEN)
+		application = bot_app.get_application()
 		#Create the Bot
 		thready_bot = ThreadyBot()
 
@@ -50,8 +50,6 @@ class Main:
 		application.add_handler(CommandHandler("end", thready_bot.end))
 
 		application.add_handler(CommandHandler("task_menu", thready_bot.task_menu))
-
-		TaskCommands.registration_task_commands(application)
 
 		# on non command i.e message - echo the message on Telegram
 		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
