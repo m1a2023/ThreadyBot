@@ -1,6 +1,5 @@
 from Handlers.Handler import Handler
 from TaskManagement.TaskManager import TaskManager
-from Models.ThreadyBot import ThreadyBot
 
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
