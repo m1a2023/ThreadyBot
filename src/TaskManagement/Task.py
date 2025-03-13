@@ -1,5 +1,6 @@
 import uuid
-from datetime import datetime
+from datetime import datetime,timezone
+
 
 from Enums import Priority, Status
 
@@ -12,10 +13,10 @@ class Task():
                  priority: Priority,
                  status: Status):
 
-        self.id = str(uuid.uuid4())
+        #self.id = str(uuid.uuid4())
         self._name = name
         self._description = description
-        self._deadline = datetime.strptime(deadline, "%Y-%m-%d")
+        self._deadline = datetime.strptime(deadline, "%Y-%m-%d") #TODO timezone utc
         self._priority = priority
         self._status = status
 
@@ -25,13 +26,13 @@ class Task():
             if description:
                 self.description = description
             if deadline:
-                self.deadline = datetime.strptime(deadline, "%Y-%m-%d")
+                self.deadline = datetime.strptime(deadline, "%Y-%m-%d") #TODO timezone utc
             if priority:
                 self.priority = priority
             if status:
                 self.status = status
 
-    def edit_name(self, name) -> None:
+    """def edit_name(self, name) -> None:
         self._name = name
 
     def edit_description(self, description) -> None:
@@ -44,7 +45,7 @@ class Task():
         self._priority = priority
 
     def edit_status(self, status: Status) -> None:
-        self._status = status
+        self._status = status"""
 
 
     def __str__(self):

@@ -1,6 +1,5 @@
 from TaskManagement import Task
 from Enums import Priority, Status
-from TaskManagement.TaskConversation import TaskConversation
 
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
@@ -10,7 +9,7 @@ class TaskManager:
         self.tasks = {}
 
     async def add_task(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        return await TaskConversation.start(update, context)
+        pass
 
     async def edit_task(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("edit")

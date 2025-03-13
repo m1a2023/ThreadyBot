@@ -4,12 +4,17 @@ import logging
 from typing import Any
 """ Python-telegram-bot packages """
 from telegram import Update
-from telegram.ext import CommandHandler, ContextTypes, MessageHandler, filters, ConversationHandler
+from telegram.ext import CommandHandler, ContextTypes, MessageHandler, filters, ConversationHandler, CallbackQueryHandler
 """ Thready packages """
 from Models.ThreadyBot import ThreadyBot
 
 from Models.bot_app import BotApp
 from Handlers.TaskHandler import TaskHandler
+from Handlers.TaskMenu.MenuHandler import MenuHandler
+from Handlers.TaskMenu.AddHandler import AddHandler
+from Handlers.TaskMenu.EditHandler import EditHandler
+from Handlers.TaskMenu.DeleteHandler import DeleteHandler
+from Handlers.TaskMenu.TextHandler import TextHandler
 
 # Enable logging
 logging.basicConfig(
@@ -42,7 +47,11 @@ class Main:
 		# Create the Application and pass it your bot's token.
 		bot_app = BotApp(TG_TOKEN)
 		application = bot_app.get_application()
-		TaskHandler.init()
+
+
+		#TaskHandler.init()
+
+
 		#Create the Bot
 		thready_bot = ThreadyBot()
 
@@ -54,8 +63,16 @@ class Main:
 		application.add_handler(CommandHandler("end", thready_bot.end))
 
 		application.add_handler(CommandHandler("task_menu", thready_bot.task_menu))
+		application.add_handler(CallbackQueryHandler(MenuHandler.handle))
+
+		application.add_handler(CallbackQueryHandler(AddHandler.handle, pattern="add_opt"))
+		application.add_handler(CallbackQueryHandler(EditHandler.handle, pattern="edit_opt"))
+		application.add_handler(CallbackQueryHandler(DeleteHandler.handle, pattern="del_opt"))
+
+		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, TextHandler.handle))
+
 		# on non command i.e message - echo the message on Telegram
-		#application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
 		# Run the bot until the user presses Ctrl-C
 		application.run_polling(allowed_updates=Update.ALL_TYPES)
