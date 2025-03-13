@@ -2,11 +2,13 @@ from Handlers.Handler import Handler
 from TaskManagement.TaskManager import TaskManager
 from Models.bot_app import BotApp
 
+from Handlers.Handler import Handler
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 from typing import Any
 
-class TaskHandler:
+class TaskHandler(Handler):
     @staticmethod
     async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any:
         keyboard = [

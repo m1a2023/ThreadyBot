@@ -9,12 +9,9 @@ from telegram.ext import CommandHandler, ContextTypes, MessageHandler, filters, 
 from Models.ThreadyBot import ThreadyBot
 
 from Models.bot_app import BotApp
-from Handlers.TaskHandler import TaskHandler
 from Handlers.TaskMenu.MenuHandler import MenuHandler
-from Handlers.TaskMenu.AddHandler import AddHandler
-from Handlers.TaskMenu.EditHandler import EditHandler
-from Handlers.TaskMenu.DeleteHandler import DeleteHandler
 from Handlers.TaskMenu.TextHandler import TextHandler
+
 
 # Enable logging
 logging.basicConfig(
@@ -61,13 +58,9 @@ class Main:
 		application.add_handler(CommandHandler("start", thready_bot.start))
 		application.add_handler(CommandHandler("help", thready_bot.help))
 		application.add_handler(CommandHandler("end", thready_bot.end))
-
 		application.add_handler(CommandHandler("task_menu", thready_bot.task_menu))
-		application.add_handler(CallbackQueryHandler(MenuHandler.handle))
 
-		application.add_handler(CallbackQueryHandler(AddHandler.handle, pattern="add_opt"))
-		application.add_handler(CallbackQueryHandler(EditHandler.handle, pattern="edit_opt"))
-		application.add_handler(CallbackQueryHandler(DeleteHandler.handle, pattern="del_opt"))
+		application.add_handler(CallbackQueryHandler(MenuHandler.handle))
 
 		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, TextHandler.handle))
 

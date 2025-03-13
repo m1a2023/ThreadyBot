@@ -6,16 +6,17 @@ from Handlers.Handler import Handler
 
 from Handlers.TaskMenu.TextHandler import TextHandler
 
-class EditHandler(Handler):
-
+class NameHandler(Handler):
     @staticmethod
-    async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any:
+    async def handle(update, context):
+        print("name add")
+
         query = update.callback_query
         await query.answer()
 
         chat_id = query.message.chat_id
-        TextHandler.USER_STATE[chat_id] = "edit_opt"  # Сохраняем состояние пользователя
+        TextHandler.USER_STATE[chat_id] = "add_name"  # Сохраняем состояние пользователя
 
-        sent_message = await query.message.reply_text("Вы выбрали edit. Введите текст:")
+        sent_message = await query.message.reply_text("Введите имя задачи:")
 
         TextHandler.USER_MESSAGES[chat_id] = sent_message.message_id

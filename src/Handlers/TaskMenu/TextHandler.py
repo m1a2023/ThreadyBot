@@ -2,9 +2,12 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from typing import Any
 
-class TextHandler:
+from Handlers.Handler import Handler
+
+class TextHandler(Handler):
     USER_STATE = {}  # Сохраняем выбранную опцию
     USER_MESSAGES = {}  # Запоминаем ID сообщений пользователя и бота
+    DATA = []
 
     @staticmethod
     async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any:
@@ -22,6 +25,8 @@ class TextHandler:
                 except Exception:
                     pass
 
+
+            #TextHandler.DATA.append(user_text)
             # Формируем ответ в зависимости от выбранной опции
             sent_message = await update.message.reply_text(f"Вы написали в {selected_option.capitalize()}: {user_text}")
 

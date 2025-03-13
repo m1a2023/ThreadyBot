@@ -2,9 +2,11 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from typing import Any
 
+from Handlers.Handler import Handler
+
 from Handlers.TaskMenu.TextHandler import TextHandler
 
-class DeleteHandler:
+class DeleteHandler(Handler):
 
     USER_TEXT = {}
 
