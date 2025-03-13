@@ -9,6 +9,7 @@ from Handlers.TaskMenu.AddTaskMenu.DescriptionHandler import DescriptionHandler
 from Handlers.TaskMenu.AddTaskMenu.DeadlineHandler import DeadlineHandler
 from Handlers.TaskMenu.AddTaskMenu.PriorityHandler import PriorityHandler
 from Handlers.TaskMenu.AddTaskMenu.StatusHandler import StatusHandler
+from Handlers.TaskMenu.AddTaskMenu.DoneHandler import DoneHandler
 
 class MenuHandler:
     @staticmethod
@@ -34,3 +35,5 @@ class MenuHandler:
             return await PriorityHandler.handle(update, context)
         elif query.data == "status":
             return await StatusHandler.handle(update, context)
+        elif query.data == "done":
+            return await DoneHandler.handle(update,context)
