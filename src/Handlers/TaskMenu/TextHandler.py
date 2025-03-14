@@ -25,14 +25,9 @@ class TextHandler(Handler):
                 except Exception:
                     pass
 
-
             TextHandler.DATA.append(user_text)
 
-            if selected_option == "done":
-                sent_message = await update.message.reply_text(f"{TextHandler.DATA}")
-            else:
-            # Формируем ответ в зависимости от выбранной опции
-                sent_message = await update.message.reply_text(f"Вы написали в {selected_option.capitalize()}: {user_text}\n{TextHandler.DATA}")
+            sent_message = await update.message.reply_text(f"Вы написали в {selected_option.capitalize()}: {user_text}")
 
             # Сохраняем ID нового ответа
             TextHandler.USER_MESSAGES[chat_id] = sent_message.message_id

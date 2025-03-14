@@ -9,14 +9,14 @@ class Task():
     def __init__(self, id,
                  name,
                  description,
-                 deadline,
-                 priority: Priority,
-                 status: Status):
+                 deadline=None,
+                 priority: Priority=None,
+                 status: Status=None):
 
         #self.id = str(uuid.uuid4())
         self._name = name
         self._description = description
-        self._deadline = datetime.strptime(deadline, "%Y-%m-%d") #TODO timezone utc
+        #self._deadline = datetime.strptime(deadline, "%Y-%m-%d") #TODO timezone utc
         self._priority = priority
         self._status = status
 
@@ -48,5 +48,6 @@ class Task():
         self._status = status"""
 
 
-    def __str__(self):
-        return (f"ID: {self._id}\nName: {self._name}\nDescription: {self._description}\nDeadline: {self._deadline}\nPriority: {self._priority}\nStatus: {self._status}")
+    """def __str__(self):
+        return (f"Name: {self._name}\nDescription: {self._description}\nDeadline: {self._deadline}\nPriority: {self._priority}\nStatus: {self._status}")
+"""
