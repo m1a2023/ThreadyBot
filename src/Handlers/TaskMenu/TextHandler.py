@@ -51,25 +51,28 @@ class TextHandler(Handler):
 
 
     #надо подумать как назвать метод
-    #data = user_text
     @staticmethod
     async def options(option, data, update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any:
         print("from option")
         if option == "edit_opt":
             print("from edit option")
-            keyboard = [
-                [InlineKeyboardButton("Изменить имя", callback_data="edit_name")],
-                [InlineKeyboardButton("Изменить описание", callback_data="edit_description")],
-                [InlineKeyboardButton("Изменить дедлайн", callback_data="edit_deadline")],
-                [InlineKeyboardButton("Изменить приоритет", callback_data="edit_priority")],
-                [InlineKeyboardButton("Изменить статус", callback_data="edit_status")],
-                [
-                    InlineKeyboardButton("Отмена", callback_data="cancel"),
-                    InlineKeyboardButton("Готово", callback_data="done")
+            context.user_data["task_name"] = data
+            if TaskManager.found_task(data):
+                keyboard = [
+                    [InlineKeyboardButton("Изменить имя", callback_data="name")],
+                    [InlineKeyboardButton("Изменить описание", callback_data="description")],
+                    [InlineKeyboardButton("Изменить дедлайн", callback_data="deadline")],
+                    [InlineKeyboardButton("Изменить приоритет", callback_data="priority")],
+                    [InlineKeyboardButton("Изменить статус", callback_data="status")],
+                    [
+                        InlineKeyboardButton("Отмена", callback_data="cancel"),
+                        InlineKeyboardButton("Готово", callback_data="edit_done")
+                    ]
                 ]
-            ]
-            reply_markup = InlineKeyboardMarkup(keyboard)
-            await update.message.reply_text(f"Вы выбрали для редактирования задачу: {data}\n Выберите действие:",reply_markup=reply_markup)
+                reply_markup = InlineKeyboardMarkup(keyboard)
+                await update.message.reply_text(f"Вы выбрали для редактирования задачу: {data}\n Выберите действие:",reply_markup=reply_markup)
+            else:
+                await update.message.reply_text("Такой задачи нет")
         elif option == "delete_opt":
             response_text = await TaskManager.delete_task(data, update, context)
 

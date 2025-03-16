@@ -13,6 +13,8 @@ from Handlers.TaskMenu.AddTaskMenu.StatusHandler import StatusHandler
 from Handlers.TaskMenu.AddTaskMenu.DoneHandler import DoneHandler
 from Handlers.TaskMenu.AddTaskMenu.CancelHandler import CancelHandler
 
+from Handlers.TaskMenu.EditTaskMenu.EditDoneHandler import EditDoneHandler
+
 class MenuHandler:
     @staticmethod
     async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -43,3 +45,5 @@ class MenuHandler:
             return await DoneHandler.handle(update,context)
         elif query.data == "cancel":
             return await CancelHandler.handle(update,context)
+        elif query.data == "edit_done":
+            return await EditDoneHandler.handle(update,context)

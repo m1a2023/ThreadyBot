@@ -34,7 +34,7 @@ class TaskManager:
 
     @staticmethod
     async def delete_task(task_name,update, context) -> any:
-        task_to_delete = next((task for task in TaskManager.TASKS if task._name == task_name), None)
+        task_to_delete = TaskManager.found_task(task_name)
 
         if task_to_delete:
             TaskManager.TASKS.remove(task_to_delete)
@@ -45,5 +45,13 @@ class TaskManager:
         return response_text
 
     @staticmethod
-    async def edit_task(update, context):
-        await update.message.reply_text("✏ Редактирование задач пока не реализовано.")
+    async def edit_task(update: Update, context: ContextTypes.DEFAULT_TYPE, name=None, description=None, deadline=None, priority=None, status=None):
+        print("from edit task | task manager")
+        task_to_edit = TaskManager.found_task(context.user_data.get("task_name"))
+        task_to_edit.edit_task(name,description,deadline,priority,status)
+
+        return task_to_edit
+
+    @staticmethod
+    def found_task(task_name):
+        return next((task for task in TaskManager.TASKS if task._name == task_name), None)

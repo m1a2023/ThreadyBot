@@ -15,7 +15,7 @@ class DoneHandler(Handler):
         TextHandler.USER_STATE[chat_id] = "done"  # Фиксируем состояние
 
         if TextHandler.name == None or TextHandler.description == None:
-            await query.message.reply_text("❌ Недостаточно данных для создания задачи. Введите хотя бы имя и описание.")
+            await query.message.reply_text("Недостаточно данных для создания задачи. Введите хотя бы имя и описание.")
             return
 
         task = await TaskManager.add_task(
