@@ -3,6 +3,7 @@ from telegram.ext import ContextTypes
 from Handlers.TaskMenu.AddHandler import AddHandler
 from Handlers.TaskMenu.EditHandler import EditHandler
 from Handlers.TaskMenu.DeleteHandler import DeleteHandler
+from Handlers.TaskMenu.ShowHandler import ShowHandler
 
 from Handlers.TaskMenu.AddTaskMenu.NameHandler import NameHandler
 from Handlers.TaskMenu.AddTaskMenu.DescriptionHandler import DescriptionHandler
@@ -15,7 +16,7 @@ from Handlers.TaskMenu.AddTaskMenu.CancelHandler import CancelHandler
 class MenuHandler:
     @staticmethod
     async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-        print("aboba")
+        print("from menuHandler")
 
         query = update.callback_query
         await query.answer()
@@ -26,6 +27,8 @@ class MenuHandler:
             return await EditHandler.handle(update, context)
         elif query.data == "del":
             return await DeleteHandler.handle(update, context)
+        elif query.data == "show":
+            return await ShowHandler.handle(update, context)
         elif query.data == "name":
             return await NameHandler.handle(update, context)
         elif query.data == "description":

@@ -13,8 +13,8 @@ class AddHandler(Handler):
         query = update.callback_query
         await query.answer()
 
-        chat_id = query.message.chat_id
-        TextHandler.USER_STATE[chat_id] = "add_opt"  # Сохраняем состояние пользователя
+        """chat_id = query.message.chat_id
+        TextHandler.USER_STATE[chat_id] = "add_opt"  # Сохраняем состояние пользователя"""
 
         keyboard = [
             [InlineKeyboardButton("Добавить имя", callback_data="name")],
@@ -30,7 +30,4 @@ class AddHandler(Handler):
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         # Отправляем сообщение с кнопками
-        sent_message = await query.message.reply_text("Выберите действие:", reply_markup=reply_markup)
-
-        # Сохраняем ID сообщения, чтобы потом удалить
-        TextHandler.USER_MESSAGES[chat_id] = sent_message.message_id
+        await query.message.reply_text("Выберите действие:", reply_markup=reply_markup)

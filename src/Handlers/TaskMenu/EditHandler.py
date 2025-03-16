@@ -1,4 +1,4 @@
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 from typing import Any
 
@@ -16,6 +16,4 @@ class EditHandler(Handler):
         chat_id = query.message.chat_id
         TextHandler.USER_STATE[chat_id] = "edit_opt"  # Сохраняем состояние пользователя
 
-        sent_message = await query.message.reply_text("Вы выбрали edit. Введите текст:")
-
-        TextHandler.USER_MESSAGES[chat_id] = sent_message.message_id
+        await query.message.reply_text("Введите имя задачи, которую хотите отредактировать:")

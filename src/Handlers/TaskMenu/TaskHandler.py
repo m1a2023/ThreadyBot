@@ -15,6 +15,7 @@ class TaskHandler(Handler):
             [InlineKeyboardButton("Добавить задачу", callback_data="add")],
             [InlineKeyboardButton("Редактировать задачу", callback_data="edit")],
             [InlineKeyboardButton("Удалить задачу", callback_data="del")],
+            [InlineKeyboardButton("Показать задачи", callback_data="show")],
             [InlineKeyboardButton("Назад", callback_data="back")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)

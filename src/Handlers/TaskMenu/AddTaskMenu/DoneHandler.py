@@ -1,12 +1,9 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from typing import Any
 
 from Handlers.Handler import Handler
-
 from Handlers.TaskMenu.TextHandler import TextHandler
 from TaskManagement.TaskManager import TaskManager
-from TaskManagement.Task import Task
 
 class DoneHandler(Handler):
     @staticmethod
@@ -15,15 +12,20 @@ class DoneHandler(Handler):
         await query.answer()
 
         chat_id = query.message.chat_id
-        TextHandler.USER_STATE[chat_id] = "done"  # Сохраняем состояние пользователя
+        TextHandler.USER_STATE[chat_id] = "done"  # Фиксируем состояние
 
-        # Отправляем итоговое сообщение (имитируя TextHandler)
+        if TextHandler.name == None or TextHandler.description == None:
+            await query.message.reply_text("❌ Недостаточно данных для создания задачи. Введите хотя бы имя и описание.")
+            return
 
-        await TaskManager.add_task(TextHandler.DATA[0],TextHandler.DATA[1])
-        sent_message = await query.message.reply_text(f"Задача создана:\n{TaskManager.TASKS[0]}\n{TextHandler.DATA}")
+        task = await TaskManager.add_task(
+            TextHandler.name,
+            TextHandler.description,
+            TextHandler.deadline,
+            TextHandler.priority,
+            TextHandler.status)
 
-        # Сохраняем ID нового ответа
-        TextHandler.USER_MESSAGES[chat_id] = sent_message.message_id
+        await query.message.reply_text(f"Задача создана:\n{task}")
 
-        # Сбрасываем состояние
+        TextHandler.data_clear()
         del TextHandler.USER_STATE[chat_id]

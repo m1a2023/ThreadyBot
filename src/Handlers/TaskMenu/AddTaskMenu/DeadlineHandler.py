@@ -15,6 +15,4 @@ class DeadlineHandler(Handler):
         chat_id = query.message.chat_id
         TextHandler.USER_STATE[chat_id] = "add_deadline"  # Сохраняем состояние пользователя
 
-        sent_message = await query.message.reply_text("Введите дедлайн для задачи в формате :")
-
-        TextHandler.USER_MESSAGES[chat_id] = sent_message.message_id
+        await query.message.reply_text("Введите дедлайн для задачи в формате :")

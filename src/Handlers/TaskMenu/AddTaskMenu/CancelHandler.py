@@ -16,12 +16,9 @@ class CancelHandler(Handler):
 
         chat_id = query.message.chat_id
         TextHandler.USER_STATE[chat_id] = "cancel"  # Сохраняем состояние пользователя
-        TextHandler.DATA.clear()
+        TextHandler.data_clear()
 
-        sent_message = await query.message.reply_text(f"Добавление задачи прервано\n{TextHandler.USER_STATE}\n{TextHandler.USER_MESSAGES}")
-
-        # Сохраняем ID нового ответа
-        TextHandler.USER_MESSAGES[chat_id] = sent_message.message_id
+        await query.message.reply_text(f"Добавление задачи прервано\n{TextHandler.USER_STATE}")
 
         # Сбрасываем состояние
         del TextHandler.USER_STATE[chat_id]
