@@ -5,6 +5,8 @@ from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandl
 
 from typing import Any
 
+from Handlers.MainMenuHandler import MainMenuHandler
+
 class StartHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any: 
@@ -13,3 +15,6 @@ class StartHandler(Handler):
       await update.message.reply_html(
           rf"Hi {user.mention_html()}!"
       )
+    
+    """ Вызов главного меню """
+    return await MainMenuHandler.handle(update, context)
