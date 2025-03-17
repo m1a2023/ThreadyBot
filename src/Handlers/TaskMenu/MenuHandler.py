@@ -22,7 +22,7 @@ class MenuHandler:
 
         query = update.callback_query
         await query.answer()
-
+        #кнопки главного меню работы с задачами
         if query.data == "add":
             return await AddHandler.handle(update, context)
         elif query.data == "edit":
@@ -31,6 +31,7 @@ class MenuHandler:
             return await DeleteHandler.handle(update, context)
         elif query.data == "show":
             return await ShowHandler.handle(update, context)
+        #кнопки меню добавления задачи
         elif query.data == "name":
             return await NameHandler.handle(update, context)
         elif query.data == "description":
@@ -45,5 +46,6 @@ class MenuHandler:
             return await DoneHandler.handle(update,context)
         elif query.data == "cancel":
             return await CancelHandler.handle(update,context)
+        #кнопки меню редактирования задачи
         elif query.data == "edit_done":
             return await EditDoneHandler.handle(update,context)

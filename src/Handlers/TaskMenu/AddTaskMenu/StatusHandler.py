@@ -13,6 +13,6 @@ class StatusHandler(Handler):
         await query.answer()
 
         chat_id = query.message.chat_id
-        TextHandler.USER_STATE[chat_id] = "add_Status"  # Сохраняем состояние пользователя
+        TextHandler.USER_STATE[chat_id] = "add_status"  # Сохраняем состояние пользователя
 
-        await query.message.reply_text("Укажите статус задачи:")
+        await query.message.reply_text("Укажите статус задачи: todo, in progress, done")

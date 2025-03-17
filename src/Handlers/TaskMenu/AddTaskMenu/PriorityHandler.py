@@ -1,4 +1,4 @@
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 from typing import Any
 
@@ -15,4 +15,4 @@ class PriorityHandler(Handler):
         chat_id = query.message.chat_id
         TextHandler.USER_STATE[chat_id] = "add_priority"  # Сохраняем состояние пользователя
 
-        await query.message.reply_text("Выберите приоритет задачи:") #потом надо будет к этому сообщению кнопки с приоритетом приделать
+        await query.message.reply_text("Выберите приоритет задачи: low, medium, high")

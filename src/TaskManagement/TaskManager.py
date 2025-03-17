@@ -1,5 +1,6 @@
 from TaskManagement.Task import Task
-from Enums import Priority, Status
+from Enums.Priority import Priority
+from Enums.Status import Status
 
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -8,9 +9,9 @@ class TaskManager:
     TASKS = []  # Храним список задач
 
     @staticmethod
-    async def add_task(name, description, deadline=None, priority=None, status=None):
-        print("add task from manager")
-        task = Task(name, description, deadline, priority, status)
+    async def add_task(name, description, deadline=None, priority:str=None, status:str=None):
+
+        task = Task(name, description, deadline, priority.lower(), status.lower())
         TaskManager.TASKS.append(task)
         return task
 
