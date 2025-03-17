@@ -11,7 +11,7 @@ class TaskManager:
     @staticmethod
     async def add_task(name, description, deadline=None, priority:str=None, status:str=None):
 
-        task = Task(name, description, deadline, priority.lower(), status.lower())
+        task = Task(name, description, deadline, priority, status)
         TaskManager.TASKS.append(task)
         return task
 

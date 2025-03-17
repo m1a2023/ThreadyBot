@@ -16,12 +16,17 @@ class Task:
             self._priority = Priority.MEDIUM
         if priority == "high":
             self._priority = Priority.HIGH
+        else:
+            self._priority = None
+
         if status == "todo":
             self._status = Status.TODO
         if status == "in progress":
             self._status = Status.IN_PROGRESS
         if status == "done":
             self._status = Status.DONE
+        else:
+            self._status = None
 
         if deadline:
             self._deadline = datetime.strptime(deadline, "%Y-%m-%d").replace(tzinfo=timezone.utc)
