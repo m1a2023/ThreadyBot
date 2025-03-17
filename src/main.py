@@ -2,6 +2,9 @@
 import sys as system
 import logging
 from typing import Any
+
+from Handlers.MainCallbackHandler import MainCallbackHandler
+from Handlers.TextHandler import TextHandler
 """ Python-telegram-bot packages """
 from telegram import Update
 from telegram.ext import CommandHandler, ContextTypes, MessageHandler, filters, ConversationHandler, CallbackQueryHandler
@@ -23,11 +26,11 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any:
-		if update.message:
-			await update.message.reply_text("There is no such command")
-		elif update.callback_query:
-			await update.callback_query.edit_message_text("There is no sucn command")
+# async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any:
+# 		if update.message:
+# 			await update.message.reply_text("There is no such command")
+# 		elif update.callback_query:
+# 			await update.callback_query.edit_message_text("There is no sucn command")
 
 class Main:
 	@staticmethod
@@ -65,7 +68,11 @@ class Main:
 		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, TextHandler.handle))
 
 		# on non command i.e message - echo the message on Telegram
-		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+		# application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, TextHandler.handle))
+
+		# Обработчик кнопок
+		application.add_handler(CallbackQueryHandler(MainCallbackHandler.handle))
 
 		# Run the bot until the user presses Ctrl-C
 		application.run_polling(allowed_updates=Update.ALL_TYPES)
