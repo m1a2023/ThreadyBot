@@ -4,29 +4,35 @@ from Enums.Priority import Priority
 from Enums.Status import Status
 
 class Task:
-    def __init__(self, name, description, deadline=None, priority: Priority = None, status: Status = None):
-        self._name = name
-        self._description = description
-        """self._priority = priority
-        self._status = status"""
 
-        if priority == "low":
-            self._priority = Priority.LOW
-        if priority == "medium":
-            self._priority = Priority.MEDIUM
-        if priority == "high":
-            self._priority = Priority.HIGH
-        if status == "todo":
-            self._status = Status.TODO
-        if status == "in progress":
-            self._status = Status.IN_PROGRESS
-        if status == "done":
-            self._status = Status.DONE
 
-        if deadline:
-            self._deadline = datetime.strptime(deadline, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+    def set_name(self,task_name):
+        self._name = task_name
+
+    def set_description(self,task_description):
+        self._description = task_description
+
+    def set_deadline(self,task_deadline):
+        if task_deadline:
+            self._deadline = datetime.strptime(task_deadline, "%Y-%m-%d").replace(tzinfo=timezone.utc)
         else:
             self._deadline = None
+
+    def set_priority(self,task_priority):
+        if task_priority == "low":
+            self._priority = Priority.LOW
+        if task_priority == "medium":
+            self._priority = Priority.MEDIUM
+        if task_priority == "high":
+            self._priority = Priority.HIGH
+
+    def set_status(self,task_status):
+        if task_status == "todo":
+            self._status = Status.TODO
+        if task_status == "in progress":
+            self._status = Status.IN_PROGRESS
+        if task_status == "done":
+            self._status = Status.DONE
 
     def __str__(self):
         return (f"Задача: {self._name}\n"
@@ -54,3 +60,12 @@ class Task:
             self._status = Status.IN_PROGRESS
         if status == "done":
             self._status = Status.DONE
+
+    def to_dict(self) -> dict:
+        return {
+            "name": self._name,
+            "description": self._description,
+            "deadline:": self._deadline,
+            "prioritet:": self._priority,
+            "status:": self._status
+        }

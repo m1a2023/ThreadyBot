@@ -13,6 +13,7 @@ class StatusHandler(Handler):
         await query.answer()
 
         chat_id = query.message.chat_id
-        TextHandler.USER_STATE[chat_id] = "add_status"  # Сохраняем состояние пользователя
+        context.user_data["state"] = "setStatusForTask"  # Сохраняем состояние пользователя
 
-        await query.message.reply_text("Укажите статус задачи: todo, in progress, done")
+        sent_message = await query.message.reply_text("Укажите статус задачи: todo, in progress, done")
+        context.user_data["bot_message_id"] = sent_message.message_id

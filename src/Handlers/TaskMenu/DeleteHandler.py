@@ -13,6 +13,6 @@ class DeleteHandler(Handler):
         await query.answer()
 
         chat_id = query.message.chat_id
-        TextHandler.USER_STATE[chat_id] = "delete_opt"  # Устанавливаем состояние
+        context.user_data["state"] = "deleteTask"  # Устанавливаем состояние
 
         await query.message.reply_text("Введите имя задачи, которую хотите удалить:")

@@ -5,6 +5,7 @@ from typing import Any
 from Handlers.Handler import Handler
 
 from Handlers.TaskMenu.TextHandler import TextHandler
+from TaskManagement.Task import Task
 
 class AddHandler(Handler):
 
@@ -13,8 +14,7 @@ class AddHandler(Handler):
         query = update.callback_query
         await query.answer()
 
-        """chat_id = query.message.chat_id
-        TextHandler.USER_STATE[chat_id] = "add_opt"  # Сохраняем состояние пользователя"""
+        context.user_data["task"] = Task()
 
         keyboard = [
             [InlineKeyboardButton("Добавить имя", callback_data="name")],

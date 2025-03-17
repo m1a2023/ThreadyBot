@@ -1,31 +1,59 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 
+from typing import Any
+
+from telegram.error import BadRequest
+
 from Handlers.Handler import Handler
-from Handlers.TaskMenu.TextHandler import TextHandler
-from TaskManagement.TaskManager import TaskManager
+
+from Handlers.TaskMenu.AddTaskMenu.NameHandler import NameHandler
+from Handlers.TaskMenu.AddTaskMenu.DescriptionHandler import DescriptionHandler
+from Handlers.TaskMenu.TaskHandler import TaskHandler
 
 class DoneHandler(Handler):
-    @staticmethod
-    async def handle(update, context):
-        query = update.callback_query
-        await query.answer()
+  @staticmethod
+  async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Получаем chat_id
+    if update.message:
+      chat_id = update.message.chat_id
+    else:
+      chat_id = update.callback_query.message.chat_id
 
-        chat_id = query.message.chat_id
-        TextHandler.USER_STATE[chat_id] = "done"  # Фиксируем состояние
+    last_bot_message_id = context.user_data.get("IdLastMessageFromBot")
 
-        if TextHandler.name == None or TextHandler.description == None:
-            await query.message.reply_text("Недостаточно данных для создания задачи. Введите хотя бы имя и описание.")
-            return
+    # Проверка на то, что пользователь точно ввел имя и описание задачи
+    new_project = context.user_data["project"].to_dict()
+    keys_for_check = ["name", "description"]
+    for key in keys_for_check:
+      if new_project[key] == "":
+        if key == "name":
+          await context.bot.editMessageText(chat_id=chat_id, message_id=last_bot_message_id, text="Вы забыли ввести имя задачи")
+          context.user_data["state"] = "setNameForTask"
+          return await NameHandler.handle(update, context)
+        elif key == "description":
+          await context.bot.editMessageText(chat_id=chat_id, message_id=last_bot_message_id, text="Вы забыли добавить описание проекту")
+          context.user_data["state"] = "setDescriptionForTask"
+          return await DescriptionHandler.handle(update, context)
 
-        task = await TaskManager.add_task(
-            TextHandler.name,
-            TextHandler.description,
-            TextHandler.deadline,
-            TextHandler.priority,
-            TextHandler.status)
 
-        await query.message.reply_text(f"Задача создана:\n{task}")
+    # Удаляем последнее сообщение бота (если есть)
+    if last_bot_message_id:
+      try:
+        await context.bot.delete_message(chat_id, last_bot_message_id)
+      except BadRequest as e:
+        print(f"Ошибка при удалении последнего сообщения бота: {e}")
 
-        TextHandler.data_clear()
-        del TextHandler.USER_STATE[chat_id]
+    # Очищаем все данные, связанные с созданием проекта
+    keys_to_remove = [
+      "state",
+      "project",
+      "projectInfoForCreateProject",
+      "IdLastMessageFromBot",
+      "bot_message_id"
+    ]
+    for key in keys_to_remove:
+      if key in context.user_data:
+        del context.user_data[key]
+
+    return await TaskHandler.handle(update, context)

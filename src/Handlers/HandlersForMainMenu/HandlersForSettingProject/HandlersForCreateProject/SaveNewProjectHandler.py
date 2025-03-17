@@ -10,15 +10,15 @@ from telegram.error import BadRequest
 
 from Handlers.Handler import Handler
 
-class SaveCreateProjectHandler(Handler): 
+class SaveCreateProjectHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Получаем chat_id
     if update.message:
-      chat_id = update.message.chat_id  
-    else: 
+      chat_id = update.message.chat_id
+    else:
       chat_id = update.callback_query.message.chat_id
-    
+
     last_bot_message_id = context.user_data.get("IdLastMessageFromBot")
 
     # Проверка на то, что пользователь точно ввел имя и описание проекта
@@ -34,7 +34,7 @@ class SaveCreateProjectHandler(Handler):
           await context.bot.editMessageText(chat_id=chat_id, message_id=last_bot_message_id, text="Вы забыли добавить описание проекту")
           context.user_data["state"] = "setDescriptionForCreateProject"
           return await SetDescriptionHandler.handle(update, context)
-    
+
 
     # Удаляем последнее сообщение бота (если есть)
     if last_bot_message_id:
@@ -42,7 +42,7 @@ class SaveCreateProjectHandler(Handler):
         await context.bot.delete_message(chat_id, last_bot_message_id)
       except BadRequest as e:
         print(f"Ошибка при удалении последнего сообщения бота: {e}")
-        
+
     # Очищаем все данные, связанные с созданием проекта
     keys_to_remove = [
       "state",

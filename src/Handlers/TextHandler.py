@@ -3,11 +3,12 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from typing import Any
 
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
-import re
+from TaskManagement.TaskManager import TaskManager
 
+import re
 class TextHandler:
   @staticmethod
   async def processMessage(
@@ -16,7 +17,7 @@ class TextHandler:
     user_message_id: int,
     bot_message_id: int,
     new_info: str,
-    info_key: str
+    info_key: str = None
   ):
       # Удаляем предыдущее сообщение бота
       if bot_message_id:
@@ -75,7 +76,7 @@ class TextHandler:
           project.set_id_owner("@" + update.message.from_user.username)
         else:
           project.set_id_owner(update.message.from_user.full_name)
-          
+
       else:
         # Если ввод некорректный, то сообщаем об этом пользователю и запрашиваем ввод снова
         # Редактируем предыдущее сообщение бота
@@ -95,7 +96,7 @@ class TextHandler:
           except Exception as e:
             print(f"Ошибка при удалении сообщения пользователя: {e}")
         return
-        
+
     elif state == "setDescriptionForCreateProject":
       # Удаляем из ввода все, что не буквы и не цифры и разделяем по пробелам
       description = (re.sub(r'[^\w\s]', '', user_text)).split()
@@ -126,14 +127,14 @@ class TextHandler:
         return
 
     elif state == "setTeamForCreateProject":
-      # Множество с юзернеймами, введеными от пользвателя 
+      # Множество с юзернеймами, введеными от пользвателя
       set_of_team = set((re.sub(r'[^\w\s@]', '', user_text)).split())
       # Добавляем юзернейм создателя, если оно есть, если нет - имя
       if update.message.from_user.username:
         set_of_team.add("@" + update.message.from_user.username)
       else:
         set_of_team.add(update.message.from_user.full_name)
-      
+
       project.set_team(set_of_team)
       await TextHandler.processMessage(
         context, chat_id, user_message_id, bot_message_id,
@@ -165,3 +166,70 @@ class TextHandler:
         except Exception as e:
           print(f"Ошибка при удалении сообщения пользователя: {e}")
         return
+
+
+    #TASKS
+    if context.user_data["task"]:
+      task = context.user_data["task"]
+
+    if state == "setNameForTask":
+      task.set_name(user_text)
+      await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Вы ввели имя: {user_text}"
+        )
+
+    elif state == "setDescriptionForTask":
+      task.set_description(user_text)
+      await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Вы ввели описание: {user_text}", "projectInfoForCreateTask"
+        )
+
+    elif state == "setDeadlineForTask":
+      task.set_deadline(user_text)
+      await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Вы ввели дедлайн: {user_text}", "projectInfoForCreateTask"
+        )
+
+    elif state == "setPriorityForTask":
+      task.set_priority(user_text)
+      await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Вы ввели приоритет: {user_text}", "projectInfoForCreateTask"
+        )
+
+    elif state == "setStatusForTask":
+      task.set_status(user_text)
+      await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Вы ввели статус: {user_text}", "projectInfoForCreateTask"
+        )
+
+    elif state == "deleteTask":
+      TaskManager.delete_task(user_text, update, context)
+      await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Вы удалили задачу: {user_text}", "projectInfoForCreateTask"
+        )
+
+    elif state == "editTask":
+      if TaskManager.found_task(user_text):
+          context.user_data["task_name"] = user_text
+          keyboard = [
+              [InlineKeyboardButton("Изменить имя", callback_data="name")],
+              [InlineKeyboardButton("Изменить описание", callback_data="description")],
+              [InlineKeyboardButton("Изменить дедлайн", callback_data="deadline")],
+              [InlineKeyboardButton("Изменить приоритет", callback_data="priority")],
+              [InlineKeyboardButton("Изменить статус", callback_data="status")],
+              [
+                  InlineKeyboardButton("Отмена", callback_data="cancel"),
+                  InlineKeyboardButton("Готово", callback_data="edit_done")
+              ]
+          ]
+          reply_markup = InlineKeyboardMarkup(keyboard)
+          #вот тут надо адаптировать под метод process message
+          await update.message.reply_text(f"Вы выбрали для редактирования задачу: {user_text}\n Выберите действие:",reply_markup=reply_markup)
+      else:
+          await update.message.reply_text("Такой задачи нет")

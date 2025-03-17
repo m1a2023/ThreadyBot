@@ -13,6 +13,7 @@ class DescriptionHandler(Handler):
         await query.answer()
 
         chat_id = query.message.chat_id
-        TextHandler.USER_STATE[chat_id] = "add_description"  # Сохраняем состояние пользователя
+        context.user_data["state"] = "setDescriptionForTask"  # Сохраняем состояние пользователя
 
-        await query.message.reply_text("Введите описание задачи:")
+        sent_message = await query.message.reply_text("Введите описание задачи:")
+        context.user_data["bot_message_id"] = sent_message.message_id

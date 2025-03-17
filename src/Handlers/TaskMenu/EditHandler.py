@@ -14,6 +14,6 @@ class EditHandler(Handler):
         await query.answer()
 
         chat_id = query.message.chat_id
-        TextHandler.USER_STATE[chat_id] = "edit_opt"  # Сохраняем состояние пользователя
+        context.user_data["state"] = "editTask"  # Сохраняем состояние пользователя
 
         await query.message.reply_text("Введите имя задачи, которую хотите отредактировать:")

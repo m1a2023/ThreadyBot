@@ -13,7 +13,7 @@ from Models.ThreadyBot import ThreadyBot
 
 from Models.bot_app import BotApp
 from Handlers.TaskMenu.MenuHandler import MenuHandler
-from Handlers.TaskMenu.TextHandler import TextHandler
+#from Handlers.TaskMenu.TextHandler import TextHandler
 
 
 # Enable logging
@@ -63,9 +63,9 @@ class Main:
 		application.add_handler(CommandHandler("end", thready_bot.end))
 		application.add_handler(CommandHandler("task_menu", thready_bot.task_menu))
 
-		application.add_handler(CallbackQueryHandler(MenuHandler.handle))
+		#application.add_handler(CallbackQueryHandler(MenuHandler.handle))
 
-		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, TextHandler.handle))
+		#application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, TextHandler.handle))
 
 		# on non command i.e message - echo the message on Telegram
 		# application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
