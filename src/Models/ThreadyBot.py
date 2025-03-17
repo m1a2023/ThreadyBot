@@ -1,7 +1,7 @@
 from Handlers.StartHandler import StartHandler
 from Handlers.HelpHandler import HelpHandler
 from Handlers.EndHandler import EndHandler
-from Handlers.TaskHandler import TaskHandler
+from Handlers.TaskMenu.TaskHandler import TaskHandler
 from Models.Bot import Bot
 
 from telegram import ForceReply, Update

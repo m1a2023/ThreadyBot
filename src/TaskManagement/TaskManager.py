@@ -1,25 +1,58 @@
-from TaskManagement import Task
-from Enums import Priority, Status
+from TaskManagement.Task import Task
+from Enums.Priority import Priority
+from Enums.Status import Status
+
+from telegram import Update
+from telegram.ext import ContextTypes
 
 class TaskManager:
-    def __init__(self):
-        self.tasks = {}
+    TASKS = []  # Храним список задач
 
-    def add_task(self, name, description, deadline, priority: Priority, status: Status):
-        task = Task(name, description, deadline, priority, status)
-        self.tasks[task.task_id] = task
-        return task.task_id
+    @staticmethod
+    async def add_task(name, description, deadline=None, priority:str=None, status:str=None):
 
-    def edit_task(self, task_id, **kwargs):
-        if task_id in self.tasks:
-            self.tasks[task_id].edit_task(**kwargs)
-            return True
-        return False
+        task = Task(name, description, deadline, priority.lower(), status.lower())
+        TaskManager.TASKS.append(task)
+        return task
 
-    def show_tasks(self):
-        if not self.tasks:
-            return "Zero tasks"
-        return "\n\n".join(str(task) for task in self.tasks.values())
+    @staticmethod
+    async def get_tasks():
+        print("from get tasks")
+        if not TaskManager.TASKS:
+            return "Список задач пуст."
 
-    def delete_task(self, task_id):
-        return self.tasks.pop(task_id, None) is not None
+        return "\n\n".join([f"{i + 1}. {task}" for i, task in enumerate(TaskManager.TASKS)])
+
+    @staticmethod
+    async def show_tasks(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        print("from show tasks")
+        tasks_text = await TaskManager.get_tasks()
+
+        if update.message:
+            await update.message.reply_text(tasks_text)
+        elif update.callback_query:
+            await update.callback_query.message.reply_text(tasks_text)
+
+    @staticmethod
+    async def delete_task(task_name,update, context) -> any:
+        task_to_delete = TaskManager.found_task(task_name)
+
+        if task_to_delete:
+            TaskManager.TASKS.remove(task_to_delete)
+            response_text = f"Задача '{task_name}' удалена."
+        else:
+            response_text = f"Задача '{task_name}' не найдена."
+
+        return response_text
+
+    @staticmethod
+    async def edit_task(update: Update, context: ContextTypes.DEFAULT_TYPE, name=None, description=None, deadline=None, priority=None, status=None):
+        print("from edit task | task manager")
+        task_to_edit = TaskManager.found_task(context.user_data.get("task_name"))
+        task_to_edit.edit_task(name,description,deadline,priority,status)
+
+        return task_to_edit
+
+    @staticmethod
+    def found_task(task_name):
+        return next((task for task in TaskManager.TASKS if task._name == task_name), None)
