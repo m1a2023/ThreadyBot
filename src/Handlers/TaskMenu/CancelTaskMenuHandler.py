@@ -3,12 +3,12 @@ from telegram.ext import ContextTypes
 
 from typing import Any
 
-from Handlers.TaskMenu.TaskHandler import TaskHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.ChangeProjectHandler import ChangeProjectHandler
 from telegram.error import BadRequest
 
 from Handlers.Handler import Handler
 
-class CancelHandler(Handler):
+class CancelTaskMenuHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Получаем chat_id
@@ -25,10 +25,11 @@ class CancelHandler(Handler):
       except BadRequest as e:
         print(f"Ошибка при удалении последнего сообщения бота: {e}")
 
-    # Очищаем все данные, связанные с редактированием задачи
+    # Очищаем все данные, связанные с задачи
     keys_to_remove = [
       "state",
       "task",
+      "TaskInfoForEditTask",
       "TaskInfoForCreateTask",
       "IdLastMessageFromBot",
       "bot_message_id"
@@ -37,4 +38,4 @@ class CancelHandler(Handler):
       if key in context.user_data:
         del context.user_data[key]
 
-    return await TaskHandler.handle(update, context)
+    return await ChangeProjectHandler.handle(update, context)

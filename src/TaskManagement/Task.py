@@ -4,7 +4,12 @@ from Enums.Priority import Priority
 from Enums.Status import Status
 
 class Task:
-
+    def __init__(self):
+        self._name = None
+        self._description = None
+        self._deadline = None
+        self._priority = None
+        self._status = None
 
     def set_name(self,task_name):
         self._name = task_name

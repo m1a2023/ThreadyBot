@@ -5,7 +5,7 @@ from typing import Any
 
 from Handlers.Handler import Handler
 
-class ChangeProjectHandler(Handler): 
+class ChangeProjectHandler(Handler):
 
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any:
@@ -14,7 +14,7 @@ class ChangeProjectHandler(Handler):
     await query.answer()
 
     keyboard = [
-        [InlineKeyboardButton("Изменение задач (пока не работает)", callback_data="123")],
+        [InlineKeyboardButton("Изменение задач", callback_data="changeTasks")],
         [InlineKeyboardButton("Изменение данных о команде (не работает)", callback_data="123")],
         [InlineKeyboardButton("Изменение данных проекта (не работает)", callback_data="123")],
         [InlineKeyboardButton("Отмена", callback_data="SettingsOfProjects")]

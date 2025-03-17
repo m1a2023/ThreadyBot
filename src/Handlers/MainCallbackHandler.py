@@ -24,6 +24,7 @@ from Handlers.TaskMenu.AddHandler import AddHandler
 from Handlers.TaskMenu.EditHandler import EditHandler
 from Handlers.TaskMenu.DeleteHandler import DeleteHandler
 from Handlers.TaskMenu.ShowHandler import ShowHandler
+from Handlers.TaskMenu.CancelTaskMenuHandler import CancelTaskMenuHandler
 
 from Handlers.TaskMenu.AddTaskMenu.NameHandler import NameHandler
 from Handlers.TaskMenu.AddTaskMenu.DescriptionHandler import DescriptionHandler
@@ -34,6 +35,14 @@ from Handlers.TaskMenu.AddTaskMenu.DoneHandler import DoneHandler
 from Handlers.TaskMenu.AddTaskMenu.CancelHandler import CancelHandler
 
 from Handlers.TaskMenu.EditTaskMenu.EditDoneHandler import EditDoneHandler
+from Handlers.TaskMenu.EditTaskMenu.EditDescriptionHandler import EditDescriptionHandler
+from Handlers.TaskMenu.EditTaskMenu.EditDeadlineHandler import EditDeadlineHandler
+from Handlers.TaskMenu.EditTaskMenu.EditPriorityHandler import EditPriorityHandler
+from Handlers.TaskMenu.EditTaskMenu.EditNameHandler import EditNameHandler
+from Handlers.TaskMenu.EditTaskMenu.EditStatusHandler import EditStatusHandler
+from Handlers.TaskMenu.EditTaskMenu.CancelEditTaskHandler import CancelEditTaskHandler
+
+from Handlers.TaskMenu.TaskHandler import TaskHandler
 
 class MainCallbackHandler(Handler):
   @staticmethod
@@ -60,6 +69,9 @@ class MainCallbackHandler(Handler):
     elif query.data == "ChangeProject":
       return await ChangeProjectHandler.handle(update, context)
 
+    elif query.data == "changeTasks":
+       return await TaskHandler.handle(update, context)
+
     # Обработка кнопок в "Создание проекта"
     elif query.data == "setNameForCreateProject":
       return await SetNameHandler.handle(update, context)
@@ -84,6 +96,8 @@ class MainCallbackHandler(Handler):
         return await DeleteHandler.handle(update, context)
     elif query.data == "show":
         return await ShowHandler.handle(update, context)
+    elif query.data == "cancelTaskMenu":
+        return await CancelTaskMenuHandler.handle(update, context)
     #кнопки меню добавления задачи
     elif query.data == "name":
         return await NameHandler.handle(update, context)
@@ -100,5 +114,18 @@ class MainCallbackHandler(Handler):
     elif query.data == "cancel":
         return await CancelHandler.handle(update,context)
     #кнопки меню редактирования задачи
+
+    elif query.data == "editTaskName":
+       return await EditNameHandler.handle(update,context)
+    elif query.data == "editTaskDescription":
+       return await EditDescriptionHandler.handle(update, context)
+    elif query.data == "editTaskDeadline":
+       return await EditDeadlineHandler.handle(update, context)
+    elif query.data == "editTaskPriority":
+       return await EditPriorityHandler.handle(update, context)
+    elif query.data == "editTaskStatus":
+       return await EditStatusHandler.handle(update, context)
     elif query.data == "edit_done":
         return await EditDoneHandler.handle(update,context)
+    elif query.data == "edit_cancel":
+        return await CancelEditTaskHandler.handle(update,context)

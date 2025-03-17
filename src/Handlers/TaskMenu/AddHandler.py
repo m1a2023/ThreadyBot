@@ -14,7 +14,12 @@ class AddHandler(Handler):
         query = update.callback_query
         await query.answer()
 
-        context.user_data["task"] = Task()
+        if "task" not in context.user_data:
+            """ Эта штука будет сохранять в контексте инфу о проекте при создании для сохранения в бд """
+            context.user_data["task"] = Task()
+            """ Эти штуки нужны для красивого вывода (комментариев для пользователя) при создании проекта """
+            context.user_data["taskInfoForCreateTask"] = ["Вы ввели:"]
+
 
         keyboard = [
             [InlineKeyboardButton("Добавить имя", callback_data="name")],

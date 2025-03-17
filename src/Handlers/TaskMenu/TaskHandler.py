@@ -11,13 +11,16 @@ from typing import Any
 class TaskHandler(Handler):
     @staticmethod
     async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any:
+        query = update.callback_query
+        await query.answer()
+
         keyboard = [
             [InlineKeyboardButton("Добавить задачу", callback_data="add")],
             [InlineKeyboardButton("Редактировать задачу", callback_data="edit")],
             [InlineKeyboardButton("Удалить задачу", callback_data="del")],
             [InlineKeyboardButton("Показать задачи", callback_data="show")],
-            [InlineKeyboardButton("Назад", callback_data="back")]
+            [InlineKeyboardButton("Назад", callback_data="cancelTaskMenu")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
-        await update.message.reply_text("Привет! Выберите действие:", reply_markup=reply_markup)
+        await query.edit_message_text("Привет! Выберите действие:", reply_markup=reply_markup)

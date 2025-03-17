@@ -6,19 +6,24 @@ from typing import Any
 from Project import Project
 
 from Handlers.Handler import Handler
+from TaskManagement.TaskManager import TaskManager
 
-class CreateProjectHandler(Handler):   
+class CreateProjectHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    
+
     query = update.callback_query
-    await query.answer() 
+    await query.answer()
 
     if "Project" not in context.user_data:
       """ Эта штука будет сохранять в контексте инфу о проекте при создании для сохранения в бд """
       context.user_data["project"] = Project()
       """ Эти штуки нужны для красивого вывода (комментариев для пользователя) при создании проекта """
       context.user_data["projectInfoForCreateProject"] = ["Вы ввели:"]
+
+    if "task_manager" not in context.user_data:
+      task_manager = TaskManager()
+      context.user_data["task_manager"] = task_manager
 
     keyboard = [
       [InlineKeyboardButton("Добавить название", callback_data="setNameForCreateProject")],
@@ -57,13 +62,13 @@ class CreateProjectHandler(Handler):
 
   # def __init__(self):
   #     self.about_project = {"name": "", "description": "","developers": [],"linkRep": ""}  # Variable for storing data about project
-  
+
   # """ Start of create """
   # async def create(self, update: Update, context: CallbackContext) -> int:
   #     await update.message.reply_text("Name of this project?")
   #     return self.NAME
 
-  # """ Project name """ 
+  # """ Project name """
   # async def name(self, update: Update, context: CallbackContext):
   #     self.about_project["name"] = update.message.text
   #     await update.message.reply_text("Do you provide some description? If yes, write it, else write \"skip\"")
@@ -81,9 +86,9 @@ class CreateProjectHandler(Handler):
   #     await update.message.reply_text("Want to add developers to the project?"
   #     "\nIf yes, write their nicknames, if no, then write \"skip\""
   #     "\nFor example: @" + username + ", @123 and etc")
-      
+
   #     return self.DEVELOPERS
-  
+
   # """ Add developers """
   # async def developers(self, update: Update, context: CallbackContext):
   #   developers_list = update.message.text
@@ -100,7 +105,7 @@ class CreateProjectHandler(Handler):
   # def is_valid_url(url):
   #   parsed_url = urlparse(url)
   #   return all([parsed_url.scheme, parsed_url.netloc])
-  
+
   # """ Repo link """
   # async def link(self, update: Update, context: CallbackContext):
   #     link_text = update.message.text
@@ -112,10 +117,10 @@ class CreateProjectHandler(Handler):
   #       else:
   #          await update.message.reply_text("The entered message is not a link. Repeat entry")
   #          return self.LINK
-      
+
   #     await update.message.reply_text("The project has been created\n\n" + str(self.about_project))
   #     return ConversationHandler.END
-  
+
   # """ Cancel of create project """
   # async def cancel(self, update: Update, context: CallbackContext):
   #   await update.message.reply_text("Project creation canceled")

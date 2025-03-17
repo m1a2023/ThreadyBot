@@ -14,6 +14,7 @@ from Handlers.TaskMenu.TaskHandler import TaskHandler
 class DoneHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.user_data["task_manager"].add_task(update, context)
     # Получаем chat_id
     if update.message:
       chat_id = update.message.chat_id
@@ -23,10 +24,10 @@ class DoneHandler(Handler):
     last_bot_message_id = context.user_data.get("IdLastMessageFromBot")
 
     # Проверка на то, что пользователь точно ввел имя и описание задачи
-    new_project = context.user_data["project"].to_dict()
+    new_task = context.user_data["task"].to_dict()
     keys_for_check = ["name", "description"]
     for key in keys_for_check:
-      if new_project[key] == "":
+      if new_task[key] == "":
         if key == "name":
           await context.bot.editMessageText(chat_id=chat_id, message_id=last_bot_message_id, text="Вы забыли ввести имя задачи")
           context.user_data["state"] = "setNameForTask"
@@ -44,11 +45,11 @@ class DoneHandler(Handler):
       except BadRequest as e:
         print(f"Ошибка при удалении последнего сообщения бота: {e}")
 
-    # Очищаем все данные, связанные с созданием проекта
+    # Очищаем все данные, связанные с созданием задачи
     keys_to_remove = [
       "state",
-      "project",
-      "projectInfoForCreateProject",
+      "task",
+      "taskInfoForCreateTask",
       "IdLastMessageFromBot",
       "bot_message_id"
     ]

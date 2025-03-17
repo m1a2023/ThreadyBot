@@ -16,4 +16,4 @@ class ShowHandler(Handler):
         query = update.callback_query
         await query.answer()
 
-        await TaskManager.show_tasks(update, context)
+        await context.user_data["task_manager"].show_tasks(update, context)

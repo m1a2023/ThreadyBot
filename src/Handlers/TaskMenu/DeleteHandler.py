@@ -12,6 +12,8 @@ class DeleteHandler(Handler):
         query = update.callback_query
         await query.answer()
 
+        context.user_data["taskInfoForDeleteTask"] = ["Вы ввели:"]
+
         chat_id = query.message.chat_id
         context.user_data["state"] = "deleteTask"  # Устанавливаем состояние
 
