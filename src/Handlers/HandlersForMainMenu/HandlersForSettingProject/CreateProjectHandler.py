@@ -18,7 +18,7 @@ class CreateProjectHandler(Handler):
       """ Эта штука будет сохранять в контексте инфу о проекте при создании для сохранения в бд """
       context.user_data["project"] = Project()
       """ Эти штуки нужны для красивого вывода (комментариев для пользователя) при создании проекта """
-      context.user_data["projectInfoForCreateProject"] = "Вы ввели:\n"
+      context.user_data["projectInfoForCreateProject"] = ["Вы ввели:"]
 
     keyboard = [
       [InlineKeyboardButton("Добавить название", callback_data="setNameForCreateProject")],
