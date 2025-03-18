@@ -1,7 +1,7 @@
 from Handlers.StartHandler import StartHandler
 from Handlers.HelpHandler import HelpHandler
 from Handlers.EndHandler import EndHandler
-from Handlers.TaskMenu.TaskHandler import TaskHandler
+from Handlers.HandlersForTaskMenu.MainTaskMenuHandler import MainTaskMenuHandler
 from Models.Bot import Bot
 
 from telegram import ForceReply, Update
@@ -57,4 +57,4 @@ class ThreadyBot(Bot):
       update: Update,
       context: ContextTypes.DEFAULT_TYPE
       ) -> None:
-    await TaskHandler.handle(update, context)
+    await MainTaskMenuHandler.handle(update, context)

@@ -4,7 +4,6 @@ from typing import Any
 
 from Handlers.Handler import Handler
 
-from Handlers.TaskMenu.TextHandler import TextHandler
 from TaskManagement.TaskManager import TaskManager
 
 class ShowHandler(Handler):
@@ -16,4 +15,4 @@ class ShowHandler(Handler):
         query = update.callback_query
         await query.answer()
 
-        await TaskManager.show_tasks(update, context)
+        await context.user_data["task_manager"].show_tasks(update, context)

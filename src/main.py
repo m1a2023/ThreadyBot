@@ -2,15 +2,14 @@
 import sys as system
 import logging
 from typing import Any
+
+from Handlers.MainCallbackHandler import MainCallbackHandler
+from Handlers.TextHandler import TextHandler
 """ Python-telegram-bot packages """
 from telegram import Update
-from telegram.ext import CommandHandler, ContextTypes, MessageHandler, filters, ConversationHandler, CallbackQueryHandler,Application
+from telegram.ext import CommandHandler, MessageHandler, filters, CallbackQueryHandler,Application
 """ Thready packages """
 from Models.ThreadyBot import ThreadyBot
-
-#from Models.bot_app import BotApp
-from Handlers.TaskMenu.MenuHandler import MenuHandler
-from Handlers.TaskMenu.TextHandler import TextHandler
 
 
 # Enable logging
@@ -23,11 +22,11 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any:
-		if update.message:
-			await update.message.reply_text("There is no such command")
-		elif update.callback_query:
-			await update.callback_query.edit_message_text("There is no sucn command")
+# async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any:
+# 		if update.message:
+# 			await update.message.reply_text("There is no such command")
+# 		elif update.callback_query:
+# 			await update.callback_query.edit_message_text("There is no sucn command")
 
 class Main:
 	@staticmethod
@@ -51,14 +50,17 @@ class Main:
 		application.add_handler(CommandHandler("start", thready_bot.start))
 		application.add_handler(CommandHandler("help", thready_bot.help))
 		application.add_handler(CommandHandler("end", thready_bot.end))
-		application.add_handler(CommandHandler("task_menu", thready_bot.task_menu))
 
-		application.add_handler(CallbackQueryHandler(MenuHandler.handle))
+		#application.add_handler(CallbackQueryHandler(MenuHandler.handle))
 
-		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, TextHandler.handle))
+		#application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, TextHandler.handle))
 
 		# on non command i.e message - echo the message on Telegram
-		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+		# application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, TextHandler.handle))
+
+		# Обработчик кнопок
+		application.add_handler(CallbackQueryHandler(MainCallbackHandler.handle))
 
 		# Run the bot until the user presses Ctrl-C
 		application.run_polling(allowed_updates=Update.ALL_TYPES)

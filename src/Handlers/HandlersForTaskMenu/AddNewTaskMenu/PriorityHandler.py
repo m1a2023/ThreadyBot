@@ -4,7 +4,6 @@ from typing import Any
 
 from Handlers.Handler import Handler
 
-from Handlers.TaskMenu.TextHandler import TextHandler
 
 class PriorityHandler(Handler):
     @staticmethod
@@ -13,6 +12,7 @@ class PriorityHandler(Handler):
         await query.answer()
 
         chat_id = query.message.chat_id
-        TextHandler.USER_STATE[chat_id] = "add_priority"  # Сохраняем состояние пользователя
+        context.user_data["state"] = "setPriorityForTask"  # Сохраняем состояние пользователя
 
-        await query.message.reply_text("Выберите приоритет задачи: low, medium, high")
+        sent_message = await query.message.reply_text("Выберите приоритет задачи: low, medium, high")
+        context.user_data["bot_message_id"] = sent_message.message_id

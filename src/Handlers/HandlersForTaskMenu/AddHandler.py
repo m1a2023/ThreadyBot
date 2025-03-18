@@ -4,7 +4,7 @@ from typing import Any
 
 from Handlers.Handler import Handler
 
-from Handlers.TaskMenu.TextHandler import TextHandler
+from TaskManagement.Task import Task
 
 class AddHandler(Handler):
 
@@ -13,8 +13,12 @@ class AddHandler(Handler):
         query = update.callback_query
         await query.answer()
 
-        """chat_id = query.message.chat_id
-        TextHandler.USER_STATE[chat_id] = "add_opt"  # Сохраняем состояние пользователя"""
+        if "task" not in context.user_data:
+            """ Эта штука будет сохранять в контексте инфу о проекте при создании для сохранения в бд """
+            context.user_data["task"] = Task()
+            """ Эти штуки нужны для красивого вывода (комментариев для пользователя) при создании проекта """
+            context.user_data["taskInfoForCreateTask"] = ["Вы ввели:"]
+
 
         keyboard = [
             [InlineKeyboardButton("Добавить имя", callback_data="name")],
@@ -30,4 +34,5 @@ class AddHandler(Handler):
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         # Отправляем сообщение с кнопками
-        await query.message.reply_text("Выберите действие:", reply_markup=reply_markup)
+        sent_message = await query.message.reply_text("Выберите действие:", reply_markup=reply_markup)
+        context.user_data["bot_message_id"] = sent_message.message_id

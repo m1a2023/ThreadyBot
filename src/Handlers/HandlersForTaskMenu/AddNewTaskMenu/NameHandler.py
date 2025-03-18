@@ -4,8 +4,6 @@ from typing import Any
 
 from Handlers.Handler import Handler
 
-from Handlers.TaskMenu.TextHandler import TextHandler
-
 class NameHandler(Handler):
     @staticmethod
     async def handle(update, context):
@@ -15,6 +13,7 @@ class NameHandler(Handler):
         await query.answer()
 
         chat_id = query.message.chat_id
-        TextHandler.USER_STATE[chat_id] = "add_name"  # Сохраняем состояние пользователя
+        context.user_data["state"] = "setNameForTask"  # Сохраняем состояние пользователя
 
-        await query.message.reply_text("Введите имя задачи:")
+        sent_message = await query.message.reply_text("Введите имя задачи:")
+        context.user_data["bot_message_id"] = sent_message.message_id

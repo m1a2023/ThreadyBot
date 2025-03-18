@@ -8,14 +8,13 @@ from telegram.ext import ContextTypes
 class TaskManager:
     TASKS = []  # Храним список задач
 
-    @staticmethod
-    async def add_task(name, description, deadline=None, priority:str=None, status:str=None):
+    async def add_task(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-        task = Task(name, description, deadline, priority, status)
+        """task = Task(name, description, deadline, priority.lower(), status.lower())
         TaskManager.TASKS.append(task)
-        return task
+        return task"""
+        TaskManager.TASKS.append(context.user_data["task"])
 
-    @staticmethod
     async def get_tasks():
         print("from get tasks")
         if not TaskManager.TASKS:
@@ -23,8 +22,7 @@ class TaskManager:
 
         return "\n\n".join([f"{i + 1}. {task}" for i, task in enumerate(TaskManager.TASKS)])
 
-    @staticmethod
-    async def show_tasks(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def show_tasks(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         print("from show tasks")
         tasks_text = await TaskManager.get_tasks()
 
@@ -33,9 +31,8 @@ class TaskManager:
         elif update.callback_query:
             await update.callback_query.message.reply_text(tasks_text)
 
-    @staticmethod
-    async def delete_task(task_name,update, context) -> any:
-        task_to_delete = TaskManager.found_task(task_name)
+    async def delete_task(self, task_name,update: Update, context: ContextTypes.DEFAULT_TYPE) -> any:
+        task_to_delete = context.user_data["task_manager"].found_task(task_name,update,context)
 
         if task_to_delete:
             TaskManager.TASKS.remove(task_to_delete)
@@ -45,14 +42,12 @@ class TaskManager:
 
         return response_text
 
-    @staticmethod
-    async def edit_task(update: Update, context: ContextTypes.DEFAULT_TYPE, name=None, description=None, deadline=None, priority=None, status=None):
-        print("from edit task | task manager")
-        task_to_edit = TaskManager.found_task(context.user_data.get("task_name"))
-        task_to_edit.edit_task(name,description,deadline,priority,status)
+    async def edit_task(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        #context.user_data["task_manager"].TASKS.remove(context.user_data["task_manager"].found_task(context.user_data["task_name"],update,context))
+        #TaskManager.TASKS.append()
 
-        return task_to_edit
+        #тут надо будет сделать функционал, который будет удалять из бд предыдущий вариант задачи и добавлять отредактированый
+        print("отредачено")
 
-    @staticmethod
-    def found_task(task_name):
-        return next((task for task in TaskManager.TASKS if task._name == task_name), None)
+    def found_task(self,task_name,update: Update, context: ContextTypes.DEFAULT_TYPE):
+        return next((task for task in context.user_data["task_manager"].TASKS if task._name == task_name), None)
