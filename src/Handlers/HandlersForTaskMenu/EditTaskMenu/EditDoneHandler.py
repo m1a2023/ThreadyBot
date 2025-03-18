@@ -7,9 +7,9 @@ from telegram.error import BadRequest
 
 from Handlers.Handler import Handler
 
-from Handlers.TaskMenu.AddTaskMenu.NameHandler import NameHandler
-from Handlers.TaskMenu.AddTaskMenu.DescriptionHandler import DescriptionHandler
-from Handlers.TaskMenu.TaskHandler import TaskHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.NameHandler import NameHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.DescriptionHandler import DescriptionHandler
+from Handlers.HandlersForTaskMenu.MainTaskMenuHandler import MainTaskMenuHandler
 
 class EditDoneHandler(Handler):
   @staticmethod
@@ -35,6 +35,7 @@ class EditDoneHandler(Handler):
       "state",
       "task",
       "taskInfoForCreateTask",
+      "taskInfoForEditTask",
       "IdLastMessageFromBot",
       "bot_message_id"
     ]
@@ -42,4 +43,4 @@ class EditDoneHandler(Handler):
       if key in context.user_data:
         del context.user_data[key]
 
-    return await TaskHandler.handle(update, context)
+    return await MainTaskMenuHandler.handle(update, context)

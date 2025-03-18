@@ -3,12 +3,12 @@ from telegram.ext import ContextTypes
 
 from typing import Any
 
-from Handlers.TaskMenu.TaskHandler import TaskHandler
+from Handlers.HandlersForTaskMenu.MainTaskMenuHandler import MainTaskMenuHandler
 from telegram.error import BadRequest
 
 from Handlers.Handler import Handler
 
-class CancelEditTaskHandler(Handler):
+class CancelHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Получаем chat_id
@@ -29,7 +29,7 @@ class CancelEditTaskHandler(Handler):
     keys_to_remove = [
       "state",
       "task",
-      "TaskInfoForEditTask",
+      "TaskInfoForCreateTask",
       "IdLastMessageFromBot",
       "bot_message_id"
     ]
@@ -37,4 +37,4 @@ class CancelEditTaskHandler(Handler):
       if key in context.user_data:
         del context.user_data[key]
 
-    return await TaskHandler.handle(update, context)
+    return await MainTaskMenuHandler.handle(update, context)

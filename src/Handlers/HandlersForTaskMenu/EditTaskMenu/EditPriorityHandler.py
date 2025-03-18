@@ -4,7 +4,6 @@ from typing import Any
 
 from Handlers.Handler import Handler
 
-from Handlers.TaskMenu.TextHandler import TextHandler
 
 class EditPriorityHandler(Handler):
     @staticmethod

@@ -23,20 +23,20 @@ class Task:
         else:
             self._deadline = None
 
-    def set_priority(self,task_priority):
-        if task_priority == "low":
+    def set_priority(self,task_priority:str):
+        if task_priority.lower() == "low":
             self._priority = Priority.LOW
-        if task_priority == "medium":
+        if task_priority.lower() == "medium":
             self._priority = Priority.MEDIUM
-        if task_priority == "high":
+        if task_priority.lower() == "high":
             self._priority = Priority.HIGH
 
-    def set_status(self,task_status):
-        if task_status == "todo":
+    def set_status(self,task_status:str):
+        if task_status.lower() == "todo":
             self._status = Status.TODO
-        if task_status == "in progress":
+        if task_status.lower() == "in progress":
             self._status = Status.IN_PROGRESS
-        if task_status == "done":
+        if task_status.lower() == "done":
             self._status = Status.DONE
 
     def __str__(self):

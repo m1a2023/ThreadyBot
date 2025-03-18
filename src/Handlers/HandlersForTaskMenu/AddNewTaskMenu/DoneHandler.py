@@ -7,14 +7,14 @@ from telegram.error import BadRequest
 
 from Handlers.Handler import Handler
 
-from Handlers.TaskMenu.AddTaskMenu.NameHandler import NameHandler
-from Handlers.TaskMenu.AddTaskMenu.DescriptionHandler import DescriptionHandler
-from Handlers.TaskMenu.TaskHandler import TaskHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.NameHandler import NameHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.DescriptionHandler import DescriptionHandler
+from Handlers.HandlersForTaskMenu.MainTaskMenuHandler import MainTaskMenuHandler
 
 class DoneHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.user_data["task_manager"].add_task(update, context)
+
     # Получаем chat_id
     if update.message:
       chat_id = update.message.chat_id
@@ -27,16 +27,20 @@ class DoneHandler(Handler):
     new_task = context.user_data["task"].to_dict()
     keys_for_check = ["name", "description"]
     for key in keys_for_check:
-      if new_task[key] == "":
+      print("проверка")
+      if new_task[key] == None:
         if key == "name":
-          await context.bot.editMessageText(chat_id=chat_id, message_id=last_bot_message_id, text="Вы забыли ввести имя задачи")
-          context.user_data["state"] = "setNameForTask"
+          print("проверку не прошло имя")
+          await context.bot.send_message(chat_id=chat_id, text="Вы забыли ввести имя задачи")
+          #context.user_data["state"] = "setNameForTask"
           return await NameHandler.handle(update, context)
         elif key == "description":
-          await context.bot.editMessageText(chat_id=chat_id, message_id=last_bot_message_id, text="Вы забыли добавить описание проекту")
-          context.user_data["state"] = "setDescriptionForTask"
+          print("проверку не прошло описание")
+          await context.bot.send_message(chat_id=chat_id, text="Вы забыли добавить описание проекту")
+          #context.user_data["state"] = "setDescriptionForTask"
           return await DescriptionHandler.handle(update, context)
 
+    await context.user_data["task_manager"].add_task(update, context)
 
     # Удаляем последнее сообщение бота (если есть)
     if last_bot_message_id:
@@ -57,4 +61,4 @@ class DoneHandler(Handler):
       if key in context.user_data:
         del context.user_data[key]
 
-    return await TaskHandler.handle(update, context)
+    return await MainTaskMenuHandler.handle(update, context)

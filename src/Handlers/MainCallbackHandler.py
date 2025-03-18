@@ -20,29 +20,30 @@ from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForCreatePro
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForCreateProject.SetLinkRepHandler import SetLinkRepHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForCreateProject.CancelCreateProjectHandler import CancelCreateProjectHandler
 
-from Handlers.TaskMenu.AddHandler import AddHandler
-from Handlers.TaskMenu.EditHandler import EditHandler
-from Handlers.TaskMenu.DeleteHandler import DeleteHandler
-from Handlers.TaskMenu.ShowHandler import ShowHandler
-from Handlers.TaskMenu.CancelTaskMenuHandler import CancelTaskMenuHandler
 
-from Handlers.TaskMenu.AddTaskMenu.NameHandler import NameHandler
-from Handlers.TaskMenu.AddTaskMenu.DescriptionHandler import DescriptionHandler
-from Handlers.TaskMenu.AddTaskMenu.DeadlineHandler import DeadlineHandler
-from Handlers.TaskMenu.AddTaskMenu.PriorityHandler import PriorityHandler
-from Handlers.TaskMenu.AddTaskMenu.StatusHandler import StatusHandler
-from Handlers.TaskMenu.AddTaskMenu.DoneHandler import DoneHandler
-from Handlers.TaskMenu.AddTaskMenu.CancelHandler import CancelHandler
+from Handlers.HandlersForTaskMenu.MainTaskMenuHandler import MainTaskMenuHandler
 
-from Handlers.TaskMenu.EditTaskMenu.EditDoneHandler import EditDoneHandler
-from Handlers.TaskMenu.EditTaskMenu.EditDescriptionHandler import EditDescriptionHandler
-from Handlers.TaskMenu.EditTaskMenu.EditDeadlineHandler import EditDeadlineHandler
-from Handlers.TaskMenu.EditTaskMenu.EditPriorityHandler import EditPriorityHandler
-from Handlers.TaskMenu.EditTaskMenu.EditNameHandler import EditNameHandler
-from Handlers.TaskMenu.EditTaskMenu.EditStatusHandler import EditStatusHandler
-from Handlers.TaskMenu.EditTaskMenu.CancelEditTaskHandler import CancelEditTaskHandler
+from Handlers.HandlersForTaskMenu.AddHandler import AddHandler
+from Handlers.HandlersForTaskMenu.EditHandler import EditHandler
+from Handlers.HandlersForTaskMenu.DeleteHandler import DeleteHandler
+from Handlers.HandlersForTaskMenu.ShowHandler import ShowHandler
+from Handlers.HandlersForTaskMenu.CancelTaskMenuHandler import CancelTaskMenuHandler
 
-from Handlers.TaskMenu.TaskHandler import TaskHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.NameHandler import NameHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.DescriptionHandler import DescriptionHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.DeadlineHandler import DeadlineHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.PriorityHandler import PriorityHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.StatusHandler import StatusHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.DoneHandler import DoneHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.CancelHandler import CancelHandler
+
+from Handlers.HandlersForTaskMenu.EditTaskMenu.EditDoneHandler import EditDoneHandler
+from Handlers.HandlersForTaskMenu.EditTaskMenu.EditDescriptionHandler import EditDescriptionHandler
+from Handlers.HandlersForTaskMenu.EditTaskMenu.EditDeadlineHandler import EditDeadlineHandler
+from Handlers.HandlersForTaskMenu.EditTaskMenu.EditPriorityHandler import EditPriorityHandler
+from Handlers.HandlersForTaskMenu.EditTaskMenu.EditNameHandler import EditNameHandler
+from Handlers.HandlersForTaskMenu.EditTaskMenu.EditStatusHandler import EditStatusHandler
+from Handlers.HandlersForTaskMenu.EditTaskMenu.CancelEditTaskHandler import CancelEditTaskHandler
 
 class MainCallbackHandler(Handler):
   @staticmethod
@@ -70,7 +71,7 @@ class MainCallbackHandler(Handler):
       return await ChangeProjectHandler.handle(update, context)
 
     elif query.data == "changeTasks":
-       return await TaskHandler.handle(update, context)
+       return await MainTaskMenuHandler.handle(update, context)
 
     # Обработка кнопок в "Создание проекта"
     elif query.data == "setNameForCreateProject":

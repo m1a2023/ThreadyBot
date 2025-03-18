@@ -179,46 +179,46 @@ class TextHandler:
       task.set_name(user_text)
       await TextHandler.processMessage(
           context, chat_id, user_message_id, bot_message_id,
-          f"Вы ввели имя: {user_text}",
-          "taskInfoForCreateTask"
+          f"Имя задачи: {user_text}", "taskInfoForCreateTask"
         )
 
     elif state == "setDescriptionForTask":
       task.set_description(user_text)
       await TextHandler.processMessage(
           context, chat_id, user_message_id, bot_message_id,
-          f"Вы ввели описание: {user_text}", "taskInfoForCreateTask"
+          f"Описание задачи: {user_text}", "taskInfoForCreateTask"
         )
 
     elif state == "setDeadlineForTask":
       task.set_deadline(user_text)
       await TextHandler.processMessage(
           context, chat_id, user_message_id, bot_message_id,
-          f"Вы ввели дедлайн: {user_text}", "taskInfoForCreateTask"
+          f"Дедлайн задачи: {user_text}", "taskInfoForCreateTask"
         )
 
     elif state == "setPriorityForTask":
       task.set_priority(user_text)
       await TextHandler.processMessage(
           context, chat_id, user_message_id, bot_message_id,
-          f"Вы ввели приоритет: {user_text}", "taskInfoForCreateTask"
+          f"Приоритет задачи: {user_text}", "taskInfoForCreateTask"
         )
 
     elif state == "setStatusForTask":
       task.set_status(user_text)
       await TextHandler.processMessage(
           context, chat_id, user_message_id, bot_message_id,
-          f"Вы ввели статус: {user_text}", "taskInfoForCreateTask"
+          f"Статус задачи: {user_text}", "taskInfoForCreateTask"
         )
 
     elif state == "deleteTask":
       await context.user_data["task_manager"].delete_task(user_text, update, context)
       await TextHandler.processMessage(
           context, chat_id, user_message_id, bot_message_id,
-          f"Вы удалили задачу: {user_text}", "taskInfoForDeleteTask"
+          f"{user_text}", "taskInfoForDeleteTask"
         )
 
     elif state == "editTask":
+      sent_message=""
       if context.user_data["task_manager"].found_task(user_text,update,context):
           context.user_data["task_name"] = user_text
           keyboard = [
@@ -234,23 +234,54 @@ class TextHandler:
           ]
           reply_markup = InlineKeyboardMarkup(keyboard)
           #вот тут надо адаптировать под метод process message
-          await update.message.reply_text(f"Вы выбрали для редактирования задачу: {user_text}\n Выберите действие:",reply_markup=reply_markup)
+          sent_message=await update.message.reply_text(f"Вы выбрали для редактирования задачу: {user_text}\nВыберите действие:",reply_markup=reply_markup)
       else:
-          await update.message.reply_text("Такой задачи нет")
+          sent_message=await update.message.reply_text("Такой задачи нет")
+      context.user_data["bot_message_id"] = sent_message.message_id
+
+      """await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Имя задачи: {user_text}", "taskInfoForCreateTask"
+        )"""
 
     elif state == "editTaskName":
       print(context.user_data["task_name"])
       context.user_data["task_manager"].found_task(context.user_data["task_name"],update,context).set_name(user_text)
       context.user_data["task_name"] = user_text
 
+      await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Имя задачи: {user_text}", "taskInfoForEditTask"
+        )
+
     elif state == "editTaskDescription":
       context.user_data["task_manager"].found_task(context.user_data["task_name"],update,context).set_description(user_text)
+
+      await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Описание задачи: {user_text}", "taskInfoForEditTask"
+        )
 
     elif state == "editTaskDeadline":
       context.user_data["task_manager"].found_task(context.user_data["task_name"],update,context).set_deadline(user_text)
 
+      await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Дедлайн задачи: {user_text}", "taskInfoForEditTask"
+        )
+
     elif state == "editTaskPriority":
       context.user_data["task_manager"].found_task(context.user_data["task_name"],update,context).set_priority(user_text)
 
+      await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Приоритет задачи: {user_text}", "taskInfoForEditTask"
+        )
+
     elif state == "editTaskStatus":
       context.user_data["task_manager"].found_task(context.user_data["task_name"],update,context).set_status(user_text)
+
+      await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Статус задачи: {user_text}", "taskInfoForEditTask"
+        )

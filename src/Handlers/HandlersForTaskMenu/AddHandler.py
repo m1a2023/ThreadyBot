@@ -4,7 +4,6 @@ from typing import Any
 
 from Handlers.Handler import Handler
 
-from Handlers.TaskMenu.TextHandler import TextHandler
 from TaskManagement.Task import Task
 
 class AddHandler(Handler):
@@ -35,4 +34,5 @@ class AddHandler(Handler):
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         # Отправляем сообщение с кнопками
-        await query.message.reply_text("Выберите действие:", reply_markup=reply_markup)
+        sent_message = await query.message.reply_text("Выберите действие:", reply_markup=reply_markup)
+        context.user_data["bot_message_id"] = sent_message.message_id

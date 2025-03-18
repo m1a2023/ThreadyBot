@@ -7,13 +7,9 @@ from Handlers.MainCallbackHandler import MainCallbackHandler
 from Handlers.TextHandler import TextHandler
 """ Python-telegram-bot packages """
 from telegram import Update
-from telegram.ext import CommandHandler, ContextTypes, MessageHandler, filters, ConversationHandler, CallbackQueryHandler
+from telegram.ext import CommandHandler, MessageHandler, filters, CallbackQueryHandler,Application
 """ Thready packages """
 from Models.ThreadyBot import ThreadyBot
-
-from Models.bot_app import BotApp
-from Handlers.TaskMenu.MenuHandler import MenuHandler
-#from Handlers.TaskMenu.TextHandler import TextHandler
 
 
 # Enable logging
@@ -45,17 +41,10 @@ class Main:
 		TG_TOKEN = argv[0]
 
 		# Create the Application and pass it your bot's token.
-		bot_app = BotApp(TG_TOKEN)
-		application = bot_app.get_application()
-
-
-		#TaskHandler.init()
-
+		application = Application.builder().token(TG_TOKEN).build()
 
 		#Create the Bot
 		thready_bot = ThreadyBot()
-
-
 
 		# on different commands - answer in Telegram
 		application.add_handler(CommandHandler("start", thready_bot.start))

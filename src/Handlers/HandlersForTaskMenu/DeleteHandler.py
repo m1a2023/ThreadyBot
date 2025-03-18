@@ -3,7 +3,6 @@ from telegram.ext import ContextTypes
 from typing import Any
 
 from Handlers.Handler import Handler
-from Handlers.TaskMenu.TextHandler import TextHandler
 from TaskManagement.TaskManager import TaskManager
 
 class DeleteHandler(Handler):
@@ -12,7 +11,7 @@ class DeleteHandler(Handler):
         query = update.callback_query
         await query.answer()
 
-        context.user_data["taskInfoForDeleteTask"] = ["Вы ввели:"]
+        context.user_data["taskInfoForDeleteTask"] = ["Вы удалили задачу: "]
 
         chat_id = query.message.chat_id
         context.user_data["state"] = "deleteTask"  # Устанавливаем состояние
