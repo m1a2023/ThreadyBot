@@ -40,7 +40,15 @@ class DoneHandler(Handler):
           #context.user_data["state"] = "setDescriptionForTask"
           return await DescriptionHandler.handle(update, context)
 
-    await context.user_data["task_manager"].add_task(update, context)
+    task_manager = context.user_data["task_managers"].get(context.user_data["project_name"])
+
+    if task_manager:
+        await task_manager.add_task(update, context)
+    else:
+        print("Ошибка: TaskManager для текущего проекта не найден!")
+
+
+    #await context.user_data["task_manager"].add_task(update, context)
 
     # Удаляем последнее сообщение бота (если есть)
     if last_bot_message_id:

@@ -5,16 +5,20 @@ from typing import Any
 
 from Handlers.Handler import Handler
 
-class MainMenuHandler(Handler): 
+from ProjectManagment.ProjectManager import ProjectManager
+
+class MainMenuHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data["project_manager"] = ProjectManager()
+
     keyboard = [
       [InlineKeyboardButton("Управление проектами", callback_data="SettingsOfProjects")],
       [InlineKeyboardButton("Ближайшие события и состояние проекта", callback_data="EventsAndStatusOfProjects")],
       [InlineKeyboardButton("Общие настройки", callback_data="GeneralSettings")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    
+
     if update.callback_query:
       query = update.callback_query
       await query.answer()  # Подтверждаем callback

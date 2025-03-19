@@ -4,14 +4,17 @@ from typing import Any
 
 from Handlers.Handler import Handler
 
-class DeadlineHandler(Handler):
+
+class EditProjectNameHandler(Handler):
     @staticmethod
     async def handle(update, context):
+        print("edit proj")
+
         query = update.callback_query
         await query.answer()
 
         chat_id = query.message.chat_id
-        context.user_data["state"] = "setDeadlineForTask"  # Сохраняем состояние пользователя
+        context.user_data["state"] = "editProjectName"  # Сохраняем состояние пользователя
 
-        sent_message = await query.message.reply_text("Введите дедлайн для задачи в формате 'YYYY-MM-DD':")
+        sent_message = await query.message.reply_text("Введите новое имя проекта:")
         context.user_data["bot_message_id"] = sent_message.message_id

@@ -11,6 +11,9 @@ from Handlers.HandlersForMainMenu.GeneralSettingsHandler import GeneralSettingsH
 """ Импорты хендлеров для управления проектами """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.CreateProjectHandler import CreateProjectHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.ChangeProjectHandler import ChangeProjectHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.ChooseProjectHandler import ChooseProjectHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.ShowProjectsInfoHandler import ShowProjectsInfoHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.DeleteProjectHandler import DeleteProjectHandler
 
 """ Импорты хендлеров для создания проекта """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForCreateProject.SaveNewProjectHandler import SaveCreateProjectHandler
@@ -20,6 +23,15 @@ from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForCreatePro
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForCreateProject.SetLinkRepHandler import SetLinkRepHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForCreateProject.CancelCreateProjectHandler import CancelCreateProjectHandler
 
+""" Импорты хендлеров для редактирования проекта """
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangeProject.EditProjectInfoHandler import EditProjectInfoHandler
+
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.EditProjectNameHandler import EditProjectNameHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.EditProjectDescriptionHandler import EditProjectDescriptionHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.EditProjectRepoLinkHandler import EditProjectRepoLinkHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.EditProjectTeamHandler import EditProjectTeamHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.SaveProjectChangesHandler import SaveProjectChangesHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.CancelEditProjectHandler import CancelEditProjectHandler
 
 from Handlers.HandlersForTaskMenu.MainTaskMenuHandler import MainTaskMenuHandler
 
@@ -67,9 +79,14 @@ class MainCallbackHandler(Handler):
     # Обработка кнопок в "Управление проектами"
     elif query.data == "CreateProject":
       return await CreateProjectHandler.handle(update, context)
-    elif query.data == "ChangeProject":
-      return await ChangeProjectHandler.handle(update, context)
+    elif query.data == "chooseProject":
+      return await ChooseProjectHandler.handle(update, context) #ChangeProjectHandler
+    elif query.data == "ShowProjectsInfo":
+       return await ShowProjectsInfoHandler.handle(update, context)
+    elif query.data == "DeleteProject":
+       return await DeleteProjectHandler.handle(update, context)
 
+    #кнопка изменения задачь(в меню изменения проекта)
     elif query.data == "changeTasks":
        return await MainTaskMenuHandler.handle(update, context)
 
@@ -86,6 +103,23 @@ class MainCallbackHandler(Handler):
       return await CancelCreateProjectHandler.handle(update, context)
     elif query.data == "SaveNewProject":
       return await SaveCreateProjectHandler.handle(update, context)
+
+    # Обработка кнопок в "Изменении проекта"
+    elif query.data == "editProject":
+      return await EditProjectInfoHandler.handle(update, context)
+
+    elif query.data == "editProjectName":
+      return await EditProjectNameHandler.handle(update, context)
+    elif query.data == "editProjectDescription":
+      return await EditProjectDescriptionHandler.handle(update, context)
+    elif query.data == "editProjectLink":
+      return await EditProjectRepoLinkHandler.handle(update, context)
+    #elif query.data == "editProjectTeam":
+    #  return await EditProjectTeamHandler.handle(update, context)
+    elif query.data == "saveProjectChanges":
+      return await SaveProjectChangesHandler.handle(update, context)
+    elif query.data == "cancelProjectEdit":
+      return await CancelEditProjectHandler.handle(update, context)
 
     #кнопки с задачами
     #кнопки главного меню работы с задачами

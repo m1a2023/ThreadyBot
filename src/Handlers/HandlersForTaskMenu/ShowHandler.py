@@ -15,4 +15,5 @@ class ShowHandler(Handler):
         query = update.callback_query
         await query.answer()
 
-        await context.user_data["task_manager"].show_tasks(update, context)
+        task_manager = context.user_data["task_managers"].get(context.user_data["project_name"])
+        await task_manager.show_tasks(update, context)

@@ -7,12 +7,13 @@ from telegram.error import BadRequest
 
 from Handlers.Handler import Handler
 
-from Handlers.HandlersForTaskMenu.MainTaskMenuHandler import MainTaskMenuHandler
 
-class EditDoneHandler(Handler):
+from Handlers.HandlersForMainMenu.SettingsOfProjectsHandler import SettingsOfProjectsHandler
+
+class SaveProjectChangesHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.user_data["task_manager"].edit_task(update, context)
+    await context.user_data["project_manager"].edit_project(update, context)
     # Получаем chat_id
     if update.message:
       chat_id = update.message.chat_id
@@ -31,9 +32,8 @@ class EditDoneHandler(Handler):
     # Очищаем все данные, связанные с редактированием задачи
     keys_to_remove = [
       "state",
-      "task",
-      "taskInfoForCreateTask",
-      "taskInfoForEditTask",
+      "project",
+      "projectInfoForEditProject",
       "IdLastMessageFromBot",
       "bot_message_id"
     ]
@@ -41,4 +41,4 @@ class EditDoneHandler(Handler):
       if key in context.user_data:
         del context.user_data[key]
 
-    return await MainTaskMenuHandler.handle(update, context)
+    return await SettingsOfProjectsHandler.handle(update, context)

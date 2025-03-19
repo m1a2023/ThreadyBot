@@ -8,13 +8,13 @@ from telegram.error import BadRequest
 
 from Handlers.Handler import Handler
 
-class CancelCreateProjectHandler(Handler): 
+class CancelCreateProjectHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Получаем chat_id
     if update.message:
-      chat_id = update.message.chat_id  
-    else: 
+      chat_id = update.message.chat_id
+    else:
       chat_id = update.callback_query.message.chat_id
 
     # Удаляем последнее сообщение бота (если есть)
@@ -29,6 +29,7 @@ class CancelCreateProjectHandler(Handler):
     keys_to_remove = [
       "state",
       "project",
+      "project_name",
       "projectInfoForCreateProject",
       "IdLastMessageFromBot",
       "bot_message_id"
