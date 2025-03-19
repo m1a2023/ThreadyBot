@@ -39,9 +39,14 @@ class SaveCreateProjectHandler(Handler):
 
     await context.user_data["project_manager"].add_project(update, context)
 
-    if "task_manager" not in context.user_data:
-      task_manager = TaskManager()
-      context.user_data["task_manager"] = task_manager
+    if "task_managers" not in context.user_data:
+        context.user_data["task_managers"] = {}
+
+    project_name = context.user_data["project_name"]  # Имя текущего проекта
+
+    if project_name not in context.user_data["task_managers"]:
+        context.user_data["task_managers"][project_name] = TaskManager()
+
 
     # Удаляем последнее сообщение бота (если есть)
     if last_bot_message_id:

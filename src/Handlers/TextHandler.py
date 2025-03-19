@@ -10,7 +10,10 @@ from telegram.ext import ContextTypes
 
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.EditProjectInfoMenuHandler import EditProjectInfoMenuHandler
 from Handlers.HandlersForTaskMenu.EditTaskMenu.EditTaskMenuHandler import EditTaskMenuHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.ChangeProjectHandler import ChangeProjectHandler
+
 import re
+
 class TextHandler:
   @staticmethod
   async def processMessage(
@@ -68,12 +71,24 @@ class TextHandler:
 
 
     if state == "deleteProject":
-      await update.message.reply_text(await context.user_data["project_manager"].delete_project(user_text, update, context))
-      del context.user_data["task_manager"]
+      await update.message.reply_text(await context.user_data["project_manager"].delete_project(user_text, update, context))\
+
+      project_name = context.user_data["project_name"]
+      if project_name in context.user_data["task_managers"]:
+        del context.user_data["task_managers"][project_name]
+
       """await TextHandler.processMessage(
           context, chat_id, user_message_id, bot_message_id,
           f"{user_text}", "projectInfoForDeleteProject"
         )"""
+
+    elif state == "chooseProject":
+       #тут будет запрос к бд
+       print(user_text)
+       if context.user_data["project_manager"].found_project(user_text, update, context):
+          return await ChangeProjectHandler.handle(update, context)
+       else:
+          await update.message.reply_text("Такого проекта нет")
 
     elif state == "editProjectName":
         try:
@@ -177,7 +192,7 @@ class TextHandler:
         )"""
 
     elif state == "editProject":
-      context.user_data["project_name"] = user_text
+
       return await EditProjectInfoMenuHandler.handle(update,context)
 
 
@@ -185,6 +200,7 @@ class TextHandler:
       # Требования к названию проекта: длина названия не менее 4 символов и не должно начинаться с цифры
       # Если ввод корректен, обновляем информацию
       if (len(user_text) >= 4 and not user_text[0].isdigit()):
+        context.user_data["project_name"] = user_text
         project.set_name(user_text)
         await TextHandler.processMessage(
           context, chat_id, user_message_id, bot_message_id,

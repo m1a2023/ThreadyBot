@@ -10,15 +10,15 @@ class ChangeProjectHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any:
 
-    query = update.callback_query
-    await query.answer()
+    #query = update.callback_query
+    #await query.answer()
 
     keyboard = [
         [InlineKeyboardButton("Изменение задач", callback_data="changeTasks")],
         [InlineKeyboardButton("Изменение данных о команде (не работает)", callback_data="123")],
-        [InlineKeyboardButton("Изменение данных проекта (не работает)", callback_data="editProject")],
+        [InlineKeyboardButton("Изменение данных проекта", callback_data="editProject")],
         [InlineKeyboardButton("Отмена", callback_data="SettingsOfProjects")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-
-    await query.edit_message_text("Изменение существующего проекта. Выберите действие", reply_markup=reply_markup)
+    await update.message.reply_text("Изменение существующего проекта. Выберите действие", reply_markup=reply_markup)
+    #await query.edit_message_text("Изменение существующего проекта. Выберите действие", reply_markup=reply_markup)

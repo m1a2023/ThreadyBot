@@ -14,7 +14,7 @@ class SettingsOfProjectsHandler(Handler):
 
     keyboard = [
       [InlineKeyboardButton("Создание нового проекта", callback_data="CreateProject")],
-      [InlineKeyboardButton("Изменить сущетсвующий проект", callback_data="ChangeProject")],
+      [InlineKeyboardButton("Изменить сущетсвующий проект", callback_data="chooseProject")], #ChangeProject
       [InlineKeyboardButton("Посмотреть данные о всех проектах", callback_data="ShowProjectsInfo")],
       [InlineKeyboardButton("Удалить проект",callback_data="DeleteProject")],
       [InlineKeyboardButton("Выйти в главное меню", callback_data="MoveToMainMenu")]

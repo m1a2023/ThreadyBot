@@ -11,6 +11,7 @@ from Handlers.HandlersForMainMenu.GeneralSettingsHandler import GeneralSettingsH
 """ Импорты хендлеров для управления проектами """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.CreateProjectHandler import CreateProjectHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.ChangeProjectHandler import ChangeProjectHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.ChooseProjectHandler import ChooseProjectHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.ShowProjectsInfoHandler import ShowProjectsInfoHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.DeleteProjectHandler import DeleteProjectHandler
 
@@ -78,8 +79,8 @@ class MainCallbackHandler(Handler):
     # Обработка кнопок в "Управление проектами"
     elif query.data == "CreateProject":
       return await CreateProjectHandler.handle(update, context)
-    elif query.data == "ChangeProject":
-      return await ChangeProjectHandler.handle(update, context)
+    elif query.data == "chooseProject":
+      return await ChooseProjectHandler.handle(update, context) #ChangeProjectHandler
     elif query.data == "ShowProjectsInfo":
        return await ShowProjectsInfoHandler.handle(update, context)
     elif query.data == "DeleteProject":
