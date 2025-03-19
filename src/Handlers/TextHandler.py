@@ -75,7 +75,7 @@ class TextHandler:
         )
 
         # Сохраняем id пользователя как владельца проекта
-        project.set_id_owner("@" + update.message.from_user.id)
+        project.set_id_owner(update.message.from_user.id)
 
       else:
         # Если ввод некорректный, то сообщаем об этом пользователю и запрашиваем ввод снова
