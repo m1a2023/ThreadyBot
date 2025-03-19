@@ -14,7 +14,7 @@ class EventsAndStatusOfProjectHandler(Handler):
 
     keyboard = [
       [InlineKeyboardButton("Текущие задачи и дедлайны (Не работает)", callback_data="123")],
-      [InlineKeyboardButton("Отчеты (Не работает)", callback_data="123")],
+      [InlineKeyboardButton("Отчеты (не работает)", callback_data="reportsMenu")],
       [InlineKeyboardButton("План, созданный нейросетью (Не работает)", callback_data="123")],
       [InlineKeyboardButton("Выход в главное меню", callback_data="MoveToMainMenu")]
     ]

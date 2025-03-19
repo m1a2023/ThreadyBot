@@ -8,6 +8,9 @@ from Handlers.HandlersForMainMenu.SettingsOfProjectsHandler import SettingsOfPro
 from Handlers.HandlersForMainMenu.EventsAndStatusOfProjectHandler import EventsAndStatusOfProjectHandler
 from Handlers.HandlersForMainMenu.GeneralSettingsHandler import GeneralSettingsHandler
 
+""" Импорты хендлеров для ближайших событий и состояния проекта """
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.ReportHandler import ReportMenuHandler
+
 """ Импорты хендлеров для управления проектами """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.CreateProjectHandler import CreateProjectHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.ChangeProjectHandler import ChangeProjectHandler
@@ -72,6 +75,10 @@ class MainCallbackHandler(Handler):
       return await EventsAndStatusOfProjectHandler.handle(update, context)
     elif query.data == "GeneralSettings":
       return await GeneralSettingsHandler.handle(update, context)
+    
+    # Обработка кнопок в "Ближайшие события и состояние проекта"
+    elif query.data == "reportsMenu":
+       return await ReportMenuHandler.handle(update, context)
 
     # Обработка кнопок в "Управление проектами"
     elif query.data == "CreateProject":
