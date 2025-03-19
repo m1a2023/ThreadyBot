@@ -6,8 +6,8 @@ from typing import Any
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
-from TaskManagement.TaskManager import TaskManager
-
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.EditProjectInfoMenuHandler import EditProjectInfoMenuHandler
+from Handlers.HandlersForTaskMenu.EditTaskMenu.EditTaskMenuHandler import EditTaskMenuHandler
 import re
 class TextHandler:
   @staticmethod
@@ -64,7 +64,58 @@ class TextHandler:
     # Получаем текущее состояние
     state = context.user_data.get("state")
 
-    if state == "setNameForCreateProject":
+
+    if state == "deleteProject":
+      await update.message.reply_text(await context.user_data["project_manager"].delete_project(user_text, update, context))
+      del context.user_data["task_manager"]
+      """await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"{user_text}", "projectInfoForDeleteProject"
+        )"""
+
+    elif state == "editProjectName":
+      context.user_data["project_manager"].found_project(context.user_data["project_name"],update,context).set_name(user_text)
+      context.user_data["project_name"] = user_text
+
+      await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Имя проекта: {user_text}", "projectInfoForEditProject"
+        )
+    elif state == "editProjectDescription":
+      context.user_data["project_manager"].found_project(context.user_data["project_name"],update,context).set_description(user_text)
+
+      await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Описание проекта: {user_text}", "projectInfoForEditProject"
+        )
+    elif state == "editProjectDeadline":
+      context.user_data["project_manager"].found_project(context.user_data["project_name"],update,context).set_deadline(user_text)
+
+      await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Дедлайн проекта: {user_text}", "projectInfoForEditProject"
+        )
+    elif state == "editProjectLink":
+      context.user_data["project_manager"].found_project(context.user_data["project_name"],update,context).set_link_rep(user_text)
+
+      await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Ссылка на репозиторий проекта: {user_text}", "projectInfoForEditProject"
+        )
+    elif state == "editProjectTeam":
+      context.user_data["project_manager"].found_project(context.user_data["project_name"],update,context).set_team(user_text)
+
+      await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Дедлайн проекта: {user_text}", "projectInfoForEditProject"
+        )
+
+    elif state == "editProject":
+      context.user_data["project_name"] = user_text
+      return await EditProjectInfoMenuHandler.handle(update,context)
+
+
+    elif state == "setNameForCreateProject":
       # Требования к названию проекта: длина названия не менее 4 символов и не должно начинаться с цифры
       # Если ввод корректен, обновляем информацию
       if (len(user_text) >= 4 and not user_text[0].isdigit()):
@@ -218,27 +269,8 @@ class TextHandler:
         )
 
     elif state == "editTask":
-      sent_message=""
-      if context.user_data["task_manager"].found_task(user_text,update,context):
-          context.user_data["task_name"] = user_text
-          keyboard = [
-              [InlineKeyboardButton("Изменить имя", callback_data="editTaskName")],
-              [InlineKeyboardButton("Изменить описание", callback_data="editTaskDescription")],
-              [InlineKeyboardButton("Изменить дедлайн", callback_data="editTaskDeadline")],
-              [InlineKeyboardButton("Изменить приоритет", callback_data="editTaskPriority")],
-              [InlineKeyboardButton("Изменить статус", callback_data="editTaskStatus")],
-              [
-                  InlineKeyboardButton("Отмена", callback_data="edit_cancel"),
-                  InlineKeyboardButton("Готово", callback_data="edit_done")
-              ]
-          ]
-          reply_markup = InlineKeyboardMarkup(keyboard)
-          #вот тут надо адаптировать под метод process message
-          sent_message=await update.message.reply_text(f"Вы выбрали для редактирования задачу: {user_text}\nВыберите действие:",reply_markup=reply_markup)
-      else:
-          sent_message=await update.message.reply_text("Такой задачи нет")
-      context.user_data["bot_message_id"] = sent_message.message_id
-
+      context.user_data["task_name"] = user_text
+      return await EditTaskMenuHandler.handle(update, context)
       """await TextHandler.processMessage(
           context, chat_id, user_message_id, bot_message_id,
           f"Имя задачи: {user_text}", "taskInfoForCreateTask"

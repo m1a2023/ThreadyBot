@@ -5,16 +5,18 @@ from typing import Any
 
 from Handlers.Handler import Handler
 
-class SettingsOfProjectsHandler(Handler): 
+class SettingsOfProjectsHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    
+
     query = update.callback_query
     await query.answer()
 
     keyboard = [
       [InlineKeyboardButton("Создание нового проекта", callback_data="CreateProject")],
       [InlineKeyboardButton("Изменить сущетсвующий проект", callback_data="ChangeProject")],
+      [InlineKeyboardButton("Посмотреть данные о всех проектах", callback_data="ShowProjectsInfo")],
+      [InlineKeyboardButton("Удалить проект",callback_data="DeleteProject")],
       [InlineKeyboardButton("Выйти в главное меню", callback_data="MoveToMainMenu")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)

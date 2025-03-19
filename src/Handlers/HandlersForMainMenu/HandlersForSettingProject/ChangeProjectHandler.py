@@ -16,7 +16,7 @@ class ChangeProjectHandler(Handler):
     keyboard = [
         [InlineKeyboardButton("Изменение задач", callback_data="changeTasks")],
         [InlineKeyboardButton("Изменение данных о команде (не работает)", callback_data="123")],
-        [InlineKeyboardButton("Изменение данных проекта (не работает)", callback_data="123")],
+        [InlineKeyboardButton("Изменение данных проекта (не работает)", callback_data="editProject")],
         [InlineKeyboardButton("Отмена", callback_data="SettingsOfProjects")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)

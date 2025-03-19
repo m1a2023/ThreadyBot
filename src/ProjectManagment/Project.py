@@ -1,11 +1,11 @@
 class Project:
-    def __init__(self, 
-                 name: str = "", 
-                 description: str = "", 
-                 link_rep: str = "", 
+    def __init__(self,
+                 name: str = "",
+                 description: str = "",
+                 link_rep: str = "",
                  team: str = set(),
-                 id_owner: str = "", 
-                 create_at: str = "", 
+                 id_owner: str = "",
+                 create_at: str = "",
                  deadline_of_project: str = ""):
         self.name = name
         self.description = description
@@ -27,7 +27,7 @@ class Project:
 
     def set_team(self, team: str):
         self.team = team
-    
+
     def set_id_owner(self, id_owner: str):
         self.id_owner = id_owner
 
@@ -47,7 +47,7 @@ class Project:
 
     def get_link_rep(self) -> str:
         return self.link_rep
-    
+
     def get_team(self):
         return self.team
 
@@ -68,3 +68,12 @@ class Project:
             "create_at": self.create_at,
             "deadline_of_project": self.deadline_of_project
         }
+
+    def __str__(self):
+        return (f"Проект: {self.name}\n"
+                f"Описание: {self.description}\n"
+                f"Ссылка на репо: {self.link_rep if self.link_rep else 'Не указано'}\n"
+                f"Команда: {self.team if self.team else 'Не указано'}\n"
+                f"Создан: {self.create_at if self.create_at else 'Не указано'}"
+                f"Дедлайн: {self.deadline_of_project if self.deadline_of_project else 'Не указано'}"
+                )

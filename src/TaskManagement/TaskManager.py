@@ -1,7 +1,3 @@
-from TaskManagement.Task import Task
-from Enums.Priority import Priority
-from Enums.Status import Status
-
 from telegram import Update
 from telegram.ext import ContextTypes
 
@@ -47,6 +43,7 @@ class TaskManager:
         #TaskManager.TASKS.append()
 
         #тут надо будет сделать функционал, который будет удалять из бд предыдущий вариант задачи и добавлять отредактированый
+
         print("отредачено")
 
     def found_task(self,task_name,update: Update, context: ContextTypes.DEFAULT_TYPE):

@@ -3,10 +3,9 @@ from telegram.ext import ContextTypes
 
 from typing import Any
 
-from Project import Project
+from ProjectManagment.Project import Project
 
 from Handlers.Handler import Handler
-from TaskManagement.TaskManager import TaskManager
 
 class CreateProjectHandler(Handler):
   @staticmethod
@@ -20,10 +19,6 @@ class CreateProjectHandler(Handler):
       context.user_data["project"] = Project()
       """ Эти штуки нужны для красивого вывода (комментариев для пользователя) при создании проекта """
       context.user_data["projectInfoForCreateProject"] = ["Вы ввели:"]
-
-    if "task_manager" not in context.user_data:
-      task_manager = TaskManager()
-      context.user_data["task_manager"] = task_manager
 
     keyboard = [
       [InlineKeyboardButton("Добавить название", callback_data="setNameForCreateProject")],

@@ -10,6 +10,8 @@ from telegram.error import BadRequest
 
 from Handlers.Handler import Handler
 
+from TaskManagement.TaskManager import TaskManager
+
 class SaveCreateProjectHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -35,6 +37,11 @@ class SaveCreateProjectHandler(Handler):
           context.user_data["state"] = "setDescriptionForCreateProject"
           return await SetDescriptionHandler.handle(update, context)
 
+    await context.user_data["project_manager"].add_project(update, context)
+
+    if "task_manager" not in context.user_data:
+      task_manager = TaskManager()
+      context.user_data["task_manager"] = task_manager
 
     # Удаляем последнее сообщение бота (если есть)
     if last_bot_message_id:
