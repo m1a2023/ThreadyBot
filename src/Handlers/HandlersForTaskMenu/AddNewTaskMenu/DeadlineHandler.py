@@ -13,5 +13,5 @@ class DeadlineHandler(Handler):
         chat_id = query.message.chat_id
         context.user_data["state"] = "setDeadlineForTask"  # Сохраняем состояние пользователя
 
-        sent_message = await query.message.reply_text("Введите дедлайн для задачи в формате гггг-мм-дд:")
+        sent_message = await query.message.reply_text("Введите дедлайн для задачи в формате 'YYYY-MM-DD':")
         context.user_data["bot_message_id"] = sent_message.message_id

@@ -3,6 +3,8 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from typing import Any
 
+from datetime import datetime, timezone
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
@@ -74,41 +76,105 @@ class TextHandler:
         )"""
 
     elif state == "editProjectName":
-      context.user_data["project_manager"].found_project(context.user_data["project_name"],update,context).set_name(user_text)
-      context.user_data["project_name"] = user_text
+        try:
+            # Название проекта должно содержать только буквы, цифры и пробелы
+            project_name = re.sub(r"[^\w\s]", "", user_text).strip()
 
-      await TextHandler.processMessage(
-          context, chat_id, user_message_id, bot_message_id,
-          f"Имя проекта: {user_text}", "projectInfoForEditProject"
-        )
+            if len(project_name) < 3:
+                raise ValueError("Название проекта должно быть не короче 3 символов.")
+
+            context.user_data["project_manager"].found_project(context.user_data["project_name"], update, context).set_name(project_name)
+            context.user_data["project_name"] = project_name
+
+            await TextHandler.processMessage(
+                context, chat_id, user_message_id, bot_message_id,
+                f"Имя проекта обновлено: {project_name}", "projectInfoForEditProject"
+            )
+        except ValueError as e:
+            error_message = str(e) if str(e) else "Ошибка! Введите корректное название проекта (не менее 3 символов)."
+            if bot_message_id:
+                try:
+                    await context.bot.edit_message_text(
+                        chat_id=chat_id,
+                        message_id=bot_message_id,
+                        text=error_message + " Попробуйте снова:"
+                    )
+                except Exception as e:
+                    print(f"Ошибка при редактировании сообщения: {e}")
+            try:
+                await context.bot.delete_message(chat_id, user_message_id)
+            except Exception as e:
+                print(f"Ошибка при удалении сообщения пользователя: {e}")
+            return
+
     elif state == "editProjectDescription":
-      context.user_data["project_manager"].found_project(context.user_data["project_name"],update,context).set_description(user_text)
+        try:
+            # Описание проекта не должно быть короче 4 слов
+            description = re.sub(r"[^\w\s]", "", user_text).split()
 
-      await TextHandler.processMessage(
-          context, chat_id, user_message_id, bot_message_id,
-          f"Описание проекта: {user_text}", "projectInfoForEditProject"
-        )
-    elif state == "editProjectDeadline":
-      context.user_data["project_manager"].found_project(context.user_data["project_name"],update,context).set_deadline(user_text)
+            if len(description) < 4:
+                raise ValueError("Описание проекта должно содержать не менее 4 слов.")
 
-      await TextHandler.processMessage(
-          context, chat_id, user_message_id, bot_message_id,
-          f"Дедлайн проекта: {user_text}", "projectInfoForEditProject"
-        )
+            context.user_data["project_manager"].found_project(context.user_data["project_name"], update, context).set_description(user_text)
+
+            await TextHandler.processMessage(
+                context, chat_id, user_message_id, bot_message_id,
+                f"Описание проекта обновлено: {user_text}", "projectInfoForEditProject"
+            )
+        except ValueError as e:
+            error_message = str(e) if str(e) else "Ошибка! Введите более детальное описание (не менее 4 слов)."
+            if bot_message_id:
+                try:
+                    await context.bot.edit_message_text(
+                        chat_id=chat_id,
+                        message_id=bot_message_id,
+                        text=error_message + " Попробуйте снова:"
+                    )
+                except Exception as e:
+                    print(f"Ошибка при редактировании сообщения: {e}")
+            try:
+                await context.bot.delete_message(chat_id, user_message_id)
+            except Exception as e:
+                print(f"Ошибка при удалении сообщения пользователя: {e}")
+            return
+
     elif state == "editProjectLink":
-      context.user_data["project_manager"].found_project(context.user_data["project_name"],update,context).set_link_rep(user_text)
+        try:
+            # Проверяем, является ли введенная строка валидной ссылкой
+            regex = r"^(https?://)?(www\.)?[\w.-]+\.\w{2,}(/[\w.-]*)*/?$"
+            if not re.match(regex, user_text):
+                raise ValueError("Введите корректную ссылку на репозиторий.")
 
-      await TextHandler.processMessage(
-          context, chat_id, user_message_id, bot_message_id,
-          f"Ссылка на репозиторий проекта: {user_text}", "projectInfoForEditProject"
-        )
-    elif state == "editProjectTeam":
+            context.user_data["project_manager"].found_project(context.user_data["project_name"], update, context).set_link_rep(user_text)
+
+            await TextHandler.processMessage(
+                context, chat_id, user_message_id, bot_message_id,
+                f"Ссылка на репозиторий обновлена: {user_text}", "projectInfoForEditProject"
+            )
+        except ValueError as e:
+            error_message = str(e) if str(e) else "Ошибка! Введите корректную ссылку на репозиторий."
+            if bot_message_id:
+                try:
+                    await context.bot.edit_message_text(
+                        chat_id=chat_id,
+                        message_id=bot_message_id,
+                        text=error_message + " Попробуйте снова:"
+                    )
+                except Exception as e:
+                    print(f"Ошибка при редактировании сообщения: {e}")
+            try:
+                await context.bot.delete_message(chat_id, user_message_id)
+            except Exception as e:
+                print(f"Ошибка при удалении сообщения пользователя: {e}")
+            return
+
+        """elif state == "editProjectTeam":
       context.user_data["project_manager"].found_project(context.user_data["project_name"],update,context).set_team(user_text)
 
       await TextHandler.processMessage(
           context, chat_id, user_message_id, bot_message_id,
-          f"Дедлайн проекта: {user_text}", "projectInfoForEditProject"
-        )
+          f"Команда проекта: {user_text}", "projectInfoForEditProject"
+        )"""
 
     elif state == "editProject":
       context.user_data["project_name"] = user_text
@@ -241,25 +307,92 @@ class TextHandler:
         )
 
     elif state == "setDeadlineForTask":
-      task.set_deadline(user_text)
-      await TextHandler.processMessage(
-          context, chat_id, user_message_id, bot_message_id,
-          f"Дедлайн задачи: {user_text}", "taskInfoForCreateTask"
-        )
+      try:
+          # Проверяем формат даты
+          task_deadline = datetime.strptime(user_text, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+          task.set_deadline(user_text)
+
+          await TextHandler.processMessage(
+              context, chat_id, user_message_id, bot_message_id,
+              f"Дедлайн задачи установлен: {user_text}", "taskInfoForCreateTask"
+          )
+      except ValueError:
+          # Ошибка формата даты
+          if bot_message_id:
+              try:
+                  await context.bot.edit_message_text(
+                      chat_id=chat_id,
+                      message_id=bot_message_id,
+                      text="Ошибка! Введите дату в формате YYYY-MM-DD. Попробуйте еще раз:"
+                  )
+              except Exception as e:
+                  print(f"Ошибка при редактировании сообщения: {e}")
+          try:
+              await context.bot.delete_message(chat_id, user_message_id)
+          except Exception as e:
+              print(f"Ошибка при удалении сообщения пользователя: {e}")
+          return
 
     elif state == "setPriorityForTask":
-      task.set_priority(user_text)
-      await TextHandler.processMessage(
-          context, chat_id, user_message_id, bot_message_id,
-          f"Приоритет задачи: {user_text}", "taskInfoForCreateTask"
-        )
+        try:
+            # Проверяем приоритет
+            valid_priorities = ["low", "medium", "high"]
+            if user_text.lower() not in valid_priorities:
+                raise ValueError
+
+            task.set_priority(user_text)
+
+            await TextHandler.processMessage(
+                context, chat_id, user_message_id, bot_message_id,
+                f"Приоритет задачи установлен: {user_text}", "taskInfoForCreateTask"
+            )
+        except ValueError:
+            # Ошибка ввода приоритета
+            if bot_message_id:
+                try:
+                    await context.bot.edit_message_text(
+                        chat_id=chat_id,
+                        message_id=bot_message_id,
+                        text="Ошибка! Приоритет должен быть 'low', 'medium' или 'high'. Попробуйте еще раз:"
+                    )
+                except Exception as e:
+                    print(f"Ошибка при редактировании сообщения: {e}")
+            try:
+                await context.bot.delete_message(chat_id, user_message_id)
+            except Exception as e:
+                print(f"Ошибка при удалении сообщения пользователя: {e}")
+            return
 
     elif state == "setStatusForTask":
-      task.set_status(user_text)
-      await TextHandler.processMessage(
-          context, chat_id, user_message_id, bot_message_id,
-          f"Статус задачи: {user_text}", "taskInfoForCreateTask"
-        )
+        try:
+            # Проверяем статус
+            valid_statuses = ["todo", "in progress", "done"]
+            if user_text.lower() not in valid_statuses:
+                raise ValueError
+
+            task.set_status(user_text)
+
+            await TextHandler.processMessage(
+                context, chat_id, user_message_id, bot_message_id,
+                f"Статус задачи установлен: {user_text}", "taskInfoForCreateTask"
+            )
+        except ValueError:
+            # Ошибка ввода статуса
+            if bot_message_id:
+                try:
+                    await context.bot.edit_message_text(
+                        chat_id=chat_id,
+                        message_id=bot_message_id,
+                        text="Ошибка! Статус должен быть 'todo', 'in progress' или 'done'. Попробуйте еще раз:"
+                    )
+                except Exception as e:
+                    print(f"Ошибка при редактировании сообщения: {e}")
+            try:
+                await context.bot.delete_message(chat_id, user_message_id)
+            except Exception as e:
+                print(f"Ошибка при удалении сообщения пользователя: {e}")
+            return
+
 
     elif state == "deleteTask":
       await context.user_data["task_manager"].delete_task(user_text, update, context)
@@ -271,10 +404,7 @@ class TextHandler:
     elif state == "editTask":
       context.user_data["task_name"] = user_text
       return await EditTaskMenuHandler.handle(update, context)
-      """await TextHandler.processMessage(
-          context, chat_id, user_message_id, bot_message_id,
-          f"Имя задачи: {user_text}", "taskInfoForCreateTask"
-        )"""
+
 
     elif state == "editTaskName":
       print(context.user_data["task_name"])
@@ -295,25 +425,88 @@ class TextHandler:
         )
 
     elif state == "editTaskDeadline":
-      context.user_data["task_manager"].found_task(context.user_data["task_name"],update,context).set_deadline(user_text)
+        try:
+            # Проверяем формат даты
+            task_deadline = datetime.strptime(user_text, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            context.user_data["task_manager"].found_task(context.user_data["task_name"], update, context).set_deadline(user_text)
 
-      await TextHandler.processMessage(
-          context, chat_id, user_message_id, bot_message_id,
-          f"Дедлайн задачи: {user_text}", "taskInfoForEditTask"
-        )
+            await TextHandler.processMessage(
+                context, chat_id, user_message_id, bot_message_id,
+                f"Дедлайн задачи обновлен: {user_text}", "taskInfoForEditTask"
+            )
+        except ValueError:
+            # Ошибка формата даты
+            if bot_message_id:
+                try:
+                    await context.bot.edit_message_text(
+                        chat_id=chat_id,
+                        message_id=bot_message_id,
+                        text="Ошибка! Введите дату в формате YYYY-MM-DD. Попробуйте еще раз:"
+                    )
+                except Exception as e:
+                    print(f"Ошибка при редактировании сообщения: {e}")
+            try:
+                await context.bot.delete_message(chat_id, user_message_id)
+            except Exception as e:
+                print(f"Ошибка при удалении сообщения пользователя: {e}")
+            return
 
     elif state == "editTaskPriority":
-      context.user_data["task_manager"].found_task(context.user_data["task_name"],update,context).set_priority(user_text)
+        try:
+            # Проверяем приоритет
+            valid_priorities = ["low", "medium", "high"]
+            if user_text.lower() not in valid_priorities:
+                raise ValueError
 
-      await TextHandler.processMessage(
-          context, chat_id, user_message_id, bot_message_id,
-          f"Приоритет задачи: {user_text}", "taskInfoForEditTask"
-        )
+            context.user_data["task_manager"].found_task(context.user_data["task_name"], update, context).set_priority(user_text)
+
+            await TextHandler.processMessage(
+                context, chat_id, user_message_id, bot_message_id,
+                f"Приоритет задачи обновлен: {user_text}", "taskInfoForEditTask"
+            )
+        except ValueError:
+            # Ошибка ввода приоритета
+            if bot_message_id:
+                try:
+                    await context.bot.edit_message_text(
+                        chat_id=chat_id,
+                        message_id=bot_message_id,
+                        text="Ошибка! Приоритет должен быть 'low', 'medium' или 'high'. Попробуйте еще раз:"
+                    )
+                except Exception as e:
+                    print(f"Ошибка при редактировании сообщения: {e}")
+            try:
+                await context.bot.delete_message(chat_id, user_message_id)
+            except Exception as e:
+                print(f"Ошибка при удалении сообщения пользователя: {e}")
+            return
 
     elif state == "editTaskStatus":
-      context.user_data["task_manager"].found_task(context.user_data["task_name"],update,context).set_status(user_text)
+        try:
+            # Проверяем статус
+            valid_statuses = ["todo", "in progress", "done"]
+            if user_text.lower() not in valid_statuses:
+                raise ValueError
 
-      await TextHandler.processMessage(
-          context, chat_id, user_message_id, bot_message_id,
-          f"Статус задачи: {user_text}", "taskInfoForEditTask"
-        )
+            context.user_data["task_manager"].found_task(context.user_data["task_name"], update, context).set_status(user_text)
+
+            await TextHandler.processMessage(
+                context, chat_id, user_message_id, bot_message_id,
+                f"Статус задачи обновлен: {user_text}", "taskInfoForEditTask"
+            )
+        except ValueError:
+            # Ошибка ввода статуса
+            if bot_message_id:
+                try:
+                    await context.bot.edit_message_text(
+                        chat_id=chat_id,
+                        message_id=bot_message_id,
+                        text="Ошибка! Статус должен быть 'todo', 'in progress' или 'done'. Попробуйте еще раз:"
+                    )
+                except Exception as e:
+                    print(f"Ошибка при редактировании сообщения: {e}")
+            try:
+                await context.bot.delete_message(chat_id, user_message_id)
+            except Exception as e:
+                print(f"Ошибка при удалении сообщения пользователя: {e}")
+            return
