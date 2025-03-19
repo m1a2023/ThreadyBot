@@ -5,6 +5,7 @@ from typing import Any
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
+from telegram.error import BadRequest
 
 from TaskManagement.TaskManager import TaskManager
 
@@ -282,3 +283,77 @@ class TextHandler:
           context, chat_id, user_message_id, bot_message_id,
           f"Статус задачи: {user_text}", "taskInfoForEditTask"
         )
+
+    # TEAM
+    if "team" in context.user_data:
+      team = context.user_data["team"]
+    
+    if state == "addNewDeveloper":
+      # Если нет такого пользователя в списке тимы
+      if user_text not in team:
+        team.append(user_text)
+        # Удаляем сообщение бота
+        if bot_message_id:
+          await context.bot.delete_message(chat_id, bot_message_id)
+
+        # Удаляем сообщение пользователя
+        if user_message_id:
+          try:
+            await context.bot.delete_message(chat_id, user_message_id)
+          except Exception as e:
+            print(f"Ошибка при удалении сообщения пользователя: {e}")
+        
+        context.user_data["state"] = None
+        
+      # Если такой пользователь уже есть в тиме
+      else:
+        if bot_message_id:
+          try:
+            await context.bot.edit_message_text(
+            chat_id=chat_id,
+            message_id=bot_message_id,
+            text="Такой пользователь уже есть в команде. Попробуйте еще раз:"
+          )
+          except Exception as e:
+            print(f"Ошибка при редактировании сообщения: {e}")
+          # Удаляем сообщение пользователя
+          if user_message_id:
+            try:
+              await context.bot.delete_message(chat_id, user_message_id)
+            except Exception as e:
+              print(f"Ошибка при удалении сообщения пользователя: {e}")
+        return
+        
+    elif state == "deleteDeveloper":
+      try:
+        team.remove(user_text)
+        # Удаляем сообщение бота
+        if bot_message_id:
+          await context.bot.delete_message(chat_id, bot_message_id)
+
+        # Удаляем сообщение пользователя
+        if user_message_id:
+          try:
+            await context.bot.delete_message(chat_id, user_message_id)
+          except Exception as e:
+            print(f"Ошибка при удалении сообщения пользователя: {e}")
+        
+        context.user_data["state"] = None
+        
+      except ValueError as e:
+        if bot_message_id:
+          try:
+            await context.bot.edit_message_text(
+            chat_id=chat_id,
+            message_id=bot_message_id,
+            text="Такого пользователя нет в команде. Попробуйте еще раз:"
+          )
+          except Exception as e:
+            print(f"Ошибка при редактировании сообщения: {e}")
+          # Удаляем сообщение пользователя
+          if user_message_id:
+            try:
+              await context.bot.delete_message(chat_id, user_message_id)
+            except Exception as e:
+              print(f"Ошибка при удалении сообщения пользователя: {e}")
+        return

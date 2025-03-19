@@ -12,6 +12,15 @@ from Handlers.HandlersForMainMenu.GeneralSettingsHandler import GeneralSettingsH
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.CreateProjectHandler import CreateProjectHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.ChangeProjectHandler import ChangeProjectHandler
 
+""" Импорты хендлеров для изменения данных уже существующих проектов """
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangeProject.ChangeInfoAboutTeamHandler import ChangeInfoAboutTeamHandler
+
+""" Импорты хендлеров для изменения тимы """
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangeProject.HandlersForChangeInfoAboutTeam.AddNewDeveloperHandler import AddNewDeveloperHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangeProject.HandlersForChangeInfoAboutTeam.DeleteDeveloperHandler import DeleteDeveloperHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangeProject.HandlersForChangeInfoAboutTeam.CancelChangeTeamHandler import CancelChangeTeamHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangeProject.HandlersForChangeInfoAboutTeam.SaveChangeTeamHandler import SaveChangeTeamHandler
+
 """ Импорты хендлеров для создания проекта """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForCreateProject.SaveNewProjectHandler import SaveCreateProjectHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForCreateProject.SetDescriptionHandler import SetDescriptionHandler
@@ -20,7 +29,7 @@ from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForCreatePro
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForCreateProject.SetLinkRepHandler import SetLinkRepHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForCreateProject.CancelCreateProjectHandler import CancelCreateProjectHandler
 
-
+""" Импорты хендлеров для тасков """
 from Handlers.HandlersForTaskMenu.MainTaskMenuHandler import MainTaskMenuHandler
 
 from Handlers.HandlersForTaskMenu.AddHandler import AddHandler
@@ -70,8 +79,21 @@ class MainCallbackHandler(Handler):
     elif query.data == "ChangeProject":
       return await ChangeProjectHandler.handle(update, context)
 
+    # Обработка кнопок в ""Изменить сущестсвующий проект""
     elif query.data == "changeTasks":
        return await MainTaskMenuHandler.handle(update, context)
+    elif query.data == "changeTeam":
+       return await ChangeInfoAboutTeamHandler.handle(update, context)
+    
+    # Обработка кнопок в "Изменение данных о команде"
+    elif query.data == "addNewDeveloper":
+       return await AddNewDeveloperHandler.handle(update, context)
+    elif query.data == "deleteDeveloper":
+      return await DeleteDeveloperHandler.handle(update, context)
+    elif query.data == "cancelChangeTeam":
+      return await CancelChangeTeamHandler.handle(update, context)
+    elif query.data == "saveChangeTeam":
+      return await SaveChangeTeamHandler.handle(update, context)
 
     # Обработка кнопок в "Создание проекта"
     elif query.data == "setNameForCreateProject":
