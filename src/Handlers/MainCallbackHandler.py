@@ -8,9 +8,21 @@ from Handlers.HandlersForMainMenu.SettingsOfProjectsHandler import SettingsOfPro
 from Handlers.HandlersForMainMenu.EventsAndStatusOfProjectHandler import EventsAndStatusOfProjectHandler
 from Handlers.HandlersForMainMenu.GeneralSettingsHandler import GeneralSettingsHandler
 
+""" Импорты хендлеров для ближайших событий и состояния проекта """
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.ReportHandler import ReportMenuHandler
+
 """ Импорты хендлеров для управления проектами """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.CreateProjectHandler import CreateProjectHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.ChangeProjectHandler import ChangeProjectHandler
+
+""" Импорты хендлеров для изменения данных уже существующих проектов """
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangeProject.ChangeInfoAboutTeamHandler import ChangeInfoAboutTeamHandler
+
+""" Импорты хендлеров для изменения тимы """
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangeProject.HandlersForChangeInfoAboutTeam.AddNewDeveloperHandler import AddNewDeveloperHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangeProject.HandlersForChangeInfoAboutTeam.DeleteDeveloperHandler import DeleteDeveloperHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangeProject.HandlersForChangeInfoAboutTeam.CancelChangeTeamHandler import CancelChangeTeamHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangeProject.HandlersForChangeInfoAboutTeam.SaveChangeTeamHandler import SaveChangeTeamHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.ChooseProjectHandler import ChooseProjectHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.ShowProjectsInfoHandler import ShowProjectsInfoHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.DeleteProjectHandler import DeleteProjectHandler
@@ -75,6 +87,10 @@ class MainCallbackHandler(Handler):
       return await EventsAndStatusOfProjectHandler.handle(update, context)
     elif query.data == "GeneralSettings":
       return await GeneralSettingsHandler.handle(update, context)
+    
+    # Обработка кнопок в "Ближайшие события и состояние проекта"
+    elif query.data == "reportsMenu":
+       return await ReportMenuHandler.handle(update, context)
 
     # Обработка кнопок в "Управление проектами"
     elif query.data == "CreateProject":
@@ -89,6 +105,18 @@ class MainCallbackHandler(Handler):
     #кнопка изменения задачь(в меню изменения проекта)
     elif query.data == "changeTasks":
        return await MainTaskMenuHandler.handle(update, context)
+    elif query.data == "changeTeam":
+       return await ChangeInfoAboutTeamHandler.handle(update, context)
+    
+    # Обработка кнопок в "Изменение данных о команде"
+    elif query.data == "addNewDeveloper":
+       return await AddNewDeveloperHandler.handle(update, context)
+    elif query.data == "deleteDeveloper":
+      return await DeleteDeveloperHandler.handle(update, context)
+    elif query.data == "cancelChangeTeam":
+      return await CancelChangeTeamHandler.handle(update, context)
+    elif query.data == "saveChangeTeam":
+      return await SaveChangeTeamHandler.handle(update, context)
 
     # Обработка кнопок в "Создание проекта"
     elif query.data == "setNameForCreateProject":
