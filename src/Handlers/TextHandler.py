@@ -102,7 +102,7 @@ class TextHandler:
       # Удаляем из ввода все, что не буквы и не цифры и разделяем по пробелам
       description = (re.sub(r'[^\w\s]', '', user_text)).split()
       # Описание должно быть не меньше 4 слов
-      if len(description) >= 4:
+      if len(description) >= 15:
         # Если ввод корректен, обновляем информацию
         project.set_description(user_text)
         await TextHandler.processMessage(
