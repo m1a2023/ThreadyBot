@@ -15,6 +15,8 @@ from Handlers.HandlersForMainMenu.HandlersForSettingProject.ChangeProjectHandler
 
 import re
 
+from Handlers.RequestsHandler import getProjectById
+
 class TextHandler:
   @staticmethod
   async def processMessage(
@@ -67,134 +69,221 @@ class TextHandler:
     user_message_id = update.message.message_id
     bot_message_id = context.user_data.get("bot_message_id")
 
+    if "chosenProject" in context.user_data:
+      chosenProject = context.user_data["chosenProject"]
+    
+    if "changedProject" in context.user_data:
+      changedProject = context.user_data["changedProject"]
+
     # Получаем текущее состояние
     state = context.user_data.get("state")
 
-
-    if state == "deleteProject":
-      await update.message.reply_text(await context.user_data["project_manager"].delete_project(user_text, update, context))\
-
-      project_name = context.user_data["project_name"]
-      if project_name in context.user_data["task_managers"]:
-        del context.user_data["task_managers"][project_name]
-
-      """await TextHandler.processMessage(
+    if state == "editProjectName":
+      if (len(user_text) >= 4 and not user_text[0].isdigit()):
+        changedProject.name = user_text
+        print(changedProject.__str__())
+        await TextHandler.processMessage(
           context, chat_id, user_message_id, bot_message_id,
-          f"{user_text}", "projectInfoForDeleteProject"
-        )"""
-
-    elif state == "chooseProject":
-       #тут будет запрос к бд
-       print(user_text)
-       if context.user_data["project_manager"].found_project(user_text, update, context):
-          return await ChangeProjectHandler.handle(update, context)
-       else:
-          await update.message.reply_text("Такого проекта нет")
-
-    elif state == "editProjectName":
-        try:
-            # Название проекта должно содержать только буквы, цифры и пробелы
-            project_name = re.sub(r"[^\w\s]", "", user_text).strip()
-
-            if len(project_name) < 3:
-                raise ValueError("Название проекта должно быть не короче 3 символов.")
-
-            context.user_data["project_manager"].found_project(context.user_data["project_name"], update, context).set_name(project_name)
-            context.user_data["project_name"] = project_name
-
-            await TextHandler.processMessage(
-                context, chat_id, user_message_id, bot_message_id,
-                f"Имя проекта обновлено: {project_name}", "projectInfoForEditProject"
+          f"Имя проекта: {user_text}", "projectInfoForChangeProject"
+        )
+      else:
+        if bot_message_id:
+          try:
+            await context.bot.edit_message_text(
+              chat_id=chat_id,
+              message_id=bot_message_id,
+              text="Вы ввели некорректное название проекта: имя проекта не может короче 4 символов и не может начинаться с числа.\nВведите имя еще раз:"
             )
-        except ValueError as e:
-            error_message = str(e) if str(e) else "Ошибка! Введите корректное название проекта (не менее 3 символов)."
-            if bot_message_id:
-                try:
-                    await context.bot.edit_message_text(
-                        chat_id=chat_id,
-                        message_id=bot_message_id,
-                        text=error_message + " Попробуйте снова:"
-                    )
-                except Exception as e:
-                    print(f"Ошибка при редактировании сообщения: {e}")
-            try:
-                await context.bot.delete_message(chat_id, user_message_id)
-            except Exception as e:
-                print(f"Ошибка при удалении сообщения пользователя: {e}")
-            return
-
+          except Exception as e:
+            print(f"Ошибка при редактировании сообщения: {e}")
+        # Удаляем сообщение пользователя
+        if user_message_id:
+          try:
+            await context.bot.delete_message(chat_id, user_message_id)
+          except Exception as e:
+            print(f"Ошибка при удалении сообщения пользователя: {e}")
+        return
+      
     elif state == "editProjectDescription":
-        try:
-            # Описание проекта не должно быть короче 4 слов
-            description = re.sub(r"[^\w\s]", "", user_text).split()
-
-            if len(description) < 4:
-                raise ValueError("Описание проекта должно содержать не менее 4 слов.")
-
-            context.user_data["project_manager"].found_project(context.user_data["project_name"], update, context).set_description(user_text)
-
-            await TextHandler.processMessage(
-                context, chat_id, user_message_id, bot_message_id,
-                f"Описание проекта обновлено: {user_text}", "projectInfoForEditProject"
-            )
-        except ValueError as e:
-            error_message = str(e) if str(e) else "Ошибка! Введите более детальное описание (не менее 4 слов)."
-            if bot_message_id:
-                try:
-                    await context.bot.edit_message_text(
-                        chat_id=chat_id,
-                        message_id=bot_message_id,
-                        text=error_message + " Попробуйте снова:"
-                    )
-                except Exception as e:
-                    print(f"Ошибка при редактировании сообщения: {e}")
-            try:
-                await context.bot.delete_message(chat_id, user_message_id)
-            except Exception as e:
-                print(f"Ошибка при удалении сообщения пользователя: {e}")
-            return
-
-    elif state == "editProjectLink":
-        try:
-            # Проверяем, является ли введенная строка валидной ссылкой
-            regex = r"^(https?://)?(www\.)?[\w.-]+\.\w{2,}(/[\w.-]*)*/?$"
-            if not re.match(regex, user_text):
-                raise ValueError("Введите корректную ссылку на репозиторий.")
-
-            context.user_data["project_manager"].found_project(context.user_data["project_name"], update, context).set_link_rep(user_text)
-
-            await TextHandler.processMessage(
-                context, chat_id, user_message_id, bot_message_id,
-                f"Ссылка на репозиторий обновлена: {user_text}", "projectInfoForEditProject"
-            )
-        except ValueError as e:
-            error_message = str(e) if str(e) else "Ошибка! Введите корректную ссылку на репозиторий."
-            if bot_message_id:
-                try:
-                    await context.bot.edit_message_text(
-                        chat_id=chat_id,
-                        message_id=bot_message_id,
-                        text=error_message + " Попробуйте снова:"
-                    )
-                except Exception as e:
-                    print(f"Ошибка при редактировании сообщения: {e}")
-            try:
-                await context.bot.delete_message(chat_id, user_message_id)
-            except Exception as e:
-                print(f"Ошибка при удалении сообщения пользователя: {e}")
-            return
-
-        """elif state == "editProjectTeam":
-      context.user_data["project_manager"].found_project(context.user_data["project_name"],update,context).set_team(user_text)
-
-      await TextHandler.processMessage(
+      description = (re.sub(r'[^\w\s]', '', user_text)).split()
+      if len(description) >= 2:
+        # Если ввод корректен, обновляем информацию
+        changedProject.set_description(user_text)
+        print(changedProject.__str__())
+        await TextHandler.processMessage(
           context, chat_id, user_message_id, bot_message_id,
-          f"Команда проекта: {user_text}", "projectInfoForEditProject"
-        )"""
+          f"Описание проекта: {user_text}", "projectInfoForChangeProject"
+        )
+      else:
+        # Редактируем предыдущее сообщение бота
+        if bot_message_id:
+          try:
+            await context.bot.edit_message_text(
+              chat_id=chat_id,
+              message_id=bot_message_id,
+              text="Вы ввели некорректное описание. Описание проекта не может быть меньше 15 слов. Введите описание еще раз:"
+            )
+          except Exception as e:
+            print(f"Ошибка при редактировании сообщения: {e}")
+        # Удаляем сообщение пользователя
+        try:
+          await context.bot.delete_message(chat_id, user_message_id)
+        except Exception as e:
+          print(f"Ошибка при удалении сообщения пользователя: {e}")
+        return
+      
+    elif state == "editProjectLink":
+      parsed_url = urlparse(user_text)
+      if (all([parsed_url.scheme, parsed_url.netloc])):
+        changedProject.set_repo_link(user_text)
+        await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Ссылка на репозиторий: {user_text}", "projectInfoForChangeProject"
+        )
+      else:
+        if bot_message_id:
+          try:
+            await context.bot.edit_message_text(
+              chat_id=chat_id,
+              message_id=bot_message_id,
+              text="Введенная ссылка недействительна. Попробуйте еще раз:"
+            )
+          except Exception as e:
+            print(f"Ошибка при редактировании сообщения: {e}")
+        # Удаляем сообщение пользователя
+        try:
+          await context.bot.delete_message(chat_id, user_message_id)
+        except Exception as e:
+          print(f"Ошибка при удалении сообщения пользователя: {e}")
+        return
+    # if state == "ShowProjectsInfo":
+    #   allProjectWithId = await context.user_data["project_manager"].get_projects_names_and_id() #Список кортежей, где 0 - имя, 1 - id
+    #   id = next((project_id for name, project_id in allProjectWithId if name == context.user_data["chosenProject"]))
+    #   foundProject = getProjectById(id)
+    #   print(foundProject.__str__())
 
-    elif state == "editProject":
+    # if state == "deleteProject":
+    #   await update.message.reply_text(await context.user_data["project_manager"].delete_project(user_text, update, context))\
 
-      return await EditProjectInfoMenuHandler.handle(update,context)
+    #   project_name = context.user_data["project_name"]
+    #   if project_name in context.user_data["task_managers"]:
+    #     del context.user_data["task_managers"][project_name]
+
+    #   """await TextHandler.processMessage(
+    #       context, chat_id, user_message_id, bot_message_id,
+    #       f"{user_text}", "projectInfoForDeleteProject"
+    #     )"""
+
+    # elif state == "chooseProject":
+    #    if context.user_data["project_manager"].found_project(user_text, update, context):
+    #       return await ChangeProjectHandler.handle(update, context)
+    #    else:
+    #       await update.message.reply_text("Такого проекта нет")
+
+    # elif state == "editProjectName":
+    #     try:
+    #         # Название проекта должно содержать только буквы, цифры и пробелы
+    #         project_name = re.sub(r"[^\w\s]", "", user_text).strip()
+
+    #         if len(project_name) < 3:
+    #             raise ValueError("Название проекта должно быть не короче 3 символов.")
+
+    #         context.user_data["project_manager"].found_project(context.user_data["project_name"], update, context).set_name(project_name)
+    #         context.user_data["project_name"] = project_name
+
+    #         await TextHandler.processMessage(
+    #             context, chat_id, user_message_id, bot_message_id,
+    #             f"Имя проекта обновлено: {project_name}", "projectInfoForEditProject"
+    #         )
+    #     except ValueError as e:
+    #         error_message = str(e) if str(e) else "Ошибка! Введите корректное название проекта (не менее 3 символов)."
+    #         if bot_message_id:
+    #             try:
+    #                 await context.bot.edit_message_text(
+    #                     chat_id=chat_id,
+    #                     message_id=bot_message_id,
+    #                     text=error_message + " Попробуйте снова:"
+    #                 )
+    #             except Exception as e:
+    #                 print(f"Ошибка при редактировании сообщения: {e}")
+    #         try:
+    #             await context.bot.delete_message(chat_id, user_message_id)
+    #         except Exception as e:
+    #             print(f"Ошибка при удалении сообщения пользователя: {e}")
+    #         return
+
+    # elif state == "editProjectDescription":
+    #     try:
+    #         # Описание проекта не должно быть короче 4 слов
+    #         description = re.sub(r"[^\w\s]", "", user_text).split()
+
+    #         if len(description) < 4:
+    #             raise ValueError("Описание проекта должно содержать не менее 4 слов.")
+
+    #         context.user_data["project_manager"].found_project(context.user_data["project_name"], update, context).set_description(user_text)
+
+    #         await TextHandler.processMessage(
+    #             context, chat_id, user_message_id, bot_message_id,
+    #             f"Описание проекта обновлено: {user_text}", "projectInfoForEditProject"
+    #         )
+    #     except ValueError as e:
+    #         error_message = str(e) if str(e) else "Ошибка! Введите более детальное описание (не менее 4 слов)."
+    #         if bot_message_id:
+    #             try:
+    #                 await context.bot.edit_message_text(
+    #                     chat_id=chat_id,
+    #                     message_id=bot_message_id,
+    #                     text=error_message + " Попробуйте снова:"
+    #                 )
+    #             except Exception as e:
+    #                 print(f"Ошибка при редактировании сообщения: {e}")
+    #         try:
+    #             await context.bot.delete_message(chat_id, user_message_id)
+    #         except Exception as e:
+    #             print(f"Ошибка при удалении сообщения пользователя: {e}")
+    #         return
+
+    # elif state == "editProjectLink":
+    #     try:
+    #         # Проверяем, является ли введенная строка валидной ссылкой
+    #         regex = r"^(https?://)?(www\.)?[\w.-]+\.\w{2,}(/[\w.-]*)*/?$"
+    #         if not re.match(regex, user_text):
+    #             raise ValueError("Введите корректную ссылку на репозиторий.")
+
+    #         context.user_data["project_manager"].found_project(context.user_data["project_name"], update, context).set_link_rep(user_text)
+
+    #         await TextHandler.processMessage(
+    #             context, chat_id, user_message_id, bot_message_id,
+    #             f"Ссылка на репозиторий обновлена: {user_text}", "projectInfoForEditProject"
+    #         )
+    #     except ValueError as e:
+    #         error_message = str(e) if str(e) else "Ошибка! Введите корректную ссылку на репозиторий."
+    #         if bot_message_id:
+    #             try:
+    #                 await context.bot.edit_message_text(
+    #                     chat_id=chat_id,
+    #                     message_id=bot_message_id,
+    #                     text=error_message + " Попробуйте снова:"
+    #                 )
+    #             except Exception as e:
+    #                 print(f"Ошибка при редактировании сообщения: {e}")
+    #         try:
+    #             await context.bot.delete_message(chat_id, user_message_id)
+    #         except Exception as e:
+    #             print(f"Ошибка при удалении сообщения пользователя: {e}")
+    #         return
+
+    #     """elif state == "editProjectTeam":
+    #   context.user_data["project_manager"].found_project(context.user_data["project_name"],update,context).set_team(user_text)
+
+    #   await TextHandler.processMessage(
+    #       context, chat_id, user_message_id, bot_message_id,
+    #       f"Команда проекта: {user_text}", "projectInfoForEditProject"
+    #     )"""
+
+    # elif state == "editProject":
+
+    #   return await EditProjectInfoMenuHandler.handle(update,context)
 
 
     elif state == "setNameForCreateProject":
@@ -202,14 +291,14 @@ class TextHandler:
       # Если ввод корректен, обновляем информацию
       if (len(user_text) >= 4 and not user_text[0].isdigit()):
         context.user_data["project_name"] = user_text
-        project.set_name(user_text)
+        project.set_title(user_text)
         await TextHandler.processMessage(
           context, chat_id, user_message_id, bot_message_id,
           f"Имя проекта: {user_text}", "projectInfoForCreateProject"
         )
 
         # Сохраняем id пользователя как владельца проекта
-        project.set_id_owner(update.message.from_user.id)
+        project.set_owner_id(update.message.from_user.id)
 
       else:
         # Если ввод некорректный, то сообщаем об этом пользователю и запрашиваем ввод снова
@@ -234,8 +323,8 @@ class TextHandler:
     elif state == "setDescriptionForCreateProject":
       # Удаляем из ввода все, что не буквы и не цифры и разделяем по пробелам
       description = (re.sub(r'[^\w\s]', '', user_text)).split()
-      # Описание должно быть не меньше 4 слов
-      if len(description) >= 15:
+      # Описание должно быть не меньше 15 слов
+      if len(description) >= 2:
         # Если ввод корректен, обновляем информацию
         project.set_description(user_text)
         await TextHandler.processMessage(
@@ -279,7 +368,7 @@ class TextHandler:
       # Проверка на то, что это действительно ссылка
       parsed_url = urlparse(user_text)
       if (all([parsed_url.scheme, parsed_url.netloc])):
-        project.set_link_rep(user_text)
+        project.set_repo_link(user_text)
         await TextHandler.processMessage(
           context, chat_id, user_message_id, bot_message_id,
           f"Ссылка на репозиторий: {user_text}", "projectInfoForCreateProject"

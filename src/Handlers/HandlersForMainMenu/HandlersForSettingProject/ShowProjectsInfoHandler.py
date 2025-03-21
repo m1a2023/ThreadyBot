@@ -4,6 +4,8 @@ from telegram.ext import ContextTypes
 from typing import Any
 
 from Handlers.Handler import Handler
+from Handlers.RequestsHandler import getProjectById
+from ProjectManagment.ProjectManager import ProjectManager
 
 class ShowProjectsInfoHandler(Handler):
 
@@ -13,4 +15,18 @@ class ShowProjectsInfoHandler(Handler):
     query = update.callback_query
     await query.answer()
 
-    await context.user_data["project_manager"].show_projects(update, context)
+    await ProjectManager.get_and_update_list_projects(update, context)
+
+    chosenProj = context.user_data["chosenProject"]
+
+    foundProject = await getProjectById(int(chosenProj))
+
+    keyboard = [
+      [InlineKeyboardButton("Назад", callback_data="SettingsOfProjects")]
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await query.edit_message_text(f"Данные о проекте {chosenProj}:\n{foundProject.__str__()}", reply_markup=reply_markup)
+    
+    context.user_data["chosenProject"] = None

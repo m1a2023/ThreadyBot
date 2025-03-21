@@ -95,12 +95,16 @@ class MainCallbackHandler(Handler):
     # Обработка кнопок в "Управление проектами"
     elif query.data == "CreateProject":
       return await CreateProjectHandler.handle(update, context)
-    elif query.data == "chooseProject":
+    elif query.data == "ChangeProject":
+      context.user_data["state"] = "changeProject"
       return await ChooseProjectHandler.handle(update, context) #ChangeProjectHandler
     elif query.data == "ShowProjectsInfo":
-       return await ShowProjectsInfoHandler.handle(update, context)
+      context.user_data["state"] = "showProjectsInfo"
+      return await ChooseProjectHandler.handle(update, context)
     elif query.data == "DeleteProject":
-       return await DeleteProjectHandler.handle(update, context)
+      context.user_data["state"] = "deleteProject"
+      return await ChooseProjectHandler.handle(update, context) #ChangeProjectHandler
+      # return await DeleteProjectHandler.handle(update, context)
 
     #кнопка изменения задачь(в меню изменения проекта)
     elif query.data == "changeTasks":
@@ -136,11 +140,11 @@ class MainCallbackHandler(Handler):
     elif query.data == "editProject":
       return await EditProjectInfoHandler.handle(update, context)
 
-    elif query.data == "editProjectName":
+    elif query.data == "changeNameProject":
       return await EditProjectNameHandler.handle(update, context)
-    elif query.data == "editProjectDescription":
+    elif query.data == "changeDescriptionProject":
       return await EditProjectDescriptionHandler.handle(update, context)
-    elif query.data == "editProjectLink":
+    elif query.data == "changeLinkProject":
       return await EditProjectRepoLinkHandler.handle(update, context)
     #elif query.data == "editProjectTeam":
     #  return await EditProjectTeamHandler.handle(update, context)
@@ -192,3 +196,15 @@ class MainCallbackHandler(Handler):
         return await EditDoneHandler.handle(update,context)
     elif query.data == "edit_cancel":
         return await CancelEditTaskHandler.handle(update,context)
+    
+    # Должно быть в самом конце (так надо)
+    elif query.data[0:14] == "chosenProject_":
+      context.user_data["chosenProject"] = query.data[14:]
+      if context.user_data["state"] == "showProjectsInfo":
+        context.user_data["state"] = None
+        return await ShowProjectsInfoHandler.handle(update, context)
+      
+      elif context.user_data["state"] == "changeProject":
+         context.user_data["state"] = None
+         return await ChangeProjectHandler.handle(update, context)
+      

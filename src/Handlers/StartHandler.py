@@ -7,6 +7,8 @@ from typing import Any
 
 from Handlers.MainMenuHandler import MainMenuHandler
 
+from Handlers.RequestsHandler import *
+
 class StartHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any: 
@@ -16,5 +18,9 @@ class StartHandler(Handler):
           rf"Hi {user.mention_html()}!"
       )
     
+    # Если юзера нет в базе, то добавляем
+    if not await checkUserExists(int(update.message.from_user.id)):
+      await addNewUser(update.message.from_user.id, update.message.from_user.full_name)
+
     """ Вызов главного меню """
     return await MainMenuHandler.handle(update, context)

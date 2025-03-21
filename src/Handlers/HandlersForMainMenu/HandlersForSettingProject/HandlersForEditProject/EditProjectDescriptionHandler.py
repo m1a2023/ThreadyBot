@@ -8,7 +8,6 @@ from Handlers.Handler import Handler
 class EditProjectDescriptionHandler(Handler):
     @staticmethod
     async def handle(update, context):
-        print("edit proj desc")
 
         query = update.callback_query
         await query.answer()
