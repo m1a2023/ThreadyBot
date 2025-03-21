@@ -3,6 +3,7 @@ from telegram.ext import ContextTypes
 from Handlers.Handler import Handler
 
 """ Импорты хендлеров для главного меню """
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.DeleteProjectHandler import DeleteProjectHandler
 from Handlers.MainMenuHandler import MainMenuHandler
 from Handlers.HandlersForMainMenu.SettingsOfProjectsHandler import SettingsOfProjectsHandler
 from Handlers.HandlersForMainMenu.EventsAndStatusOfProjectHandler import EventsAndStatusOfProjectHandler
@@ -25,7 +26,7 @@ from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangePro
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangeProject.HandlersForChangeInfoAboutTeam.SaveChangeTeamHandler import SaveChangeTeamHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.ChooseProjectHandler import ChooseProjectHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.ShowProjectsInfoHandler import ShowProjectsInfoHandler
-from Handlers.HandlersForMainMenu.HandlersForSettingProject.DeleteProjectHandler import DeleteProjectHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.ConfirmationDeleteProjectHandler import ConfirmationDeleteProjectHandler
 
 """ Импорты хендлеров для создания проекта """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForCreateProject.SaveNewProjectHandler import SaveCreateProjectHandler
@@ -95,16 +96,21 @@ class MainCallbackHandler(Handler):
     # Обработка кнопок в "Управление проектами"
     elif query.data == "CreateProject":
       return await CreateProjectHandler.handle(update, context)
+    
     elif query.data == "ChangeProject":
       context.user_data["state"] = "changeProject"
-      return await ChooseProjectHandler.handle(update, context) #ChangeProjectHandler
+      return await ChooseProjectHandler.handle(update, context)
+    
     elif query.data == "ShowProjectsInfo":
       context.user_data["state"] = "showProjectsInfo"
       return await ChooseProjectHandler.handle(update, context)
-    elif query.data == "DeleteProject":
+    
+    elif query.data == "ConfirmationDeleteProject":
       context.user_data["state"] = "deleteProject"
-      return await ChooseProjectHandler.handle(update, context) #ChangeProjectHandler
-      # return await DeleteProjectHandler.handle(update, context)
+      return await ChooseProjectHandler.handle(update, context)
+    
+    elif query.data == "deleteProject":
+      return await DeleteProjectHandler.handle(update, context)
 
     #кнопка изменения задачь(в меню изменения проекта)
     elif query.data == "changeTasks":
@@ -207,4 +213,8 @@ class MainCallbackHandler(Handler):
       elif context.user_data["state"] == "changeProject":
          context.user_data["state"] = None
          return await ChangeProjectHandler.handle(update, context)
+      
+      elif context.user_data["state"] == "deleteProject":
+        context.user_data["state"] = None
+        return await ConfirmationDeleteProjectHandler.handle(update, context)
       

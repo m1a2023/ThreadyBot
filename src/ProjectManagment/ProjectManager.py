@@ -20,30 +20,18 @@ class ProjectManager:
         else:
             context.user_data["project_manager"].projects = await getAllProjects(update.callback_query.from_user.id)
 
-    # async def edit_project(self, project_name, new_project_data):
-    #     project = self.found_project(project_name)
-    #     if project:
-    #         project.update(new_project_data)
-    #         print(f"Проект '{project_name}' отредактирован.")
-    #     else:
-    #         print(f"Проект '{project_name}' не найден.")
-
-    async def delete_project(self, project_name):
-        project = self.found_project(project_name)
-        if project:
-            self.projects.remove(project)
-            response_text = f"Проект '{project_name}' удален."
-        else:
-            response_text = f"Проект '{project_name}' не найден."
-        return response_text
-
-    async def get_projects_names_and_id(self): # Вернет список с именами проектов
+    async def get_projects_names_and_id(self): # Вернет список кортежей, с именами проектов и их id
         list_of_projects = []
         if not self.projects:
            return []
         for project in self.projects:
             list_of_projects.append((project["title"], project["id"]))
         return list_of_projects
-
-    def found_project(self, project_name):
-        return next((proj for proj in self.projects if proj.name == project_name), None)
+    
+    async def get_projects_names(self): # Вернет список с именами проектов
+        list_of_projects = []
+        if not self.projects:
+           return []
+        for project in self.projects:
+            list_of_projects.append(project["title"])
+        return list_of_projects

@@ -1,3 +1,4 @@
+from http import client
 import httpx
 
 from ProjectManagment.Project import Project
@@ -28,10 +29,22 @@ async def addNewUser(id, name):
           "http://localhost:9000/api/db/users/",
           json=user_data
       )
-      # Проверка статуса ответа
       response.raise_for_status()
       print("Юзер добалвен")
       return response.json()
+
+async def getUserNameById(user_id: int):
+  async with httpx.AsyncClient() as client:
+    try:
+      response = await client.get(
+        f"http://localhost:9000/api/db/users/{user_id}"  # URL эндпоинта
+      )
+      response.raise_for_status()
+      user_data = response.json()
+      return user_data.get("name")
+    except Exception as e:
+      print(f"Неожиданная ошибка: {e}")
+
 
 # 
 # Запросы для проектов
@@ -72,7 +85,7 @@ async def getProjectById(project_id) -> Project:
       f"http://localhost:9000/api/db/projects/{project_id}"
     )
     response.raise_for_status()
-    data = response.json() #Словарь с данными
+    data = response.json()
     foundProject = Project(
       title = data["title"], 
       description = data["description"], 
@@ -80,7 +93,7 @@ async def getProjectById(project_id) -> Project:
     )
     return foundProject
   
-
+""" Сохраняет новые данные в проект """
 async def updateProjectById(project_id, newInfo: dict):
   async with httpx.AsyncClient() as client:
     try:
@@ -89,9 +102,98 @@ async def updateProjectById(project_id, newInfo: dict):
         f"http://localhost:9000/api/db/projects/{project_id}",
         json=newInfo
       )
-      response.raise_for_status()  # Проверяем на ошибки HTTP
-      return response  # Возвращаем ID обновленного проекта
+      response.raise_for_status()
+      return response
     except httpx.HTTPStatusError as e:
       print(f"Ошибка HTTP: {e}")
+    except Exception as e:
+      print(f"Неожиданная ошибка: {e}")
+
+""" Удаляет проект по ID """
+async def deleteProject(project_id: int):
+  async with httpx.AsyncClient() as client:
+    try:
+      # Отправляем DELETE-запрос
+      response = await client.delete(
+        f"http://localhost:9000/api/db/projects/{project_id}"
+      )
+      response.raise_for_status()
+      return response.json()
+    except Exception as e:
+      print(f"Неожиданная ошибка: {e}")
+
+# 
+# Запросы для тимы
+# 
+
+""" Запрос для создания тимы """
+async def createNewTeams(team_data: dict):
+  async with httpx.AsyncClient() as client:
+    try:
+      response = await client.post(
+        "http://localhost:9000/api/db/teams/",
+        json=team_data
+      )
+      response.raise_for_status() 
+      return response.json()  
+    except Exception as e:
+      print(f"Неожиданная ошибка: {e}")
+  
+""" Запрос на добавление нового человека в команду """
+async def addUserToTeam(team_data: dict):
+  async with httpx.AsyncClient() as client:
+    try:
+      # Отправляем POST-запрос
+      response = await client.post(
+          "http://localhost:9000/api/db/teams/user", 
+          json=team_data
+      )
+      response.raise_for_status()
+      return response.json()
+    except Exception as e:
+      print(f"Неожиданная ошибка: {e}")
+
+""" Удаление юзера из команды """
+async def deleteUserFromTeam(user_id: int, project_id: int):
+  async with httpx.AsyncClient() as client:
+    try:
+      response = await client.delete(
+        f"http://localhost:9000/api/db/teams/user/{user_id}/project/{project_id}"
+      )
+      response.raise_for_status()
+      return response.json()
+    except Exception as e:
+      print(f"Неожиданная ошибка: {e}")
+
+""" Запрос на получение команды """
+async def getTeamByProjectId(project_id: int):
+  async with httpx.AsyncClient() as client:
+    try:
+      # Отправляем GET-запрос
+      response = await client.get(
+        f"http://localhost:9000/api/db/teams/project/{project_id}"  # URL эндпоинта
+      )
+      response.raise_for_status()  # Проверяем на ошибки HTTP
+      return response.json()
+    except Exception as e:
+      print(f"Неожиданная ошибка: {e}")
+
+""" Запрос на получение команды, возвращающий только id разработчиков """
+async def getListDevelopersIdByProjectId(project_id: int):
+  async with httpx.AsyncClient() as client:
+    try:
+      response = await client.get(
+        f"http://localhost:9000/api/db/teams/project/{project_id}"
+      )
+      response.raise_for_status()
+
+      data = response.json()
+
+      # Извлекаем список ID разработчиков
+      developers_id = []
+      for item in data:
+        developers_id.append(item["user_id"])
+      
+      return developers_id
     except Exception as e:
       print(f"Неожиданная ошибка: {e}")

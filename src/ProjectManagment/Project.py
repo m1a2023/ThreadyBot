@@ -1,13 +1,17 @@
+from ProjectManagment.Developer import Developer
+
 class Project:
     def __init__(self,
                  title: str = "",
                  description: str = "",
                  repo_link: str = "",
-                 owner_id: str = ""):
+                 owner_id: str = "",
+                 team: list = []):
         self.title = title
         self.description = description
         self.repo_link = repo_link
         self.owner_id = owner_id
+        self.team = team
 
     """ Setter for all """
     def set_title(self, name: str):
@@ -32,6 +36,10 @@ class Project:
 
     def get_link_rep(self) -> str:
         return self.repo_link
+    
+    
+    def addDeveloper(self, dev: Developer):
+        self.team.append(dev.to_dict())
 
     """ Returns project data in the form of a dictionary """
     def to_dict(self) -> dict:
@@ -39,7 +47,8 @@ class Project:
             "title": self.title,
             "description": self.description,
             "repo_link": self.repo_link,
-            "owner_id": self.owner_id
+            "owner_id": self.owner_id,
+            "team": self.team
         }
 
     def __str__(self):

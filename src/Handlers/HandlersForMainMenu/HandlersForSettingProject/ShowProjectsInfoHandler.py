@@ -27,6 +27,6 @@ class ShowProjectsInfoHandler(Handler):
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await query.edit_message_text(f"Данные о проекте {chosenProj}:\n{foundProject.__str__()}", reply_markup=reply_markup)
+    await query.edit_message_text(f"Данные о проекте:\n{foundProject.__str__()}", reply_markup=reply_markup)
     
     context.user_data["chosenProject"] = None

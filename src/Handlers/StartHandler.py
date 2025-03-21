@@ -15,7 +15,7 @@ class StartHandler(Handler):
     if update.message and update.effective_user:
       user = update.effective_user 
       await update.message.reply_html(
-          rf"Hi {user.mention_html()}!"
+          rf"Привет, {user.mention_html()}!"
       )
     
     # Если юзера нет в базе, то добавляем
