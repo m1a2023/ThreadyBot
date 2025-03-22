@@ -10,6 +10,7 @@ from Handlers.HandlersForMainMenu.GeneralSettingsHandler import GeneralSettingsH
 
 """ Импорты хендлеров для ближайших событий и состояния проекта """
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.ReportHandler import ReportMenuHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.ProjectReportHandler import ProjectReportHandler
 
 """ Импорты хендлеров для управления проектами """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.CreateProjectHandler import CreateProjectHandler
@@ -87,10 +88,12 @@ class MainCallbackHandler(Handler):
       return await EventsAndStatusOfProjectHandler.handle(update, context)
     elif query.data == "GeneralSettings":
       return await GeneralSettingsHandler.handle(update, context)
-    
+
     # Обработка кнопок в "Ближайшие события и состояние проекта"
     elif query.data == "reportsMenu":
        return await ReportMenuHandler.handle(update, context)
+    elif query.data == "get_project_report":
+       return await ProjectReportHandler.handle(update, context)
 
     # Обработка кнопок в "Управление проектами"
     elif query.data == "CreateProject":
@@ -107,7 +110,7 @@ class MainCallbackHandler(Handler):
        return await MainTaskMenuHandler.handle(update, context)
     elif query.data == "changeTeam":
        return await ChangeInfoAboutTeamHandler.handle(update, context)
-    
+
     # Обработка кнопок в "Изменение данных о команде"
     elif query.data == "addNewDeveloper":
        return await AddNewDeveloperHandler.handle(update, context)
