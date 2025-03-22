@@ -8,7 +8,6 @@ from Handlers.Handler import Handler
 class EditDescriptionHandler(Handler):
     @staticmethod
     async def handle(update, context):
-        print("edit description")
 
         query = update.callback_query
         await query.answer()

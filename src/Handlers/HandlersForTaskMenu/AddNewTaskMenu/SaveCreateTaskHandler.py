@@ -7,11 +7,12 @@ from telegram.error import BadRequest
 
 from Handlers.Handler import Handler
 
-from Handlers.HandlersForTaskMenu.AddNewTaskMenu.NameHandler import NameHandler
-from Handlers.HandlersForTaskMenu.AddNewTaskMenu.DescriptionHandler import DescriptionHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.SetNameHandler import SetNameTaskHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.SetDescriptionForCreateTaskHandler import SetDescriptionForCreateTaskHandler
 from Handlers.HandlersForTaskMenu.MainTaskMenuHandler import MainTaskMenuHandler
+from Handlers.RequestsHandler import createTask
 
-class DoneHandler(Handler):
+class SaveCreateTaskHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
@@ -27,28 +28,20 @@ class DoneHandler(Handler):
     new_task = context.user_data["task"].to_dict()
     keys_for_check = ["name", "description"]
     for key in keys_for_check:
-      print("проверка")
       if new_task[key] == None:
         if key == "name":
-          print("проверку не прошло имя")
-          await context.bot.send_message(chat_id=chat_id, text="Вы забыли ввести имя задачи")
-          #context.user_data["state"] = "setNameForTask"
-          return await NameHandler.handle(update, context)
+          await context.bot.editMessageText(chat_id=chat_id, text="Вы забыли ввести имя задачи")
+          context.user_data["state"] = "setNameForTask"
+          return await SetNameTaskHandler.handle(update, context)
         elif key == "description":
-          print("проверку не прошло описание")
-          await context.bot.send_message(chat_id=chat_id, text="Вы забыли добавить описание проекту")
-          #context.user_data["state"] = "setDescriptionForTask"
-          return await DescriptionHandler.handle(update, context)
-
-    task_manager = context.user_data["task_managers"].get(context.user_data["project_name"])
-
-    if task_manager:
-        await task_manager.add_task(update, context)
-    else:
-        print("Ошибка: TaskManager для текущего проекта не найден!")
-
-
-    #await context.user_data["task_manager"].add_task(update, context)
+          await context.bot.editMessageText(chat_id=chat_id, text="Вы забыли добавить описание проекту")
+          context.user_data["state"] = "setDescriptionForTask"
+          return await SetDescriptionForCreateTaskHandler.handle(update, context)
+    
+    # Сохраняем задачу
+    new_task = context.user_data["task"]
+    project_id = context.user_data["chosenProject"]
+    await createTask(new_task, project_id)
 
     # Удаляем последнее сообщение бота (если есть)
     if last_bot_message_id:

@@ -7,9 +7,9 @@ class ProjectManager:
     def __init__(self):
         self.projects = []
 
-    async def add_project(self, project):
-        self.projects.append(project)
-        print(f"Проект '{project.name}' добавлен для владельца {self.owner_id}.")
+    # async def add_project(self, project):
+    #     self.projects.append(project)
+    #     print(f"Проект '{project.name}' добавлен для владельца {self.owner_id}.")
 
     @staticmethod
     async def get_and_update_list_projects(update: Update, context: ContextTypes.DEFAULT_TYPE):

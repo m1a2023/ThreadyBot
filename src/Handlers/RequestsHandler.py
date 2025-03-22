@@ -1,7 +1,7 @@
-from http import client
 import httpx
 
 from ProjectManagment.Project import Project
+from TaskManagement.Task import Task
 
 # 
 # Запросы для юзеров
@@ -145,8 +145,8 @@ async def addUserToTeam(team_data: dict):
     try:
       # Отправляем POST-запрос
       response = await client.post(
-          "http://localhost:9000/api/db/teams/user", 
-          json=team_data
+        "http://localhost:9000/api/db/teams/user", 
+        json=team_data
       )
       response.raise_for_status()
       return response.json()
@@ -195,5 +195,88 @@ async def getListDevelopersIdByProjectId(project_id: int):
         developers_id.append(item["user_id"])
       
       return developers_id
+    except Exception as e:
+      print(f"Неожиданная ошибка: {e}")
+
+# 
+# Запросы для тасков
+# 
+
+""" Создает задачу """
+async def createTask(task: Task, project_id: int):
+  task_data = {
+    "title": task._name,
+    "description": task._description,
+    "deadline": task._deadline.isoformat(),
+    "priority": task._priority,
+    "status": task._status,
+    "project_id": project_id
+  }
+  async with httpx.AsyncClient() as client:
+    try:
+      response = await client.post(
+        "http://localhost:9000/api/db/tasks/", 
+        json=task_data
+      )
+
+      response.raise_for_status() 
+      return response.json()  
+    except Exception as e:
+      print(f"Неожиданная ошибка: {e}")
+
+""" Запрос на редактирование задачи """
+async def updateTaskById(task_id, newInfo: dict):
+  async with httpx.AsyncClient() as client:
+    try:
+      response = await client.put(
+        f"http://localhost:9000/api/db/tasks/{task_id}",
+        json=newInfo
+      )
+      response.raise_for_status()
+      return response
+    except Exception as e:
+      print(f"Неожиданная ошибка: {e}")
+
+""" Запрос на вывод всех задач по id проекта """
+async def getAllTasks(project_id) -> list:
+  async with httpx.AsyncClient() as client:
+    response = await client.get(
+      f"http://localhost:9000/api/db/tasks/project/{project_id}"
+    )
+    response.raise_for_status()
+    tasks = response.json()
+    return tasks
+  
+""" Запрос на удаление задачи """
+async def deleteTaskById(task_id: int):
+  async with httpx.AsyncClient() as client:
+    try:
+      response = await client.delete(
+        f"http://localhost:9000/api/db/tasks/{task_id}"
+      )
+      response.raise_for_status()
+      return response.json()
+    except Exception as e:
+      print(f"Неожиданная ошибка: {e}")
+
+""" Запрос на получение данных о задаче """
+async def getTaskById(task_id: int) -> Task:
+  async with httpx.AsyncClient() as client:
+    try:
+      response = await client.get(
+        f"http://localhost:9000/api/db/tasks/{task_id}"
+      )
+      response.raise_for_status()
+      data = response.json()
+      
+      task = Task(
+        _name = data["title"], 
+        _description = data["description"], 
+        _deadline = data["deadline"],
+        _priority = data["priority"],
+        _status = data["status"]
+      )
+
+      return task
     except Exception as e:
       print(f"Неожиданная ошибка: {e}")

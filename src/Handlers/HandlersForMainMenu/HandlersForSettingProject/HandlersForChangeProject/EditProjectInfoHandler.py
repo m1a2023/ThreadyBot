@@ -30,4 +30,4 @@ class EditProjectInfoHandler(Handler):
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
-        await query.edit_message_text("Изменение данных проекта проекта. Выберите действие", reply_markup=reply_markup)
+        await query.edit_message_text("Изменение данных проекта. Выберите действие", reply_markup=reply_markup)

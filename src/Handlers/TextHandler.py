@@ -28,46 +28,48 @@ class TextHandler:
     new_info: str,
     info_key: str = None
   ):
-      # Удаляем предыдущее сообщение бота
-      if bot_message_id:
-        await context.bot.delete_message(chat_id, bot_message_id)
+    # Удаляем предыдущее сообщение бота
+    if bot_message_id:
+      await context.bot.delete_message(chat_id, bot_message_id)
 
-      # Удаляем сообщение пользователя
-      if user_message_id:
-        try:
-          await context.bot.delete_message(chat_id, user_message_id)
-        except Exception as e:
-          print(f"Ошибка при удалении сообщения пользователя: {e}")
+    # Удаляем сообщение пользователя
+    if user_message_id:
+      try:
+        await context.bot.delete_message(chat_id, user_message_id)
+      except Exception as e:
+        print(f"Ошибка при удалении сообщения пользователя: {e}")
 
-      # Удаляем сообщение, чтобы вывести другое с доп. инфой, которую ввел пользователь
-      last_bot_message_id = context.user_data.get("IdLastMessageFromBot")
-      if last_bot_message_id:
-        try:
-          await context.bot.delete_message(chat_id, last_bot_message_id)
-        except Exception as e:
-          print(f"Ошибка при удалении последнего сообщения бота: {e}")
+    # Удаляем сообщение, чтобы вывести другое с доп. инфой, которую ввел пользователь
+    last_bot_message_id = context.user_data.get("IdLastMessageFromBot")
+    if last_bot_message_id:
+      try:
+        await context.bot.delete_message(chat_id, last_bot_message_id)
+      except Exception as e:
+        print(f"Ошибка при удалении последнего сообщения бота: {e}")
 
-      # Обновляем информацию о проекте
-      context.user_data[info_key].append(new_info)
+    # Обновляем информацию о проекте
+    context.user_data[info_key].append(new_info)
 
-      # Отправляем новое сообщение с обновленной информацией
-      last_message_from_bot = await context.bot.send_message(chat_id, "\n".join(context.user_data[info_key]))
+    # Отправляем новое сообщение с обновленной информацией
+    last_message_from_bot = await context.bot.send_message(chat_id, "\n".join(context.user_data[info_key]))
 
-      # Сохраняем ID нового сообщения бота
-      context.user_data["IdLastMessageFromBot"] = last_message_from_bot.message_id
+    # Сохраняем ID нового сообщения бота
+    context.user_data["IdLastMessageFromBot"] = last_message_from_bot.message_id
 
-      # Сбрасываем состояние
-      context.user_data["state"] = None
+    # Сбрасываем состояние
+    context.user_data["state"] = None
+    context.user_data["calendar_id"] = None
 
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_text = update.message.text
+    if update.message:
+      user_text = update.message.text
+      chat_id = update.message.chat_id
+      user_message_id = update.message.message_id
 
     if "project" in context.user_data:
       project = context.user_data["project"]
 
-    chat_id = update.message.chat_id
-    user_message_id = update.message.message_id
     bot_message_id = context.user_data.get("bot_message_id")
 
     if "project_manager" in context.user_data:
@@ -75,6 +77,9 @@ class TextHandler:
     
     if "changedProject" in context.user_data:
       changedProject = context.user_data["changedProject"]
+    
+    if "changedTask" in context.user_data:
+      changedTask = context.user_data["changedTask"]
 
     # Получаем текущее состояние
     state = context.user_data.get("state")
@@ -86,7 +91,6 @@ class TextHandler:
     if state == "editProjectName":
       if (len(user_text) >= 4 and not user_text[0].isdigit() and user_text not in users_project):
         changedProject.name = user_text
-        print(changedProject.__str__())
         await TextHandler.processMessage(
           context, chat_id, user_message_id, bot_message_id,
           f"Имя проекта: {user_text}", "projectInfoForChangeProject"
@@ -271,7 +275,7 @@ class TextHandler:
         return
 
     # 
-    # Обработка статусов для тасков
+    # Обработка статусов для создания тасков
     # 
 
     if "task" in context.user_data:
@@ -292,215 +296,171 @@ class TextHandler:
         )
 
     elif state == "setDeadlineForTask":
+      # Проверяем, есть ли callback_query
+      if not update.callback_query:
+        await update.message.reply_text("Ошибка: callback_query отсутствует.")
+        return
+
+      # Извлекаем дату
       try:
-          # Проверяем формат даты
-          task_deadline = datetime.strptime(user_text, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-          task.set_deadline(user_text)
+        _, year, month, day = update.callback_query.data.split("_")
+        selected_date_str = f"{year}-{month}-{day}"  # Форматируем дату в строку
+        selected_date = datetime.strptime(selected_date_str, "%Y-%m-%d")
+      except ValueError as e:
+        await update.callback_query.message.reply_text(f"Ошибка при обработке даты: {e}")
+        return
 
-          await TextHandler.processMessage(
-              context, chat_id, user_message_id, bot_message_id,
-              f"Дедлайн задачи установлен: {user_text}", "taskInfoForCreateTask"
-          )
-      except ValueError:
-          # Ошибка формата даты
-          if bot_message_id:
-              try:
-                  await context.bot.edit_message_text(
-                      chat_id=chat_id,
-                      message_id=bot_message_id,
-                      text="Ошибка! Введите дату в формате YYYY-MM-DD. Попробуйте еще раз:"
-                  )
-              except Exception as e:
-                  print(f"Ошибка при редактировании сообщения: {e}")
-          try:
-              await context.bot.delete_message(chat_id, user_message_id)
-          except Exception as e:
-              print(f"Ошибка при удалении сообщения пользователя: {e}")
-          return
+      # Проверяем корректность даты (например, что она не в прошлом)
+      if selected_date < datetime.now():
+        await update.callback_query.message.reply_text("Выбранная дата уже прошла, повторите выбор")
+        return
 
-    elif state == "setPriorityForTask":
-        try:
-            # Проверяем приоритет
-            valid_priorities = ["low", "medium", "high"]
-            if user_text.lower() not in valid_priorities:
-                raise ValueError
+      task.set_deadline(selected_date_str)
 
-            task.set_priority(user_text)
+      # Получаем ID сообщений
+      chat_id = update.callback_query.message.chat_id
+      user_message_id = update.callback_query.message.message_id
+      bot_message_id = context.user_data.get("bot_message_id")
 
-            await TextHandler.processMessage(
-                context, chat_id, user_message_id, bot_message_id,
-                f"Приоритет задачи установлен: {user_text}", "taskInfoForCreateTask"
-            )
-        except ValueError:
-            # Ошибка ввода приоритета
-            if bot_message_id:
-                try:
-                    await context.bot.edit_message_text(
-                        chat_id=chat_id,
-                        message_id=bot_message_id,
-                        text="Ошибка! Приоритет должен быть 'low', 'medium' или 'high'. Попробуйте еще раз:"
-                    )
-                except Exception as e:
-                    print(f"Ошибка при редактировании сообщения: {e}")
-            try:
-                await context.bot.delete_message(chat_id, user_message_id)
-            except Exception as e:
-                print(f"Ошибка при удалении сообщения пользователя: {e}")
-            return
-
-    elif state == "setStatusForTask":
-        try:
-            # Проверяем статус
-            valid_statuses = ["todo", "in progress", "done"]
-            if user_text.lower() not in valid_statuses:
-                raise ValueError
-
-            task.set_status(user_text)
-
-            await TextHandler.processMessage(
-                context, chat_id, user_message_id, bot_message_id,
-                f"Статус задачи установлен: {user_text}", "taskInfoForCreateTask"
-            )
-        except ValueError:
-            # Ошибка ввода статуса
-            if bot_message_id:
-                try:
-                    await context.bot.edit_message_text(
-                        chat_id=chat_id,
-                        message_id=bot_message_id,
-                        text="Ошибка! Статус должен быть 'todo', 'in progress' или 'done'. Попробуйте еще раз:"
-                    )
-                except Exception as e:
-                    print(f"Ошибка при редактировании сообщения: {e}")
-            try:
-                await context.bot.delete_message(chat_id, user_message_id)
-            except Exception as e:
-                print(f"Ошибка при удалении сообщения пользователя: {e}")
-            return
-
-
-    elif state == "deleteTask":
-      await context.user_data["task_manager"].delete_task(user_text, update, context)
       await TextHandler.processMessage(
-          context, chat_id, user_message_id, bot_message_id,
-          f"{user_text}", "taskInfoForDeleteTask"
-        )
+        context, chat_id, user_message_id, bot_message_id,
+        f"Дедлайн: {selected_date_str}", "taskInfoForCreateTask")
+      
+    elif state == "setPriorityForTask":
+      # Проверяем, есть ли callback_query
+      if not update.callback_query:
+        await update.message.reply_text("Ошибка: callback_query отсутствует.")
+        return
 
-    elif state == "editTask":
-      context.user_data["task_name"] = user_text
-      return await EditTaskMenuHandler.handle(update, context)
+      priority = update.callback_query.data[12:]
 
+      task._priority = priority.lower()
+
+      # Получаем ID сообщений
+      chat_id = update.callback_query.message.chat_id
+      user_message_id = update.callback_query.message.message_id
+      bot_message_id = context.user_data.get("bot_message_id")
+
+      # Используем метод processMessage для обработки сообщений
+      await TextHandler.processMessage(
+        context, chat_id, user_message_id, bot_message_id,
+        f"Приоритет: {priority}", "taskInfoForCreateTask")
+      
+    elif state == "setStatusForTask":
+      # Проверяем, есть ли callback_query
+      if not update.callback_query:
+        await update.message.reply_text("Ошибка: callback_query отсутствует.")
+        return
+
+      status = update.callback_query.data[10:]
+
+      task._status = status.lower()
+
+      # Получаем ID сообщений
+      chat_id = update.callback_query.message.chat_id
+      user_message_id = update.callback_query.message.message_id
+      bot_message_id = context.user_data.get("bot_message_id")
+
+      # Используем метод processMessage для обработки сообщений
+      await TextHandler.processMessage(
+        context, chat_id, user_message_id, bot_message_id,
+        f"Статус: {status}", "taskInfoForCreateTask")
+
+    # 
+    # Обработка статусов для редактирования тасков
+    # 
 
     elif state == "editTaskName":
-      print(context.user_data["task_name"])
-      context.user_data["task_manager"].found_task(context.user_data["task_name"],update,context).set_name(user_text)
-      context.user_data["task_name"] = user_text
-
+      changedTask._name = user_text
+      
       await TextHandler.processMessage(
-          context, chat_id, user_message_id, bot_message_id,
-          f"Имя задачи: {user_text}", "taskInfoForEditTask"
-        )
+        context, chat_id, user_message_id, bot_message_id,
+        f"Название задачи: {user_text}", "TaskInfoForChangeTask"
+      )
 
     elif state == "editTaskDescription":
-      context.user_data["task_manager"].found_task(context.user_data["task_name"],update,context).set_description(user_text)
-
+      changedTask._description = user_text
+      
       await TextHandler.processMessage(
-          context, chat_id, user_message_id, bot_message_id,
-          f"Описание задачи: {user_text}", "taskInfoForEditTask"
-        )
+        context, chat_id, user_message_id, bot_message_id,
+        f"Описание задачи задачи: {user_text}", "TaskInfoForChangeTask"
+      )
 
     elif state == "editTaskDeadline":
-        try:
-            # Проверяем формат даты
-            task_deadline = datetime.strptime(user_text, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-            context.user_data["task_manager"].found_task(context.user_data["task_name"], update, context).set_deadline(user_text)
+      if not update.callback_query:
+        await update.message.reply_text("Ошибка: callback_query отсутствует.")
+        return
 
-            await TextHandler.processMessage(
-                context, chat_id, user_message_id, bot_message_id,
-                f"Дедлайн задачи обновлен: {user_text}", "taskInfoForEditTask"
-            )
-        except ValueError:
-            # Ошибка формата даты
-            if bot_message_id:
-                try:
-                    await context.bot.edit_message_text(
-                        chat_id=chat_id,
-                        message_id=bot_message_id,
-                        text="Ошибка! Введите дату в формате YYYY-MM-DD. Попробуйте еще раз:"
-                    )
-                except Exception as e:
-                    print(f"Ошибка при редактировании сообщения: {e}")
-            try:
-                await context.bot.delete_message(chat_id, user_message_id)
-            except Exception as e:
-                print(f"Ошибка при удалении сообщения пользователя: {e}")
-            return
+      # Извлекаем дату
+      try:
+        _, year, month, day = update.callback_query.data.split("_")
+        selected_date_str = f"{year}-{month}-{day}"  # Форматируем дату в строку
+        selected_date = datetime.strptime(selected_date_str, "%Y-%m-%d")
+      except ValueError as e:
+        await update.callback_query.message.reply_text(f"Ошибка при обработке даты: {e}")
+        return
+
+      # Проверяем корректность даты (например, что она не в прошлом)
+      if selected_date < datetime.now():
+        await update.callback_query.message.reply_text("Выбранная дата уже прошла, повторите выбор")
+        return
+
+      changedTask.set_deadline(selected_date_str)
+
+      # Получаем ID сообщений
+      chat_id = update.callback_query.message.chat_id
+      user_message_id = update.callback_query.message.message_id
+      bot_message_id = context.user_data.get("bot_message_id")
+
+      await TextHandler.processMessage(
+        context, chat_id, user_message_id, bot_message_id,
+        f"Дедлайн: {selected_date_str}", "TaskInfoForChangeTask")
 
     elif state == "editTaskPriority":
-        try:
-            # Проверяем приоритет
-            valid_priorities = ["low", "medium", "high"]
-            if user_text.lower() not in valid_priorities:
-                raise ValueError
+      # Проверяем, есть ли callback_query
+      if not update.callback_query:
+        await update.message.reply_text("Ошибка: callback_query отсутствует.")
+        return
 
-            context.user_data["task_manager"].found_task(context.user_data["task_name"], update, context).set_priority(user_text)
+      priority = update.callback_query.data[12:]
 
-            await TextHandler.processMessage(
-                context, chat_id, user_message_id, bot_message_id,
-                f"Приоритет задачи обновлен: {user_text}", "taskInfoForEditTask"
-            )
-        except ValueError:
-            # Ошибка ввода приоритета
-            if bot_message_id:
-                try:
-                    await context.bot.edit_message_text(
-                        chat_id=chat_id,
-                        message_id=bot_message_id,
-                        text="Ошибка! Приоритет должен быть 'low', 'medium' или 'high'. Попробуйте еще раз:"
-                    )
-                except Exception as e:
-                    print(f"Ошибка при редактировании сообщения: {e}")
-            try:
-                await context.bot.delete_message(chat_id, user_message_id)
-            except Exception as e:
-                print(f"Ошибка при удалении сообщения пользователя: {e}")
-            return
+      changedTask._priority = priority.lower()
+
+      # Получаем ID сообщений
+      chat_id = update.callback_query.message.chat_id
+      user_message_id = update.callback_query.message.message_id
+      bot_message_id = context.user_data.get("bot_message_id")
+
+      # Используем метод processMessage для обработки сообщений
+      await TextHandler.processMessage(
+        context, chat_id, user_message_id, bot_message_id,
+        f"Приоритет: {priority}", "TaskInfoForChangeTask")
 
     elif state == "editTaskStatus":
-        try:
-            # Проверяем статус
-            valid_statuses = ["todo", "in progress", "done"]
-            if user_text.lower() not in valid_statuses:
-                raise ValueError
+      # Проверяем, есть ли callback_query
+      if not update.callback_query:
+        await update.message.reply_text("Ошибка: callback_query отсутствует.")
+        return
 
-            context.user_data["task_manager"].found_task(context.user_data["task_name"], update, context).set_status(user_text)
+      status = update.callback_query.data[10:]
 
-            await TextHandler.processMessage(
-                context, chat_id, user_message_id, bot_message_id,
-                f"Статус задачи обновлен: {user_text}", "taskInfoForEditTask"
-            )
-        except ValueError:
-            # Ошибка ввода статуса
-            if bot_message_id:
-                try:
-                    await context.bot.edit_message_text(
-                        chat_id=chat_id,
-                        message_id=bot_message_id,
-                        text="Ошибка! Статус должен быть 'todo', 'in progress' или 'done'. Попробуйте еще раз:"
-                    )
-                except Exception as e:
-                    print(f"Ошибка при редактировании сообщения: {e}")
-            try:
-                await context.bot.delete_message(chat_id, user_message_id)
-            except Exception as e:
-                print(f"Ошибка при удалении сообщения пользователя: {e}")
-            return
+      changedTask._status = status.lower()
+
+      # Получаем ID сообщений
+      chat_id = update.callback_query.message.chat_id
+      user_message_id = update.callback_query.message.message_id
+      bot_message_id = context.user_data.get("bot_message_id")
+
+      # Используем метод processMessage для обработки сообщений
+      await TextHandler.processMessage(
+        context, chat_id, user_message_id, bot_message_id,
+        f"Статус: {status}", "TaskInfoForChangeTask")
     
     # 
     # Обработка статусов для команд
     # 
-
-    team = await getListDevelopersIdByProjectId(context.user_data["chosenProject"])
+    if "chosenProject" in context.user_data:
+      team = await getListDevelopersIdByProjectId(context.user_data["chosenProject"])
     
     if state == "addNewDeveloper":
       # Если нет такого пользователя в списке тимы

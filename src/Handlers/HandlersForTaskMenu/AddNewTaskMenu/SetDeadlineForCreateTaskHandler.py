@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from telegram import Update
 from telegram.ext import ContextTypes
 from typing import Any
@@ -6,14 +6,14 @@ from typing import Any
 from Handlers.Handler import Handler
 from Handlers.HandlersForTaskMenu.CreateCalendarHandler import CreateCalendar
 
-
-class EditDeadlineHandler(Handler):
+class SetDeadlineForCreateTaskHandler(Handler):
     @staticmethod
-    async def handle(update, context, year = None, month = None):
+    async def handle(update, context, year=None, month=None):
+
         query = update.callback_query
         await query.answer()
 
-        context.user_data["state"] = "editTaskDeadline"
+        context.user_data["state"] = "setDeadlineForTask"
         
         # Если год и месяц не переданы, используем текущую дату
         if year is None or month is None:

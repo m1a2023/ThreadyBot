@@ -4,12 +4,12 @@ from Enums.Priority import Priority
 from Enums.Status import Status
 
 class Task:
-    def __init__(self):
-        self._name = None
-        self._description = None
-        self._deadline = None
-        self._priority = None
-        self._status = None
+    def __init__(self, _name: str = None, _description = None, _deadline = None, _priority = None, _status = None):
+        self._name = _name
+        self._description = _description
+        self._deadline = _deadline
+        self._priority = _priority
+        self._status = _status
 
     def set_name(self,task_name):
         self._name = task_name
@@ -19,25 +19,15 @@ class Task:
 
     def set_deadline(self,task_deadline):
         if task_deadline:
-            self._deadline = datetime.strptime(task_deadline, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            self._deadline = datetime.strptime(task_deadline, "%Y-%m-%d")
         else:
             self._deadline = None
 
-    def set_priority(self,task_priority:str):
-        if task_priority.lower() == "low":
-            self._priority = Priority.LOW
-        if task_priority.lower() == "medium":
-            self._priority = Priority.MEDIUM
-        if task_priority.lower() == "high":
-            self._priority = Priority.HIGH
+    def set_priority(self, task_priority:str):
+        self._priority = task_priority
 
     def set_status(self,task_status:str):
-        if task_status.lower() == "todo":
-            self._status = Status.TODO
-        if task_status.lower() == "in progress":
-            self._status = Status.IN_PROGRESS
-        if task_status.lower() == "done":
-            self._status = Status.DONE
+        self._status = task_status
 
     def __str__(self):
         return (f"Задача: {self._name}\n"
@@ -74,3 +64,19 @@ class Task:
             "prioritet:": self._priority,
             "status:": self._status
         }
+    
+    def __str__(self):
+        deadline_str = (
+            datetime.fromisoformat(self._deadline).strftime("%d.%m.%Y")
+            if self._deadline
+            else "Нет дедлайна"
+        )
+
+        # Форматируем строку с информацией о задаче
+        return (
+            f"Задача: {self._name}\n"
+            f"Описание: {self._description}\n"
+            f"Статус: {self._status}\n"
+            f"Приоритет: {self._priority}\n"
+            f"Дедлайн: {deadline_str}"
+        )
