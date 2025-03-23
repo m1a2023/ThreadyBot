@@ -7,6 +7,7 @@ from telegram.error import BadRequest
 
 from Handlers.Handler import Handler
 
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.SetDeadlineForCreateTaskHandler import SetDeadlineForCreateTaskHandler
 from Handlers.HandlersForTaskMenu.AddNewTaskMenu.SetNameHandler import SetNameTaskHandler
 from Handlers.HandlersForTaskMenu.AddNewTaskMenu.SetDescriptionForCreateTaskHandler import SetDescriptionForCreateTaskHandler
 from Handlers.HandlersForTaskMenu.MainTaskMenuHandler import MainTaskMenuHandler
@@ -26,17 +27,23 @@ class SaveCreateTaskHandler(Handler):
 
     # Проверка на то, что пользователь точно ввел имя и описание задачи
     new_task = context.user_data["task"].to_dict()
-    keys_for_check = ["title", "description"]
+    keys_for_check = ["title", "description", "deadline"]
     for key in keys_for_check:
       if new_task[key] == None:
         if key == "title":
-          await context.bot.editMessageText(chat_id=chat_id, text="Вы забыли ввести имя задачи")
+          await context.bot.editMessageText(chat_id=chat_id, message_id=last_bot_message_id, text="Вы забыли ввести имя задачи")
           context.user_data["state"] = "setNameForTask"
           return await SetNameTaskHandler.handle(update, context)
         elif key == "description":
-          await context.bot.editMessageText(chat_id=chat_id, text="Вы забыли добавить описание проекту")
+          await context.bot.editMessageText(chat_id=chat_id, message_id=last_bot_message_id, text="Вы забыли добавить описание задаче")
           context.user_data["state"] = "setDescriptionForTask"
           return await SetDescriptionForCreateTaskHandler.handle(update, context)
+        elif key == "deadline":
+          message = await context.bot.editMessageText(chat_id=chat_id, message_id=last_bot_message_id, text="Вы забыли добавить дедлайн задаче")
+          context.user_data["state"] = "setDeadlineForTask"
+          # context.user_data["IdLastMessageFromBot"] = message.id
+          # context.user_data["bot_message_id"] = message.id
+          return await SetDeadlineForCreateTaskHandler.handle(update, context)
     
     # Сохраняем задачу
     new_task = context.user_data["task"]

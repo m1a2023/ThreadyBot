@@ -56,7 +56,7 @@ async def saveNewProject(project):
       "title": project["title"],
       "description": project["description"],
       "repo_link": project["repo_link"],
-      "owner_id": int(project["owner_id"]),
+      "owner_id": project["owner_id"]
   }
   
   async with httpx.AsyncClient() as client:
@@ -89,7 +89,7 @@ async def getProjectById(project_id) -> Project:
     foundProject = Project(
       title = data["title"], 
       description = data["description"], 
-      repo_link = data["repo_link"]
+      repo_link = data["repo_link"],
     )
     return foundProject
   
@@ -211,7 +211,7 @@ async def createTask(task: Task, project_id: int):
     "priority": task.priority,
     "status": task.status,
     "project_id": project_id,
-    "user_id": int(task.executor)
+    "user_id": task.executor
   }
   async with httpx.AsyncClient() as client:
     try:

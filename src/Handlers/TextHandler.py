@@ -238,15 +238,32 @@ class TextHandler:
         return
 
     elif state == "setTeamForCreateProject":
-      # Множество с юзернеймами, введеными от пользвателя
       set_of_team = set((re.sub(r'[^\w\s@]', '', user_text)).split())
-      for dev_id in set_of_team:
-        developer = Developer(int(dev_id), 0, "user")
-        project.addDeveloper(developer)
-      await TextHandler.processMessage(
-        context, chat_id, user_message_id, bot_message_id,
-        f"Группа разработчиков: {', '.join(set_of_team)}", "projectInfoForCreateProject"
-      )
+      try:
+        for dev_id in set_of_team:
+          dev_id_int = int(dev_id)
+          developer = Developer(dev_id_int, 0, "user")
+          project.addDeveloper(developer)
+        await TextHandler.processMessage(
+          context, chat_id, user_message_id, bot_message_id,
+          f"Группа разработчиков: {', '.join(set_of_team)}", "projectInfoForCreateProject"
+        )
+      except ValueError:
+        if bot_message_id:
+          try:
+            await context.bot.edit_message_text(
+              chat_id=chat_id,
+              message_id=bot_message_id,
+              text="Ошибка: Введенные данные должны быть целыми числами (ID пользователей). Введите данные еще раз:"
+            )
+          except Exception as e:
+            print(f"Ошибка при редактировании сообщения: {e}")
+        try:
+          await context.bot.delete_message(chat_id, user_message_id)
+        except Exception as e:
+          print(f"Ошибка при удалении сообщения пользователя: {e}")
+        
+        return
 
     elif state == "setLinkForCreateProject":
       # Проверка на то, что это действительно ссылка

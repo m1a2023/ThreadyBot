@@ -26,17 +26,20 @@ class ChangeInfoAboutTeamHandler(Handler):
         dev_id_list.append(dict["user_id"])
     
     owner_name = await getUserNameById(owner_id)
+    owner_link = f'<a href="tg://user?id={owner_id}">{owner_name}</a>'
+
     dev_name_list = []
     for id in dev_id_list:
       dev_name_list.append(await getUserNameById(id))
-    
-    dev_data = []
-    for i in range(0, len(dev_id_list)):
-      dev_data.append(f"{dev_name_list[i]} - {dev_id_list[i]}")
-    
-    dev_name_and_id = "\n".join(dev_data)
 
-    team_text = f"Владелец проекта:\n{owner_name} - {owner_id}\nРазработчики проекта:\n{dev_name_and_id}"
+    dev_links = []
+    for dev_id in dev_id_list:
+      dev_name = await getUserNameById(dev_id)
+      dev_link = f'<a href="tg://user?id={dev_id}">{dev_name}</a>'
+      dev_links.append(f"{dev_link} - {dev_id}")
+
+    dev_links_text = "\n".join(dev_links)
+    team_text = f"Владелец проекта:\n{owner_link}\nРазработчики проекта:\n{dev_links_text}"
 
     keyboard = [
         [InlineKeyboardButton("Добавить нового разработчика", callback_data="addNewDeveloper")],
@@ -48,4 +51,4 @@ class ChangeInfoAboutTeamHandler(Handler):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await query.edit_message_text(f"Изменение команды.\n\nВаша команда на данный момент:\n\n{team_text}\n\n\nВыберите действие", reply_markup=reply_markup)
+    await query.edit_message_text(f"Изменение команды.\n\nВаша команда на данный момент:\n{team_text}\n\n\nВыберите действие", reply_markup=reply_markup, parse_mode="HTML")
