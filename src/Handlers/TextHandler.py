@@ -282,7 +282,7 @@ class TextHandler:
       task = context.user_data["task"]
 
     if state == "setNameForTask":
-      task.set_name(user_text)
+      task.set_title(user_text)
       await TextHandler.processMessage(
         context, chat_id, user_message_id, bot_message_id,
         f"Имя задачи: {user_text}", "taskInfoForCreateTask"
@@ -334,7 +334,7 @@ class TextHandler:
 
       priority = update.callback_query.data[12:]
 
-      task._priority = priority.lower()
+      task.priority = priority.lower()
 
       # Получаем ID сообщений
       chat_id = update.callback_query.message.chat_id
@@ -354,7 +354,7 @@ class TextHandler:
 
       status = update.callback_query.data[10:]
 
-      task._status = status.lower()
+      task.status = status.lower()
 
       # Получаем ID сообщений
       chat_id = update.callback_query.message.chat_id
@@ -371,7 +371,7 @@ class TextHandler:
     # 
 
     elif state == "editTaskName":
-      changedTask._name = user_text
+      changedTask.title = user_text
       
       await TextHandler.processMessage(
         context, chat_id, user_message_id, bot_message_id,
@@ -379,7 +379,7 @@ class TextHandler:
       )
 
     elif state == "editTaskDescription":
-      changedTask._description = user_text
+      changedTask.description = user_text
       
       await TextHandler.processMessage(
         context, chat_id, user_message_id, bot_message_id,
@@ -424,7 +424,7 @@ class TextHandler:
 
       priority = update.callback_query.data[12:]
 
-      changedTask._priority = priority.lower()
+      changedTask.priority = priority.lower()
 
       # Получаем ID сообщений
       chat_id = update.callback_query.message.chat_id
@@ -444,7 +444,7 @@ class TextHandler:
 
       status = update.callback_query.data[10:]
 
-      changedTask._status = status.lower()
+      changedTask.status = status.lower()
 
       # Получаем ID сообщений
       chat_id = update.callback_query.message.chat_id
@@ -459,6 +459,7 @@ class TextHandler:
     # 
     # Обработка статусов для команд
     # 
+
     if "chosenProject" in context.user_data:
       team = await getListDevelopersIdByProjectId(context.user_data["chosenProject"])
     

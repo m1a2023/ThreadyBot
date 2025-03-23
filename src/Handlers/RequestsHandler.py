@@ -205,11 +205,11 @@ async def getListDevelopersIdByProjectId(project_id: int):
 """ Создает задачу """
 async def createTask(task: Task, project_id: int):
   task_data = {
-    "title": task._name,
-    "description": task._description,
-    "deadline": task._deadline.isoformat(),
-    "priority": task._priority,
-    "status": task._status,
+    "title": task.title,
+    "description": task.description,
+    "deadline": task.deadline.isoformat(),
+    "priority": task.priority,
+    "status": task.status,
     "project_id": project_id
   }
   async with httpx.AsyncClient() as client:
@@ -270,11 +270,11 @@ async def getTaskById(task_id: int) -> Task:
       data = response.json()
       
       task = Task(
-        _name = data["title"], 
-        _description = data["description"], 
-        _deadline = data["deadline"],
-        _priority = data["priority"],
-        _status = data["status"]
+        title = data["title"], 
+        description = data["description"], 
+        deadline = data["deadline"],
+        priority = data["priority"],
+        status = data["status"]
       )
 
       return task

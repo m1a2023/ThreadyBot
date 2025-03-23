@@ -26,10 +26,10 @@ class SaveCreateTaskHandler(Handler):
 
     # Проверка на то, что пользователь точно ввел имя и описание задачи
     new_task = context.user_data["task"].to_dict()
-    keys_for_check = ["name", "description"]
+    keys_for_check = ["title", "description"]
     for key in keys_for_check:
       if new_task[key] == None:
-        if key == "name":
+        if key == "title":
           await context.bot.editMessageText(chat_id=chat_id, text="Вы забыли ввести имя задачи")
           context.user_data["state"] = "setNameForTask"
           return await SetNameTaskHandler.handle(update, context)

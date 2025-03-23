@@ -189,7 +189,10 @@ class MainCallbackHandler(Handler):
     elif query.data.startswith("prev_") or query.data.startswith("next_"):
       _, year, month = query.data.split("_")
       year, month = int(year), int(month)
-      return await SetDeadlineForCreateTaskHandler.handle(update, context, year, month)
+      if context.user_data["state"] == "setDeadlineForTask":
+        return await SetDeadlineForCreateTaskHandler.handle(update, context, year, month)
+      else:
+        return await EditDeadlineHandler.handle(update, context, year, month)
 
     elif query.data == "setPriorityForCreateTask":
       return await SetPriorityForTaskHandler.handle(update, context)
