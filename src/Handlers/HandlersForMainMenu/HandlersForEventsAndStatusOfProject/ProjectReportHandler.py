@@ -8,10 +8,8 @@ from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfgen import canvas
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.charts.barcharts import VerticalBarChart
-from reportlab.graphics.charts.piecharts import Pie
 
 import os
 
@@ -21,25 +19,26 @@ from Handlers.RequestsHandler import get_report_by_project_id
 class ProjectReportHandler(Handler):
     @staticmethod
     async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        report = await get_report_by_project_id(7) #покатак
+        proj_id = "" #сюда надо вставить id
 
-        file_path = f"project_report_{7}.pdf"
+        report = await get_report_by_project_id(proj_id) #покатак
+
+        file_path = f"Project_report_{proj_id}.pdf"
         await ProjectReportHandler.generate_pdf(report, file_path)
 
         # Отправляем пользователю
         with open(file_path, "rb") as pdf_file:
             print("done")
-            await update.callback_query.message.reply_document(document=pdf_file, filename=f"Report_{7}.pdf")
+            await update.callback_query.message.reply_document(document=pdf_file, filename=f"Project_report_{proj_id}.pdf")
 
         os.remove(file_path)
 
     @staticmethod
     async def generate_pdf(report_data: dict, file_path: str):
+        tasks = report_data['all_tasks_in_project_with_duration']
+
         doc = SimpleDocTemplate(file_path, pagesize=A4)
         elements = []
-        styles = getSampleStyleSheet()
-
-        tasks = report_data['all_tasks_in_project_with_duration']
 
         pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
         pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf'))
@@ -76,8 +75,8 @@ class ProjectReportHandler(Handler):
             [Paragraph("Всего задач", body_style), report_data['total_quantity_of_tasks'], "100%"],
 
             [
-            Paragraph("Завершено", body_style), report_data['quantity_of_compleated_tasks'],
-            f"{int(report_data['quantity_of_compleated_tasks']/report_data['total_quantity_of_tasks']*100)}%"
+            Paragraph("Завершено", body_style), report_data['quantity_of_completed_tasks'],
+            f"{int(report_data['quantity_of_completed_tasks']/report_data['total_quantity_of_tasks']*100)}%"
             ],
 
             [

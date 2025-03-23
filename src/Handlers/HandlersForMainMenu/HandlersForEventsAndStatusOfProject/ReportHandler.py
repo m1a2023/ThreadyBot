@@ -13,8 +13,8 @@ class ReportMenuHandler(Handler):
     await query.answer()
 
     keyboard = [
-      [InlineKeyboardButton("Сделать отчет по сотрудникам (Не работает)", callback_data="123")],
-      [InlineKeyboardButton("Сделать отчет о ходе выполнения задач (Не работает)", callback_data="get_project_report")],
+      [InlineKeyboardButton("Сделать отчет по сотруднику", callback_data="get_developer_report")],
+      [InlineKeyboardButton("Сделать отчет о проекте", callback_data="get_project_report")],
       [InlineKeyboardButton("Выход в главное меню", callback_data="MoveToMainMenu")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)

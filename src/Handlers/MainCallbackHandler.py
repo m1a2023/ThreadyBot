@@ -11,6 +11,7 @@ from Handlers.HandlersForMainMenu.GeneralSettingsHandler import GeneralSettingsH
 """ Импорты хендлеров для ближайших событий и состояния проекта """
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.ReportHandler import ReportMenuHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.ProjectReportHandler import ProjectReportHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.UserReportHandler import UserReportHandler
 
 """ Импорты хендлеров для управления проектами """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.CreateProjectHandler import CreateProjectHandler
@@ -94,6 +95,8 @@ class MainCallbackHandler(Handler):
        return await ReportMenuHandler.handle(update, context)
     elif query.data == "get_project_report":
        return await ProjectReportHandler.handle(update, context)
+    elif query.data == "get_developer_report":
+       return await UserReportHandler.handle(update, context)
 
     # Обработка кнопок в "Управление проектами"
     elif query.data == "CreateProject":
