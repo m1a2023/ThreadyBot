@@ -29,7 +29,7 @@ class ProjectManager():
         if not ProjectManager.PROJECTS:
             return "Список проектов пуст."
 
-        return "\n\n".join([f"{i + 1}. {proj}" for i, proj in enumerate(ProjectManager.PROJECTS)])
+        return "\n---\n".join([f"{i + 1}. {proj}" for i, proj in enumerate(ProjectManager.PROJECTS)])
 
     @staticmethod
     async def show_projects(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -44,3 +44,10 @@ class ProjectManager():
     @staticmethod
     def found_project(proj_name,update: Update, context: ContextTypes.DEFAULT_TYPE):
         return next((proj for proj in context.user_data["project_manager"].PROJECTS if proj.name == proj_name), None)
+
+    async def get_projects_list():
+        print("from get projs list")
+        if not ProjectManager.PROJECTS:
+            return "Список проектов пуст."
+
+        return [(i+1,proj) for i, proj in enumerate(ProjectManager.PROJECTS)]

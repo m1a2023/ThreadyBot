@@ -1,6 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from Handlers.Handler import Handler
+from watchfiles import awatch
 
 """ Импорты хендлеров для главного меню """
 from Handlers.MainMenuHandler import MainMenuHandler
@@ -12,6 +13,10 @@ from Handlers.HandlersForMainMenu.GeneralSettingsHandler import GeneralSettingsH
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.ReportHandler import ReportMenuHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.ProjectReportHandler import ProjectReportHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.UserReportHandler import UserReportHandler
+
+""" Импорты хендлеров для работы с генерацией плана проекта от ЛЛМ"""
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.GeneratingProjectPlanMenuHandler import GeneratingPlanMenuHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.GenerateProjectPlanHandler import GenerateProjectPlanHandler
 
 """ Импорты хендлеров для управления проектами """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.CreateProjectHandler import CreateProjectHandler
@@ -97,6 +102,8 @@ class MainCallbackHandler(Handler):
        return await ProjectReportHandler.handle(update, context)
     elif query.data == "get_developer_report":
        return await UserReportHandler.handle(update, context)
+    elif query.data == "generatePlanMenu":
+        return await GeneratingPlanMenuHandler.handle(update,context)
 
     # Обработка кнопок в "Управление проектами"
     elif query.data == "CreateProject":
@@ -198,3 +205,7 @@ class MainCallbackHandler(Handler):
         return await EditDoneHandler.handle(update,context)
     elif query.data == "edit_cancel":
         return await CancelEditTaskHandler.handle(update,context)
+
+    #кнопки для работы с генерацией плана проекта
+    elif query.data == "generate_plan":
+        return await GenerateProjectPlanHandler.handle(update, context)
