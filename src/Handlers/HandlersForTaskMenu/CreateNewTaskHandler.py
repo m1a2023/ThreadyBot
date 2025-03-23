@@ -23,6 +23,7 @@ class CreateNewTaskHandler(Handler):
             [InlineKeyboardButton("Назначить дедлайн", callback_data="setDeadlineForCreateTask")],
             [InlineKeyboardButton("Назначить приоритет", callback_data="setPriorityForCreateTask")],
             [InlineKeyboardButton("Назначить статус", callback_data="setStatusForCreateTask")],
+            [InlineKeyboardButton("Назначить исполнителя", callback_data="setExecutorForCreateTask")],
             [
                 InlineKeyboardButton("Отмена", callback_data="cancelCreateTask"),
                 InlineKeyboardButton("Сохранить", callback_data="saveNewTaskForCreateTask")

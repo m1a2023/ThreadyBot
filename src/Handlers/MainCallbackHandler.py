@@ -2,8 +2,11 @@ from datetime import datetime, timezone
 from telegram import Update
 from telegram.ext import ContextTypes
 from Handlers.Handler import Handler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.SetExecutorForCreateHandler import SetExecutorForTaskHandler
+from Handlers.HandlersForTaskMenu.ChooseExecutorHandler import ChooseExecutorHandler
 from Handlers.HandlersForTaskMenu.ChooseTaskHandler import ChooseTaskHandler
 from Handlers.HandlersForTaskMenu.ConfirmationDeleteTask import ConfirmationDeleteTaskHandler
+from Handlers.HandlersForTaskMenu.EditTaskMenu.EditExecutorHandler import EditExecutorForTaskHandler
 from Handlers.HandlersForTaskMenu.EditTaskMenu.EditTaskMenuHandler import EditTaskMenuHandler
 from Handlers.TextHandler import TextHandler
 
@@ -203,6 +206,11 @@ class MainCallbackHandler(Handler):
         return await SetStatusForCreateTaskHandler.handle(update, context)
     elif query.data.startswith("statusTask"):
        return await TextHandler.handle(update, context)
+    
+    elif query.data == "setExecutorForCreateTask":
+      return await SetExecutorForTaskHandler.handle(update, context)
+    elif query.data.startswith("chosenExecuter_"):
+       return await TextHandler.handle(update, context)
 
     elif query.data == "saveNewTaskForCreateTask":
         return await SaveCreateTaskHandler.handle(update,context)
@@ -211,19 +219,21 @@ class MainCallbackHandler(Handler):
     #кнопки меню редактирования задачи
 
     elif query.data == "editTaskName":
-       return await EditNameHandler.handle(update,context)
+      return await EditNameHandler.handle(update,context)
     elif query.data == "editTaskDescription":
-       return await EditDescriptionHandler.handle(update, context)
+      return await EditDescriptionHandler.handle(update, context)
     elif query.data == "editTaskDeadline":
-       return await EditDeadlineHandler.handle(update, context)
+      return await EditDeadlineHandler.handle(update, context)
     elif query.data == "editTaskPriority":
-       return await EditPriorityHandler.handle(update, context)
+      return await EditPriorityHandler.handle(update, context)
     elif query.data == "editTaskStatus":
-       return await EditStatusHandler.handle(update, context)
+      return await EditStatusHandler.handle(update, context)
+    elif query.data == "editTaskExecutor":
+      return await EditExecutorForTaskHandler.handle(update, context)
     elif query.data == "saveEditTask":
-        return await SaveEditTaskHandler.handle(update,context)
+      return await SaveEditTaskHandler.handle(update,context)
     elif query.data == "cancelEditTask":
-        return await CancelEditTaskHandler.handle(update,context)
+      return await CancelEditTaskHandler.handle(update,context)
     
     elif query.data.startswith("chosenProject_"):
       context.user_data["chosenProject"] = query.data[14:]
@@ -248,6 +258,13 @@ class MainCallbackHandler(Handler):
       elif context.user_data["state"] == "deleteTask":
         context.user_data["state"] = None
         return await ConfirmationDeleteTaskHandler.handle(update, context)
+    
+    # elif query.data.startswith("chosenExecuter_"):
+    #   context.user_data["chosenExecuter"] = query.data[15:]
+
+    #   if context.user_data["state"] == "setExecutorForTask":
+    #     context.user_data["state"] = None
+    #     return await TextHandler.handle(update, context)
     
     else:
       pass

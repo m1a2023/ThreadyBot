@@ -4,12 +4,13 @@ from Enums.Priority import Priority
 from Enums.Status import Status
 
 class Task:
-    def __init__(self, title: str = None, description = None, deadline = None, priority = None, status = None):
+    def __init__(self, title: str = None, description = None, deadline = None, priority = None, status = None, executor = None):
         self.title = title
         self.description = description
         self.deadline = deadline
         self.priority = priority
         self.status = status
+        self.executor = executor
 
     def set_title(self,task_name):
         self.title = task_name
@@ -28,13 +29,17 @@ class Task:
 
     def set_status(self,task_status:str):
         self.status = task_status
+    
+    def set_executor(self,task_executor:str):
+        self.executor = task_executor
 
     def __str__(self):
         return (f"Задача: {self.title}\n"
                 f"Описание: {self.description}\n"
                 f"Дедлайн: {self.deadline if self.deadline else 'Не установлен'}\n"
                 f"Приоритет: {self.priority if self.priority else 'Не указан'}\n"
-                f"Статус: {self.status if self.status else 'Не указан'}")
+                f"Статус: {self.status if self.status else 'Не указан'}\n"
+                f"Исполнитель: {self.executor if self.executor else 'Не указан'}")
 
     def to_dict(self) -> dict:
         return {
@@ -42,21 +47,6 @@ class Task:
             "description": self.description,
             "deadline": self.deadline,
             "priority": self.priority,
-            "status": self.status
+            "status": self.status,
+            "user_id": self.executor
         }
-    
-    def __str__(self):
-        deadline_str = (
-            datetime.fromisoformat(self.deadline).strftime("%d.%m.%Y")
-            if self.deadline
-            else "Нет дедлайна"
-        )
-
-        # Форматируем строку с информацией о задаче
-        return (
-            f"Задача: {self.title}\n"
-            f"Описание: {self.description}\n"
-            f"Статус: {self.status}\n"
-            f"Приоритет: {self.priority}\n"
-            f"Дедлайн: {deadline_str}"
-        )

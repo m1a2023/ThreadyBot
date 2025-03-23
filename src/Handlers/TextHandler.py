@@ -365,6 +365,26 @@ class TextHandler:
       await TextHandler.processMessage(
         context, chat_id, user_message_id, bot_message_id,
         f"Статус: {status}", "taskInfoForCreateTask")
+      
+    elif state == "setExecutorForTask":
+      if not update.callback_query:
+        await update.message.reply_text("Ошибка: callback_query отсутствует.")
+        return
+
+      executor = update.callback_query.data[15:]
+
+      task.executor = executor
+
+      # Получаем ID сообщений
+      chat_id = update.callback_query.message.chat_id
+      user_message_id = update.callback_query.message.message_id
+      bot_message_id = context.user_data.get("bot_message_id")
+
+      # Используем метод processMessage для обработки сообщений
+      await TextHandler.processMessage(
+        context, chat_id, user_message_id, bot_message_id,
+        f"Исполнитель: {executor}", "taskInfoForCreateTask")
+
 
     # 
     # Обработка статусов для редактирования тасков
@@ -455,6 +475,26 @@ class TextHandler:
       await TextHandler.processMessage(
         context, chat_id, user_message_id, bot_message_id,
         f"Статус: {status}", "TaskInfoForChangeTask")
+      
+    elif state == "EditTaskExecutor":
+      # Проверяем, есть ли callback_query
+      if not update.callback_query:
+        await update.message.reply_text("Ошибка: callback_query отсутствует.")
+        return
+
+      executor = update.callback_query.data[15:]
+
+      changedTask.executor = executor
+
+      # Получаем ID сообщений
+      chat_id = update.callback_query.message.chat_id
+      user_message_id = update.callback_query.message.message_id
+      bot_message_id = context.user_data.get("bot_message_id")
+
+      # Используем метод processMessage для обработки сообщений
+      await TextHandler.processMessage(
+        context, chat_id, user_message_id, bot_message_id,
+        f"Исполнитель: {executor}", "TaskInfoForChangeTask")
     
     # 
     # Обработка статусов для команд
