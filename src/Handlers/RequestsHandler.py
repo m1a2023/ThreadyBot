@@ -13,7 +13,7 @@ async def checkUserExists(user_id: int) -> bool:
     response = await client.get(
       f"http://localhost:9000/api/db/users/{user_id}"
     )
-    if response.json() is not None:
+    if response.status_code == 200:
       return True
     return False
 
