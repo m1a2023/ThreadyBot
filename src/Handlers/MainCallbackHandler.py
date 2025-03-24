@@ -22,6 +22,13 @@ from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.ReportHand
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.ProjectReportHandler import ProjectReportHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.UserReportHandler import UserReportHandler
 
+
+""" Иморты хендлеров для работы с ЛЛМ"""
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.GeneratingProjectPlanMenuHandler import GeneratingPlanMenuHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.GenerateProjectPlanHandler import GenerateProjectPlanHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.SaveGeneratedPlanHandler import SaveGeneratedPlanHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.ShowCurrentPlanHandler import ShowCurrentPlanHandler
+
 """ Импорты хендлеров для управления проектами """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.CreateProjectHandler import CreateProjectHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.ChangeProjectHandler import ChangeProjectHandler
@@ -102,6 +109,16 @@ class MainCallbackHandler(Handler):
        return await ProjectReportHandler.handle(update, context)
     elif query.data == "get_developer_report":
        return await UserReportHandler.handle(update, context)
+    elif query.data == "generate_menu":
+       return await GeneratingPlanMenuHandler.handle(update, context)
+
+    # Обработка кнопок с генерацией плана
+    elif query.data == "save_generated_plan":
+      return await SaveGeneratedPlanHandler.handle(update, context)
+    elif query.data == "show_current_plan":
+      return await ShowCurrentPlanHandler.handle(update, context)
+    #elif query.data == "generate_plan":
+    #  return await GenerateProjectPlanHandler.handle(update, context)
 
     # Обработка кнопок в "Управление проектами"
     elif query.data == "CreateProject":
@@ -114,6 +131,7 @@ class MainCallbackHandler(Handler):
     elif query.data == "ShowProjectsInfo":
       context.user_data["state"] = "showProjectsInfo"
       return await ChooseProjectHandler.handle(update, context)
+<<<<<<< Updated upstream
     
     elif query.data == "ConfirmationDeleteProject":
       context.user_data["state"] = "deleteProject"
@@ -122,6 +140,20 @@ class MainCallbackHandler(Handler):
     elif query.data == "deleteProject":
       return await DeleteProjectHandler.handle(update, context)
 
+=======
+
+    elif query.data == "generate_plan":
+      context.user_data["state"] = "generate_plan"
+      return await ChooseProjectHandler.handle(update, context)
+    
+    elif query.data == "ConfirmationDeleteProject":
+      context.user_data["state"] = "deleteProject"
+      return await ChooseProjectHandler.handle(update, context)
+    
+    elif query.data == "deleteProject":
+      return await DeleteProjectHandler.handle(update, context)
+
+>>>>>>> Stashed changes
     #кнопка изменения задач (в меню изменения проекта)
     elif query.data == "changeTasks":
        return await MainTaskMenuHandler.handle(update, context)
@@ -254,6 +286,13 @@ class MainCallbackHandler(Handler):
       elif context.user_data["state"] == "deleteProject":
         context.user_data["state"] = None
         return await ConfirmationDeleteProjectHandler.handle(update, context)
+<<<<<<< Updated upstream
+=======
+
+      elif context.user_data["state"] == "generate_plan":
+        context.user_data["state"] = None
+        return await GenerateProjectPlanHandler.handle(update, context)
+>>>>>>> Stashed changes
     
     elif query.data.startswith("chosenTask_"):
       context.user_data["chosenTask"] = query.data[11:]

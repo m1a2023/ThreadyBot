@@ -3,6 +3,7 @@ import sys as system
 import logging
 from typing import Any
 
+from src.config import TG_TOKEN
 from Handlers.MainCallbackHandler import MainCallbackHandler
 from Handlers.TextHandler import TextHandler
 """ Python-telegram-bot packages """
@@ -37,8 +38,6 @@ class Main:
 		if argv is None:
 			logger.critical("You did not provide the API key to the telegram-bot.\n Insert it and try again.")
 			return
-
-		TG_TOKEN = argv[0]
 
 		# Create the Application and pass it your bot's token.
 		application = Application.builder().token(TG_TOKEN).build()
