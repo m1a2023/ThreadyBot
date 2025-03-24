@@ -1,7 +1,7 @@
 from __future__ import annotations
-from src.config import IAM_TOKEN, FOLDER_ID
+from config import IAM_TOKEN, FOLDER_ID
 from yandex_cloud_ml_sdk import YCloudML
-from src.ProjectManagment.Project import Project
+from ProjectManagment.Project import Project
 
 
 async def generateProjectPlan(project):

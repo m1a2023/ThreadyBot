@@ -5,7 +5,7 @@ from telegram.ext import ContextTypes
 
 from Handlers.Handler import Handler
 
-from src.LLMgen.GeneratePlan import generateProjectPlan
+from LLMgen.GeneratePlan import generateProjectPlan
 
 
 class GeneratingPlanMenuHandler(Handler):

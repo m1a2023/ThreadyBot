@@ -131,8 +131,7 @@ class MainCallbackHandler(Handler):
     elif query.data == "ShowProjectsInfo":
       context.user_data["state"] = "showProjectsInfo"
       return await ChooseProjectHandler.handle(update, context)
-<<<<<<< Updated upstream
-    
+
     elif query.data == "ConfirmationDeleteProject":
       context.user_data["state"] = "deleteProject"
       return await ChooseProjectHandler.handle(update, context)
@@ -140,7 +139,7 @@ class MainCallbackHandler(Handler):
     elif query.data == "deleteProject":
       return await DeleteProjectHandler.handle(update, context)
 
-=======
+
 
     elif query.data == "generate_plan":
       context.user_data["state"] = "generate_plan"
@@ -153,7 +152,7 @@ class MainCallbackHandler(Handler):
     elif query.data == "deleteProject":
       return await DeleteProjectHandler.handle(update, context)
 
->>>>>>> Stashed changes
+
     #кнопка изменения задач (в меню изменения проекта)
     elif query.data == "changeTasks":
        return await MainTaskMenuHandler.handle(update, context)
@@ -286,14 +285,12 @@ class MainCallbackHandler(Handler):
       elif context.user_data["state"] == "deleteProject":
         context.user_data["state"] = None
         return await ConfirmationDeleteProjectHandler.handle(update, context)
-<<<<<<< Updated upstream
-=======
+
 
       elif context.user_data["state"] == "generate_plan":
         context.user_data["state"] = None
         return await GenerateProjectPlanHandler.handle(update, context)
->>>>>>> Stashed changes
-    
+
     elif query.data.startswith("chosenTask_"):
       context.user_data["chosenTask"] = query.data[11:]
 

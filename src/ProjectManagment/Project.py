@@ -36,12 +36,10 @@ class Project:
 
     def get_link_rep(self) -> str:
         return self.repo_link
-<<<<<<< Updated upstream
-=======
 
     def get_team(self) -> list:
         return self.team
->>>>>>> Stashed changes
+
     
     
     def addDeveloper(self, dev: Developer):

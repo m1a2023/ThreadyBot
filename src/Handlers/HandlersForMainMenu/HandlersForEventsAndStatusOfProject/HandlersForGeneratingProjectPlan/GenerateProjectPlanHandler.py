@@ -2,12 +2,12 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 from typing import Any
 
-from src.LLMgen.GeneratePlan import generateProjectPlan
+from LLMgen.GeneratePlan import generateProjectPlan
 from Handlers.Handler import Handler
 from Handlers.RequestsHandler import getProjectById
 from ProjectManagment.ProjectManager import ProjectManager
 
-from src.LLMgen.GeneratePlan import generateProjectPlan
+from LLMgen.GeneratePlan import generateProjectPlan
 
 
 class GenerateProjectPlanHandler(Handler):

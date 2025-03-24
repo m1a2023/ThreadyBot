@@ -3,7 +3,7 @@ import sys as system
 import logging
 from typing import Any
 
-from src.config import TG_TOKEN
+from config import TG_TOKEN
 from Handlers.MainCallbackHandler import MainCallbackHandler
 from Handlers.TextHandler import TextHandler
 """ Python-telegram-bot packages """
