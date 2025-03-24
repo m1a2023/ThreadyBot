@@ -6,7 +6,7 @@ from Handlers.Handler import Handler
 from Handlers.RequestsHandler import getTeamByProjectId, getUserNameById
 
 
-class ChooseExecutorHandler(Handler):
+class ChooseDeveloperHandler(Handler):
   @staticmethod
   async def handle(update, context):
 
@@ -24,7 +24,8 @@ class ChooseExecutorHandler(Handler):
     
     # Создаем кнопки
     for dev in developers_id_and_name:
-      keyboard.append([InlineKeyboardButton(f"{dev[0]}", callback_data=f"chosenExecuter_{dev[1]}")])
+      keyboard.append([InlineKeyboardButton(f"{dev[0]}", callback_data=f"chosenDeveloper_{dev[1]}")])
+    keyboard.append([InlineKeyboardButton("Назад", callback_data="reportsMenu")])
 
     reply_markup = InlineKeyboardMarkup(keyboard)
     await query.edit_message_text(text="Выберите разработчика: ", reply_markup=reply_markup)

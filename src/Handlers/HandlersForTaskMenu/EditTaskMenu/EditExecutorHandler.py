@@ -6,7 +6,7 @@ from Handlers.Handler import Handler
 from Handlers.RequestsHandler import getTeamByProjectId, getUserNameById
 
 
-class EditExecutorForTaskHandler(Handler):
+class EditDeveloperForTaskHandler(Handler):
     @staticmethod
     async def handle(update, context):
         query = update.callback_query

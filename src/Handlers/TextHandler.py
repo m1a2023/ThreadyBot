@@ -383,14 +383,14 @@ class TextHandler:
         context, chat_id, user_message_id, bot_message_id,
         f"Статус: {status}", "taskInfoForCreateTask")
       
-    elif state == "setExecutorForTask":
+    elif state == "setDeveloperForTask":
       if not update.callback_query:
         await update.message.reply_text("Ошибка: callback_query отсутствует.")
         return
 
-      executor = update.callback_query.data[15:]
+      developer = update.callback_query.data[16:]
 
-      task.executor = executor
+      task.developer = developer
 
       # Получаем ID сообщений
       chat_id = update.callback_query.message.chat_id
@@ -400,7 +400,7 @@ class TextHandler:
       # Используем метод processMessage для обработки сообщений
       await TextHandler.processMessage(
         context, chat_id, user_message_id, bot_message_id,
-        f"Исполнитель: {executor}", "taskInfoForCreateTask")
+        f"Исполнитель: {developer}", "taskInfoForCreateTask")
 
 
     # 
@@ -493,15 +493,15 @@ class TextHandler:
         context, chat_id, user_message_id, bot_message_id,
         f"Статус: {status}", "TaskInfoForChangeTask")
       
-    elif state == "EditTaskExecutor":
+    elif state == "EditTaskDeveloper":
       # Проверяем, есть ли callback_query
       if not update.callback_query:
         await update.message.reply_text("Ошибка: callback_query отсутствует.")
         return
 
-      executor = update.callback_query.data[15:]
+      developer = update.callback_query.data[16:]
 
-      changedTask.executor = executor
+      changedTask.developer = developer
 
       # Получаем ID сообщений
       chat_id = update.callback_query.message.chat_id
@@ -511,7 +511,7 @@ class TextHandler:
       # Используем метод processMessage для обработки сообщений
       await TextHandler.processMessage(
         context, chat_id, user_message_id, bot_message_id,
-        f"Исполнитель: {executor}", "TaskInfoForChangeTask")
+        f"Исполнитель: {developer}", "TaskInfoForChangeTask")
     
     # 
     # Обработка статусов для команд

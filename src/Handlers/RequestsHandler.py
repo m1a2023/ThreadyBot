@@ -222,7 +222,7 @@ async def createTask(task: Task, project_id: int):
     "priority": task.priority,
     "status": task.status,
     "project_id": project_id,
-    "user_id": task.executor
+    "user_id": task.developer
   }
   async with httpx.AsyncClient() as client:
     try:

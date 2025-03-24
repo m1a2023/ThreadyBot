@@ -19,7 +19,11 @@ import os
 class UserReportHandler(Handler):
     @staticmethod
     async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        user_id = 1 #сюда надо вставить id
+        print("123")
+        user_id = context.user_data["chosenDeveloper"] # id выбранного разработчика для формирования отчета
+        project_id = context.user_data["chosenProject"] # id выбранного проекта для формирования отчета
+
+        print(user_id, project_id)
 
         report = await get_report_by_user_id(user_id) #покатак
 

@@ -6,14 +6,14 @@ from Handlers.Handler import Handler
 from Handlers.RequestsHandler import getTeamByProjectId, getUserNameById
 
 
-class SetExecutorForTaskHandler(Handler):
+class SetDeveloperForTaskHandler(Handler):
     @staticmethod
     async def handle(update, context):
         query = update.callback_query
         await query.answer()
 
         chat_id = query.message.chat_id
-        context.user_data["state"] = "setExecutorForTask"  # Сохраняем состояние пользователя
+        context.user_data["state"] = "setExecuterForTask"  # Сохраняем состояние пользователя
 
         team = await getTeamByProjectId(context.user_data["chosenProject"])
 
@@ -26,7 +26,7 @@ class SetExecutorForTaskHandler(Handler):
         
         # Создаем кнопки
         for dev in developers_id_and_name:
-          keyboard.append([InlineKeyboardButton(f"{dev[0]}", callback_data=f"chosenExecuter_{dev[1]}")])
+          keyboard.append([InlineKeyboardButton(f"{dev[0]}", callback_data=f"chosenDeveloperForTask_{dev[1]}")])
         
         reply_markup = InlineKeyboardMarkup(keyboard)
 
