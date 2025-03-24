@@ -1,46 +1,37 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 
-class ProjectManager():
-    PROJECTS = []
+from Handlers.RequestsHandler import getAllProjects
+
+class ProjectManager:
+    def __init__(self):
+        self.projects = []
+
+    # async def add_project(self, project):
+    #     self.projects.append(project)
+    #     print(f"Проект '{project.name}' добавлен для владельца {self.owner_id}.")
 
     @staticmethod
-    async def add_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        ProjectManager.PROJECTS.append(context.user_data["project"])
-
-    @staticmethod
-    async def edit_project(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        print("отредвчен проект")
-
-    @staticmethod
-    async def delete_project(project_name,update: Update, context: ContextTypes.DEFAULT_TYPE):
-        proj_to_delete = ProjectManager.found_project(project_name, update, context)
-
-        if proj_to_delete:
-            ProjectManager.PROJECTS.remove(proj_to_delete)
-            response_text = f"Проект '{project_name}' удален."
-        else:
-            response_text = f"Проект '{project_name}' не найден."
-        return response_text
-
-    @staticmethod
-    async def get_projects():
-        print("from get projs")
-        if not ProjectManager.PROJECTS:
-            return "Список проектов пуст."
-
-        return "\n\n".join([f"{i + 1}. {proj}" for i, proj in enumerate(ProjectManager.PROJECTS)])
-
-    @staticmethod
-    async def show_projects(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        print("from show projs")
-        projs_text = await ProjectManager.get_projects()
-
+    async def get_and_update_list_projects(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        if "project_manager" not in context.user_data:
+            context.user_data["project_manager"] = ProjectManager()
         if update.message:
-            await update.message.reply_text(projs_text)
-        elif update.callback_query:
-            await update.callback_query.message.reply_text(projs_text)
+            context.user_data["project_manager"].projects = await getAllProjects(update.message.from_user.id)
+        else:
+            context.user_data["project_manager"].projects = await getAllProjects(update.callback_query.from_user.id)
 
-    @staticmethod
-    def found_project(proj_name,update: Update, context: ContextTypes.DEFAULT_TYPE):
-        return next((proj for proj in context.user_data["project_manager"].PROJECTS if proj.name == proj_name), None)
+    async def get_projects_names_and_id(self): # Вернет список кортежей, с именами проектов и их id
+        list_of_projects = []
+        if not self.projects:
+           return []
+        for project in self.projects:
+            list_of_projects.append((project["title"], project["id"]))
+        return list_of_projects
+    
+    async def get_projects_names(self): # Вернет список с именами проектов
+        list_of_projects = []
+        if not self.projects:
+           return []
+        for project in self.projects:
+            list_of_projects.append(project["title"])
+        return list_of_projects

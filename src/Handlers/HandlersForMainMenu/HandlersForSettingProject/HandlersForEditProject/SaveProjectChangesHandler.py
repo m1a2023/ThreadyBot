@@ -9,11 +9,11 @@ from Handlers.Handler import Handler
 
 
 from Handlers.HandlersForMainMenu.SettingsOfProjectsHandler import SettingsOfProjectsHandler
+from Handlers.RequestsHandler import updateProjectById
 
 class SaveProjectChangesHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.user_data["project_manager"].edit_project(update, context)
     # Получаем chat_id
     if update.message:
       chat_id = update.message.chat_id
@@ -29,11 +29,20 @@ class SaveProjectChangesHandler(Handler):
       except BadRequest as e:
         print(f"Ошибка при удалении последнего сообщения бота: {e}")
 
+    # Сохраняем изменения
+    changed_project = context.user_data["changedProject"].to_dict()
+    new_info = {}
+    for key in changed_project:
+      if changed_project[key] != "":
+        new_info[f"{key}"] = changed_project[key]
+    await updateProjectById(int(context.user_data["chosenProject"]), new_info)
+
+
     # Очищаем все данные, связанные с редактированием задачи
     keys_to_remove = [
       "state",
-      "project",
-      "projectInfoForEditProject",
+      "changedProject",
+      "projectInfoForChangeProject",
       "IdLastMessageFromBot",
       "bot_message_id"
     ]

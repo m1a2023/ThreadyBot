@@ -10,7 +10,7 @@ from ProjectManagment.ProjectManager import ProjectManager
 class MainMenuHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data["project_manager"] = ProjectManager()
+    await ProjectManager.get_and_update_list_projects(update, context)
 
     keyboard = [
       [InlineKeyboardButton("Управление проектами", callback_data="SettingsOfProjects")],

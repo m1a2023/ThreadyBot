@@ -1,3 +1,4 @@
+from datetime import datetime
 from telegram import Update
 from telegram.ext import ContextTypes
 
@@ -8,11 +9,11 @@ from telegram.error import BadRequest
 from Handlers.Handler import Handler
 
 from Handlers.HandlersForTaskMenu.MainTaskMenuHandler import MainTaskMenuHandler
+from Handlers.RequestsHandler import updateTaskById
 
-class EditDoneHandler(Handler):
+class SaveEditTaskHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.user_data["task_manager"].edit_task(update, context)
     # Получаем chat_id
     if update.message:
       chat_id = update.message.chat_id
@@ -28,11 +29,23 @@ class EditDoneHandler(Handler):
       except BadRequest as e:
         print(f"Ошибка при удалении последнего сообщения бота: {e}")
 
+    print ("from save changes task")
+    changed_task = context.user_data["changedTask"].to_dict()
+    new_info = {}
+    for key in changed_task:
+      if changed_task[key] != "":
+        # Если значение — это объект datetime, преобразуем его в строку
+        if isinstance(changed_task[key], datetime):
+          new_info[key] = changed_task[key].isoformat()
+        else:
+          new_info[key] = changed_task[key]
+    print(new_info)
+    await updateTaskById(int(context.user_data["chosenTask"]), new_info)
+
     # Очищаем все данные, связанные с редактированием задачи
     keys_to_remove = [
       "state",
       "task",
-      "taskInfoForCreateTask",
       "taskInfoForEditTask",
       "IdLastMessageFromBot",
       "bot_message_id"

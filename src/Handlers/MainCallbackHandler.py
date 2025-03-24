@@ -1,8 +1,17 @@
+from datetime import datetime, timezone
 from telegram import Update
 from telegram.ext import ContextTypes
 from Handlers.Handler import Handler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.SetExecutorForCreateHandler import SetExecutorForTaskHandler
+from Handlers.HandlersForTaskMenu.ChooseExecutorHandler import ChooseExecutorHandler
+from Handlers.HandlersForTaskMenu.ChooseTaskHandler import ChooseTaskHandler
+from Handlers.HandlersForTaskMenu.ConfirmationDeleteTask import ConfirmationDeleteTaskHandler
+from Handlers.HandlersForTaskMenu.EditTaskMenu.EditExecutorHandler import EditExecutorForTaskHandler
+from Handlers.HandlersForTaskMenu.EditTaskMenu.EditTaskMenuHandler import EditTaskMenuHandler
+from Handlers.TextHandler import TextHandler
 
 """ Импорты хендлеров для главного меню """
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.DeleteProjectHandler import DeleteProjectHandler
 from Handlers.MainMenuHandler import MainMenuHandler
 from Handlers.HandlersForMainMenu.SettingsOfProjectsHandler import SettingsOfProjectsHandler
 from Handlers.HandlersForMainMenu.EventsAndStatusOfProjectHandler import EventsAndStatusOfProjectHandler
@@ -27,7 +36,7 @@ from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangePro
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangeProject.HandlersForChangeInfoAboutTeam.SaveChangeTeamHandler import SaveChangeTeamHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.ChooseProjectHandler import ChooseProjectHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.ShowProjectsInfoHandler import ShowProjectsInfoHandler
-from Handlers.HandlersForMainMenu.HandlersForSettingProject.DeleteProjectHandler import DeleteProjectHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.ConfirmationDeleteProjectHandler import ConfirmationDeleteProjectHandler
 
 """ Импорты хендлеров для создания проекта """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForCreateProject.SaveNewProjectHandler import SaveCreateProjectHandler
@@ -49,21 +58,18 @@ from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProje
 
 from Handlers.HandlersForTaskMenu.MainTaskMenuHandler import MainTaskMenuHandler
 
-from Handlers.HandlersForTaskMenu.AddHandler import AddHandler
-from Handlers.HandlersForTaskMenu.EditHandler import EditHandler
-from Handlers.HandlersForTaskMenu.DeleteHandler import DeleteHandler
-from Handlers.HandlersForTaskMenu.ShowHandler import ShowHandler
-from Handlers.HandlersForTaskMenu.CancelTaskMenuHandler import CancelTaskMenuHandler
+from Handlers.HandlersForTaskMenu.CreateNewTaskHandler import CreateNewTaskHandler
+from Handlers.HandlersForTaskMenu.ShowAllTaskHandler import ShowAllTaskHandler
 
-from Handlers.HandlersForTaskMenu.AddNewTaskMenu.NameHandler import NameHandler
-from Handlers.HandlersForTaskMenu.AddNewTaskMenu.DescriptionHandler import DescriptionHandler
-from Handlers.HandlersForTaskMenu.AddNewTaskMenu.DeadlineHandler import DeadlineHandler
-from Handlers.HandlersForTaskMenu.AddNewTaskMenu.PriorityHandler import PriorityHandler
-from Handlers.HandlersForTaskMenu.AddNewTaskMenu.StatusHandler import StatusHandler
-from Handlers.HandlersForTaskMenu.AddNewTaskMenu.DoneHandler import DoneHandler
-from Handlers.HandlersForTaskMenu.AddNewTaskMenu.CancelHandler import CancelHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.SetNameHandler import SetNameTaskHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.SetDescriptionForCreateTaskHandler import SetDescriptionForCreateTaskHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.SetDeadlineForCreateTaskHandler import SetDeadlineForCreateTaskHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.SetPriorityForTaskHandler import SetPriorityForTaskHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.SetStatusForCreateTaskHandler import SetStatusForCreateTaskHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.SaveCreateTaskHandler import SaveCreateTaskHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.CancelCreateTaskHandler import CancelCreateTaskHandler
 
-from Handlers.HandlersForTaskMenu.EditTaskMenu.EditDoneHandler import EditDoneHandler
+from Handlers.HandlersForTaskMenu.EditTaskMenu.SaveEditTaskHandler import SaveEditTaskHandler
 from Handlers.HandlersForTaskMenu.EditTaskMenu.EditDescriptionHandler import EditDescriptionHandler
 from Handlers.HandlersForTaskMenu.EditTaskMenu.EditDeadlineHandler import EditDeadlineHandler
 from Handlers.HandlersForTaskMenu.EditTaskMenu.EditPriorityHandler import EditPriorityHandler
@@ -78,7 +84,6 @@ class MainCallbackHandler(Handler):
     query = update.callback_query
     await query.answer()
 
-    # пока хз, как добавить цикличность
     if query.data == "MoveToMainMenu":
       return await MainMenuHandler.handle(update, context)
 
@@ -101,14 +106,23 @@ class MainCallbackHandler(Handler):
     # Обработка кнопок в "Управление проектами"
     elif query.data == "CreateProject":
       return await CreateProjectHandler.handle(update, context)
-    elif query.data == "chooseProject":
-      return await ChooseProjectHandler.handle(update, context) #ChangeProjectHandler
+    
+    elif query.data == "ChangeProject":
+      context.user_data["state"] = "changeProject"
+      return await ChooseProjectHandler.handle(update, context)
+    
     elif query.data == "ShowProjectsInfo":
-       return await ShowProjectsInfoHandler.handle(update, context)
-    elif query.data == "DeleteProject":
-       return await DeleteProjectHandler.handle(update, context)
+      context.user_data["state"] = "showProjectsInfo"
+      return await ChooseProjectHandler.handle(update, context)
+    
+    elif query.data == "ConfirmationDeleteProject":
+      context.user_data["state"] = "deleteProject"
+      return await ChooseProjectHandler.handle(update, context)
+    
+    elif query.data == "deleteProject":
+      return await DeleteProjectHandler.handle(update, context)
 
-    #кнопка изменения задачь(в меню изменения проекта)
+    #кнопка изменения задач (в меню изменения проекта)
     elif query.data == "changeTasks":
        return await MainTaskMenuHandler.handle(update, context)
     elif query.data == "changeTeam":
@@ -142,14 +156,12 @@ class MainCallbackHandler(Handler):
     elif query.data == "editProject":
       return await EditProjectInfoHandler.handle(update, context)
 
-    elif query.data == "editProjectName":
+    elif query.data == "changeNameProject":
       return await EditProjectNameHandler.handle(update, context)
-    elif query.data == "editProjectDescription":
+    elif query.data == "changeDescriptionProject":
       return await EditProjectDescriptionHandler.handle(update, context)
-    elif query.data == "editProjectLink":
+    elif query.data == "changeLinkProject":
       return await EditProjectRepoLinkHandler.handle(update, context)
-    #elif query.data == "editProjectTeam":
-    #  return await EditProjectTeamHandler.handle(update, context)
     elif query.data == "saveProjectChanges":
       return await SaveProjectChangesHandler.handle(update, context)
     elif query.data == "cancelProjectEdit":
@@ -157,44 +169,109 @@ class MainCallbackHandler(Handler):
 
     #кнопки с задачами
     #кнопки главного меню работы с задачами
-    if query.data == "add":
-        return await AddHandler.handle(update, context)
-    elif query.data == "edit":
-        return await EditHandler.handle(update, context)
-    elif query.data == "del":
-        return await DeleteHandler.handle(update, context)
-    elif query.data == "show":
-        return await ShowHandler.handle(update, context)
-    elif query.data == "cancelTaskMenu":
-        return await CancelTaskMenuHandler.handle(update, context)
-    #кнопки меню добавления задачи
-    elif query.data == "name":
-        return await NameHandler.handle(update, context)
-    elif query.data == "description":
-        return await DescriptionHandler.handle(update, context)
-    elif query.data == "deadline":
-        return await DeadlineHandler.handle(update, context)
-    elif query.data == "priority":
-        return await PriorityHandler.handle(update, context)
-    elif query.data == "status":
-        return await StatusHandler.handle(update, context)
-    elif query.data == "done":
-        return await DoneHandler.handle(update,context)
-    elif query.data == "cancel":
-        return await CancelHandler.handle(update,context)
+    if query.data == "createNewTask":
+      return await CreateNewTaskHandler.handle(update, context)
+    elif query.data == "editTask":
+      context.user_data["state"] = "editTask"
+      return await ChooseTaskHandler.handle(update, context)
+    
+    elif query.data == "confirmationDeleteTask":
+      context.user_data["state"] = "deleteTask"
+      return await ChooseTaskHandler.handle(update, context)
+    elif query.data == "deleteTask":
+      context.user_data["state"] = "deleteTask"
+      return await ChooseTaskHandler.handle(update, context)
+    elif query.data == "showTask":
+      return await ShowAllTaskHandler.handle(update, context)
+
+    elif query.data == "setNameForCreateTask":
+      return await SetNameTaskHandler.handle(update, context)
+    elif query.data == "setDescriptionForCreateTask":
+      return await SetDescriptionForCreateTaskHandler.handle(update, context)
+    elif query.data == "setDeadlineForCreateTask":
+      return await SetDeadlineForCreateTaskHandler.handle(update, context)
+    
+    # Обработка кнопок календаря
+    elif query.data.startswith("day_"):
+      return await TextHandler.handle(update, context)
+    
+    elif query.data.startswith("prev_") or query.data.startswith("next_"):
+      _, year, month = query.data.split("_")
+      year, month = int(year), int(month)
+      if context.user_data["state"] == "setDeadlineForTask":
+        return await SetDeadlineForCreateTaskHandler.handle(update, context, year, month)
+      else:
+        return await EditDeadlineHandler.handle(update, context, year, month)
+
+    elif query.data == "setPriorityForCreateTask":
+      return await SetPriorityForTaskHandler.handle(update, context)
+    elif query.data.startswith("priorityTask"):
+       return await TextHandler.handle(update, context)
+
+    elif query.data == "setStatusForCreateTask":
+        return await SetStatusForCreateTaskHandler.handle(update, context)
+    elif query.data.startswith("statusTask"):
+       return await TextHandler.handle(update, context)
+    
+    elif query.data == "setExecutorForCreateTask":
+      return await SetExecutorForTaskHandler.handle(update, context)
+    elif query.data.startswith("chosenExecuter_"):
+       return await TextHandler.handle(update, context)
+
+    elif query.data == "saveNewTaskForCreateTask":
+        return await SaveCreateTaskHandler.handle(update,context)
+    elif query.data == "cancelCreateTask":
+        return await CancelCreateTaskHandler.handle(update,context)
     #кнопки меню редактирования задачи
 
     elif query.data == "editTaskName":
-       return await EditNameHandler.handle(update,context)
+      return await EditNameHandler.handle(update,context)
     elif query.data == "editTaskDescription":
-       return await EditDescriptionHandler.handle(update, context)
+      return await EditDescriptionHandler.handle(update, context)
     elif query.data == "editTaskDeadline":
-       return await EditDeadlineHandler.handle(update, context)
+      return await EditDeadlineHandler.handle(update, context)
     elif query.data == "editTaskPriority":
-       return await EditPriorityHandler.handle(update, context)
+      return await EditPriorityHandler.handle(update, context)
     elif query.data == "editTaskStatus":
-       return await EditStatusHandler.handle(update, context)
-    elif query.data == "edit_done":
-        return await EditDoneHandler.handle(update,context)
-    elif query.data == "edit_cancel":
-        return await CancelEditTaskHandler.handle(update,context)
+      return await EditStatusHandler.handle(update, context)
+    elif query.data == "editTaskExecutor":
+      return await EditExecutorForTaskHandler.handle(update, context)
+    elif query.data == "saveEditTask":
+      return await SaveEditTaskHandler.handle(update,context)
+    elif query.data == "cancelEditTask":
+      return await CancelEditTaskHandler.handle(update,context)
+    
+    elif query.data.startswith("chosenProject_"):
+      context.user_data["chosenProject"] = query.data[14:]
+      if context.user_data["state"] == "showProjectsInfo":
+        context.user_data["state"] = None
+        return await ShowProjectsInfoHandler.handle(update, context)
+      
+      elif context.user_data["state"] == "changeProject":
+        context.user_data["state"] = None
+        return await ChangeProjectHandler.handle(update, context)
+      
+      elif context.user_data["state"] == "deleteProject":
+        context.user_data["state"] = None
+        return await ConfirmationDeleteProjectHandler.handle(update, context)
+    
+    elif query.data.startswith("chosenTask_"):
+      context.user_data["chosenTask"] = query.data[11:]
+
+      if context.user_data["state"] == "editTask":
+        context.user_data["state"] = None
+        return await EditTaskMenuHandler.handle(update, context)
+      elif context.user_data["state"] == "deleteTask":
+        context.user_data["state"] = None
+        return await ConfirmationDeleteTaskHandler.handle(update, context)
+    
+    # elif query.data.startswith("chosenExecuter_"):
+    #   context.user_data["chosenExecuter"] = query.data[15:]
+
+    #   if context.user_data["state"] == "setExecutorForTask":
+    #     context.user_data["state"] = None
+    #     return await TextHandler.handle(update, context)
+    
+    else:
+      pass
+      

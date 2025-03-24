@@ -3,27 +3,33 @@ from telegram.ext import ContextTypes
 from typing import Any
 
 from Handlers.Handler import Handler
+from TaskManagement.Task import Task
+from TaskManagement.TaskManager import TaskManager
 
 class EditTaskMenuHandler(Handler):
     @staticmethod
     async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        task_name = context.user_data["task_name"]
-        if context.user_data["task_manager"].found_task(task_name,update,context):
+        query = update.callback_query
+        await query.answer()
 
-            keyboard = [
-                [InlineKeyboardButton("Изменить имя", callback_data="editTaskName")],
-                [InlineKeyboardButton("Изменить описание", callback_data="editTaskDescription")],
-                [InlineKeyboardButton("Изменить дедлайн", callback_data="editTaskDeadline")],
-                [InlineKeyboardButton("Изменить приоритет", callback_data="editTaskPriority")],
-                [InlineKeyboardButton("Изменить статус", callback_data="editTaskStatus")],
-                [
-                    InlineKeyboardButton("Отмена", callback_data="edit_cancel"),
-                    InlineKeyboardButton("Готово", callback_data="edit_done")
-                ]
+        await TaskManager.get_and_update_list_tasks(update, context, context.user_data["chosenProject"])
+
+        if "changedProject" not in context.user_data:
+            context.user_data["changedTask"] = Task()
+            context.user_data["TaskInfoForChangeTask"] = ["Вы ввели:"]
+        
+        keyboard = [
+            [InlineKeyboardButton("Изменить имя", callback_data="editTaskName")],
+            [InlineKeyboardButton("Изменить описание", callback_data="editTaskDescription")],
+            [InlineKeyboardButton("Изменить дедлайн", callback_data="editTaskDeadline")],
+            [InlineKeyboardButton("Изменить приоритет", callback_data="editTaskPriority")],
+            [InlineKeyboardButton("Изменить статус", callback_data="editTaskStatus")],
+            [InlineKeyboardButton("Изменить исполнителя", callback_data="editTaskExecutor")],
+            [
+                InlineKeyboardButton("Отмена", callback_data="cancelEditTask"),
+                InlineKeyboardButton("Готово", callback_data="saveEditTask")
             ]
-            reply_markup = InlineKeyboardMarkup(keyboard)
-            #вот тут надо адаптировать под метод process message
-            sent_message=await update.message.reply_text(f"Вы выбрали для редактирования задачу: {task_name}\nВыберите действие:",reply_markup=reply_markup)
-        else:
-            sent_message=await update.message.reply_text("Такой задачи нет")
-        context.user_data["bot_message_id"] = sent_message.message_id
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+        await query.edit_message_text("Изменение данных задачи. Выберите действие", reply_markup=reply_markup)

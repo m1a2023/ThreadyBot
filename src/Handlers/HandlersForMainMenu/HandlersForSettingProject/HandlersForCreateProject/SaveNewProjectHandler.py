@@ -10,7 +10,9 @@ from telegram.error import BadRequest
 
 from Handlers.Handler import Handler
 
-from TaskManagement.TaskManager import TaskManager
+from ProjectManagment.Developer import Developer
+
+from Handlers.RequestsHandler import addUserToTeam, createNewTeams, saveNewProject
 
 class SaveCreateProjectHandler(Handler):
   @staticmethod
@@ -25,10 +27,10 @@ class SaveCreateProjectHandler(Handler):
 
     # Проверка на то, что пользователь точно ввел имя и описание проекта
     new_project = context.user_data["project"].to_dict()
-    keys_for_check = ["name", "description"]
+    keys_for_check = ["title", "description"]
     for key in keys_for_check:
       if new_project[key] == "":
-        if key == "name":
+        if key == "title":
           await context.bot.editMessageText(chat_id=chat_id, message_id=last_bot_message_id, text="Вы забыли ввести имя проекта")
           context.user_data["state"] = "setNameForCreateProject"
           return await SetNameHandler.handle(update, context)
@@ -37,16 +39,17 @@ class SaveCreateProjectHandler(Handler):
           context.user_data["state"] = "setDescriptionForCreateProject"
           return await SetDescriptionHandler.handle(update, context)
 
-    await context.user_data["project_manager"].add_project(update, context)
+    # Сохраняем проект
+    project_id = await saveNewProject(new_project)
 
-    if "task_managers" not in context.user_data:
-        context.user_data["task_managers"] = {}
+    # Добавляем владельца в команду (и создаем команду)
+    owner = Developer(update.callback_query.message.chat_id, project_id, "admin")
+    await createNewTeams(owner.to_dict())
 
-    project_name = context.user_data["project_name"]  # Имя текущего проекта
-
-    if project_name not in context.user_data["task_managers"]:
-        context.user_data["task_managers"][project_name] = TaskManager()
-
+    # Добавляем разрабов
+    for developer in new_project["team"]:
+      developer["project_id"] = project_id
+      await addUserToTeam(developer)
 
     # Удаляем последнее сообщение бота (если есть)
     if last_bot_message_id:

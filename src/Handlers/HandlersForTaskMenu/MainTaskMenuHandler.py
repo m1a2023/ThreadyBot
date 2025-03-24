@@ -13,14 +13,15 @@ class MainTaskMenuHandler(Handler):
         query = update.callback_query
         await query.answer()
 
+        await TaskManager.get_and_update_list_tasks(update, context, context.user_data["chosenProject"])
+
         keyboard = [
-            [InlineKeyboardButton("Добавить задачу", callback_data="add")],
-            [InlineKeyboardButton("Редактировать задачу", callback_data="edit")],
-            [InlineKeyboardButton("Удалить задачу", callback_data="del")],
-            [InlineKeyboardButton("Показать задачи", callback_data="show")],
-            [InlineKeyboardButton("Назад", callback_data="cancelTaskMenu")]
+            [InlineKeyboardButton("Добавить задачу", callback_data="createNewTask")],
+            [InlineKeyboardButton("Редактировать задачу", callback_data="editTask")],
+            [InlineKeyboardButton("Удалить задачу", callback_data="deleteTask")],
+            [InlineKeyboardButton("Показать задачи", callback_data="showTask")],
+            [InlineKeyboardButton("Назад", callback_data="SettingsOfProjects")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
-        sent_message=await query.edit_message_text("Выберите действие:", reply_markup=reply_markup)
-        context.user_data["bot_message_id"] = sent_message.message_id
+        await query.edit_message_text("Выберите действие:", reply_markup=reply_markup)

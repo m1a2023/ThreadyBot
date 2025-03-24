@@ -8,7 +8,7 @@ from telegram.error import BadRequest
 
 from Handlers.Handler import Handler
 
-class CancelHandler(Handler):
+class CancelCreateTaskHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Получаем chat_id

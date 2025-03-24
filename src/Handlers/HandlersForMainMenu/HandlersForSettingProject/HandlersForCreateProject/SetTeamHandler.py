@@ -19,7 +19,6 @@ class SetTeamHandler(Handler):
     context.user_data["state"] = "setTeamForCreateProject"
 
     # Отправляем сообщение с запросом имени проекта
-    sent_message = await query.message.reply_text("Введите юзернеймы разработчиков через пробел:")
-
+    sent_message = await query.message.reply_text("Введите id разработчиков через пробел:")
     # Сохраняем ID сообщения бота в context.user_data
     context.user_data["bot_message_id"] = sent_message.message_id

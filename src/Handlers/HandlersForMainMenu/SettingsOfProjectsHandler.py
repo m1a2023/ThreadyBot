@@ -4,6 +4,7 @@ from telegram.ext import ContextTypes
 from typing import Any
 
 from Handlers.Handler import Handler
+from ProjectManagment.ProjectManager import ProjectManager
 
 class SettingsOfProjectsHandler(Handler):
   @staticmethod
@@ -12,11 +13,13 @@ class SettingsOfProjectsHandler(Handler):
     query = update.callback_query
     await query.answer()
 
+    await ProjectManager.get_and_update_list_projects(update, context)
+
     keyboard = [
       [InlineKeyboardButton("Создание нового проекта", callback_data="CreateProject")],
-      [InlineKeyboardButton("Изменить сущетсвующий проект", callback_data="chooseProject")], #ChangeProject
-      [InlineKeyboardButton("Посмотреть данные о всех проектах", callback_data="ShowProjectsInfo")],
-      [InlineKeyboardButton("Удалить проект",callback_data="DeleteProject")],
+      [InlineKeyboardButton("Изменить сущеcтвующий проект", callback_data="ChangeProject")],
+      [InlineKeyboardButton("Посмотреть данные о проекте", callback_data="ShowProjectsInfo")],
+      [InlineKeyboardButton("Удалить проект",callback_data="ConfirmationDeleteProject")],
       [InlineKeyboardButton("Выйти в главное меню", callback_data="MoveToMainMenu")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
