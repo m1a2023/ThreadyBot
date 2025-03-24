@@ -2,6 +2,8 @@ from datetime import datetime, timezone
 from telegram import Update
 from telegram.ext import ContextTypes
 from Handlers.Handler import Handler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.CurrentTasksHandler import CurrentTasksHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.ShowInfoAndFastEditTasksHandler import ShowInfoAndFastEditTasksHandler
 from Handlers.HandlersForTaskMenu.AddNewTaskMenu.SetDeveloperForCreateHandler import SetDeveloperForTaskHandler
 from Handlers.HandlersForTaskMenu.ChooseDeveloperHandler import ChooseDeveloperHandler
 from Handlers.HandlersForTaskMenu.ChooseTaskHandler import ChooseTaskHandler
@@ -96,6 +98,9 @@ class MainCallbackHandler(Handler):
       return await GeneralSettingsHandler.handle(update, context)
 
     # Обработка кнопок в "Ближайшие события и состояние проекта"
+    elif query.data == "currentTasks":
+      context.user_data["state"] = "currentTasks"
+      return await ChooseProjectHandler.handle(update, context)
     elif query.data == "reportsMenu":
       return await ReportMenuHandler.handle(update, context)
     elif query.data == "get_project_report":
@@ -104,6 +109,9 @@ class MainCallbackHandler(Handler):
     elif query.data == "get_developer_report":
       context.user_data["state"] = "chooseDeveloper"
       return await ChooseProjectHandler.handle(update, context)
+    elif query.data.startswith("taskInCurrentTasks_"):
+      context.user_data["taskInCurrentTasks"] = query.data[19:]
+      return await ShowInfoAndFastEditTasksHandler.handle(update, context)
 
     # Обработка кнопок в "Управление проектами"
     elif query.data == "CreateProject":
@@ -264,7 +272,10 @@ class MainCallbackHandler(Handler):
       elif context.user_data["state"] == "chooseDeveloper":
         context.user_data["state"] =  "get_developer_report"
         return await ChooseDeveloperHandler.handle(update, context)
-       
+      
+      elif context.user_data["state"] == "currentTasks":
+        context.user_data["state"] = None
+        return await CurrentTasksHandler.handle(update, context)      
     
     elif query.data.startswith("chosenTask_"):
       context.user_data["chosenTask"] = query.data[11:]

@@ -286,7 +286,8 @@ async def getTaskById(task_id: int) -> Task:
         description = data["description"], 
         deadline = data["deadline"],
         priority = data["priority"],
-        status = data["status"]
+        status = data["status"],
+        developer = data["user_id"]
       )
 
       return task
