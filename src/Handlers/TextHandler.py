@@ -90,7 +90,7 @@ class TextHandler:
 
     if state == "editProjectName":
       if (len(user_text) >= 4 and not user_text[0].isdigit() and user_text not in users_project):
-        changedProject.name = user_text
+        changedProject.title = user_text
         await TextHandler.processMessage(
           context, chat_id, user_message_id, bot_message_id,
           f"Имя проекта: {user_text}", "projectInfoForChangeProject"

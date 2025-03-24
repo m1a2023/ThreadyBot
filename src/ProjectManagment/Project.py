@@ -14,8 +14,8 @@ class Project:
         self.team = team
 
     """ Setter for all """
-    def set_title(self, name: str):
-        self.title = name
+    def set_title(self, title: str):
+        self.title = title
 
     def set_description(self, description: str):
         self.description = description

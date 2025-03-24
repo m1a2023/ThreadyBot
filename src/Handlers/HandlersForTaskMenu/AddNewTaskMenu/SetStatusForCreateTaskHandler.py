@@ -16,7 +16,7 @@ class SetStatusForCreateTaskHandler(Handler):
 
         keyboard = [
             [InlineKeyboardButton("TODO", callback_data="statusTaskTodo")],
-            [InlineKeyboardButton("В процессе", callback_data="statusTaskInProgress")],
+            [InlineKeyboardButton("В процессе", callback_data="statusTaskIn_Progress")],
             [InlineKeyboardButton("Выполнено", callback_data="statusTaskDone")],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)

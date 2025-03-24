@@ -111,7 +111,6 @@ async def getProjectById(project_id) -> Project:
 async def updateProjectById(project_id, newInfo: dict):
   async with httpx.AsyncClient() as client:
     try:
-      # Отправляем PUT-запрос
       response = await client.put(
         f"http://localhost:9000/api/db/projects/{project_id}",
         json=newInfo
@@ -127,7 +126,6 @@ async def updateProjectById(project_id, newInfo: dict):
 async def deleteProject(project_id: int):
   async with httpx.AsyncClient() as client:
     try:
-      # Отправляем DELETE-запрос
       response = await client.delete(
         f"http://localhost:9000/api/db/projects/{project_id}"
       )
@@ -183,11 +181,10 @@ async def deleteUserFromTeam(user_id: int, project_id: int):
 async def getTeamByProjectId(project_id: int):
   async with httpx.AsyncClient() as client:
     try:
-      # Отправляем GET-запрос
       response = await client.get(
-        f"http://localhost:9000/api/db/teams/project/{project_id}"  # URL эндпоинта
+        f"http://localhost:9000/api/db/teams/project/{project_id}"
       )
-      response.raise_for_status()  # Проверяем на ошибки HTTP
+      response.raise_for_status()
       return response.json()
     except Exception as e:
       print(f"Неожиданная ошибка: {e}")
