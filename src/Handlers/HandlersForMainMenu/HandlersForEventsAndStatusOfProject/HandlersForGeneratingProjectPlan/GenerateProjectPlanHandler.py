@@ -19,7 +19,7 @@ class GenerateProjectPlanHandler(Handler):
 
     await ProjectManager.get_and_update_list_projects(update, context)
 
-    await query.edit_message_text(f'Подождите идет генерация...')
+    await query.edit_message_text(f'(1/1)   Подождите идет генерация плана...')
 
     chosenProj = context.user_data["chosenProject"]
 
@@ -27,7 +27,7 @@ class GenerateProjectPlanHandler(Handler):
 
     keyboard = [
       [InlineKeyboardButton("Назад", callback_data="generate_menu")],
-      [InlineKeyboardButton('Сохранить этот план', callback_data='save_generated_plan')]
+      [InlineKeyboardButton('Сохранить этот план (так же добавятся задачи)', callback_data='save_generated_plan')]
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)

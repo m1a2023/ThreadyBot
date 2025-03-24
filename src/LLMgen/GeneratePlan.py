@@ -13,10 +13,12 @@ async def generateProjectPlan(project):
     team = len(project.get_team())
     done_tasks = ''
 
+
+
     messages = [
         {
             "role": "system",
-            "text": "Ты — опытный проджект менеджер. Напиши пошаговый план выполнения для следующего проекта, с учетом названия, описания и количества сотрудников. Каждую задачу разделяй на отдельные подзадачи. Если есть уже сделанные задачи, учти их.",
+            "text": "Ты — опытный проджект менеджер. Напиши (среднего размера) пошаговый план выполнения для следующего проекта, с учетом названия, описания и количества сотрудников. Каждую задачу разделяй на отдельные подзадачи. Если есть уже сделанные задачи, учти их.",
         },
         {
             "role": "user",
@@ -33,7 +35,7 @@ async def generateProjectPlan(project):
     )
 
     result = (
-        sdk.models.completions("yandexgpt").configure(temperature=0.2, max_tokens=700).run(messages)
+        sdk.models.completions("yandexgpt").configure(temperature=0.2, max_tokens=600).run(messages)
     )
 
     plan = result.text

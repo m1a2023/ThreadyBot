@@ -39,6 +39,8 @@ class Main:
 			logger.critical("You did not provide the API key to the telegram-bot.\n Insert it and try again.")
 			return
 
+		#TG_TOKEN = argv[0]
+
 		# Create the Application and pass it your bot's token.
 		application = Application.builder().token(TG_TOKEN).build()
 
