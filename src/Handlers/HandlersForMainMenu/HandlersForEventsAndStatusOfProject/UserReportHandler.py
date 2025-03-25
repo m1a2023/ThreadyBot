@@ -12,6 +12,7 @@ from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.charts.barcharts import VerticalBarChart
 
 from Handlers.Handler import Handler
+from Handlers.MainMenuHandler import MainMenuHandler
 from Handlers.RequestsHandler import get_report_by_user_id
 
 import os
@@ -31,6 +32,8 @@ class UserReportHandler(Handler):
         with open(file_path, "rb") as pdf_file:
             print("done")
             await update.callback_query.message.reply_document(document=pdf_file, filename=f"Developer_report_{user_id}.pdf")
+            await update.callback_query.delete_message()
+            return await MainMenuHandler.handle(update, context)
 
         # Можно удалить файл после отправки (если не нужен локально)
         os.remove(file_path)

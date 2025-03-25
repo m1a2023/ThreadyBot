@@ -23,8 +23,11 @@ class MainMenuHandler(Handler):
       query = update.callback_query
       await query.answer()  # Подтверждаем callback
 
-      # Редактируем сообщение с кнопками
-      await query.edit_message_text(text="Главное меню\nВыберите действие", reply_markup=reply_markup)
+      try:
+        # Редактируем сообщение с кнопками
+        await query.edit_message_text(text="Главное меню\nВыберите действие", reply_markup=reply_markup)
+      except:
+        await update.callback_query.message.reply_text(text="Главное меню\nВыберите действие", reply_markup=reply_markup)
     else:
       # Отправляем новое сообщение с кнопками
       await update.message.reply_text(text="Главное меню\nВыберите действие", reply_markup=reply_markup)

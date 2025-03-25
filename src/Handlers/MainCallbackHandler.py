@@ -3,8 +3,9 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from Handlers.Handler import Handler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.CurrentTasksHandler import CurrentTasksHandler
-from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.FastEditTaskForStatusDone import FastEditTaskForStatusDone
-from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.FastEditTaskForStatusInProgress import FastEditTaskForStatusInProgress
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.FastEditTaskForDevelperHandler import FastEditTaskForDeveloper
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.FastEditTaskForStatusDoneHandler import FastEditTaskForStatusDone
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.FastEditTaskForStatusInProgressHandler import FastEditTaskForStatusInProgress
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.ShowInfoAndFastEditTasksHandler import ShowInfoAndFastEditTasksHandler
 from Handlers.HandlersForTaskMenu.AddNewTaskMenu.SetDeveloperForCreateHandler import SetDeveloperForTaskHandler
 from Handlers.HandlersForTaskMenu.ChooseDeveloperHandler import ChooseDeveloperHandler
@@ -109,6 +110,10 @@ class MainCallbackHandler(Handler):
       return await FastEditTaskForStatusDone.handle(update, context)
     elif query.data == "FastEditTaskForStatusInProgress":
       return await FastEditTaskForStatusInProgress.handle(update, context)
+    
+    elif query.data == "chooseDeveloperForFastEdit":
+      context.user_data["state"] = "chooseDeveloperForFastEdit"
+      return await ChooseDeveloperHandler.handle(update, context)
 
     elif query.data == "reportsMenu":
       return await ReportMenuHandler.handle(update, context)
@@ -311,6 +316,10 @@ class MainCallbackHandler(Handler):
       elif context.user_data["state"] == "get_developer_report":
         context.user_data["state"] = None
         return await UserReportHandler.handle(update, context)
+      
+      elif context.user_data["state"] == "chooseDeveloperForFastEdit":
+        context.user_data["state"] = None
+        return await FastEditTaskForDeveloper.handle(update, context)
     
     else:
       pass

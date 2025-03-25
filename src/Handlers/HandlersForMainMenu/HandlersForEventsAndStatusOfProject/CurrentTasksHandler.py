@@ -15,16 +15,6 @@ class CurrentTasksHandler(Handler):
     await query.answer()
 
     await TaskManager.get_and_update_list_tasks(update, context, context.user_data["chosenProject"])
-
-    # [{'title': 'task1', 
-    # 'deadline': '2025-03-31T00:00:00', 
-    # 'user_id': 1356189545, 
-    # 'created_at': '2025-03-24T14:08:52.910076', 
-    # 'changed_at': '2025-03-24T14:09:41.976852', 
-    # 'description': '1234', 
-    # 'priority': 'high', 
-    # 'status': 'done', 
-    # 'project_id': 1, 'id': 1}
    
     all_tasks = context.user_data["task_manager"].tasks
     if all_tasks == []:

@@ -14,6 +14,7 @@ from reportlab.graphics.charts.barcharts import VerticalBarChart
 import os
 
 from Handlers.Handler import Handler
+from Handlers.MainMenuHandler import MainMenuHandler
 from Handlers.RequestsHandler import get_report_by_project_id
 
 class ProjectReportHandler(Handler):
@@ -30,6 +31,8 @@ class ProjectReportHandler(Handler):
         with open(file_path, "rb") as pdf_file:
             print("done")
             await update.callback_query.message.reply_document(document=pdf_file, filename=f"Project_report_{proj_id}.pdf")
+            await update.callback_query.delete_message()
+            return await MainMenuHandler.handle(update, context)
 
         os.remove(file_path)
 
