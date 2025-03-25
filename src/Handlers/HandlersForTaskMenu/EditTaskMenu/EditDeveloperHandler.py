@@ -13,7 +13,7 @@ class EditDeveloperForTaskHandler(Handler):
         await query.answer()
 
         chat_id = query.message.chat_id
-        context.user_data["state"] = "EditTaskExecutor"  # Сохраняем состояние пользователя
+        context.user_data["state"] = "EditTaskDeveloper"  # Сохраняем состояние пользователя
 
         team = await getTeamByProjectId(context.user_data["chosenProject"])
 
@@ -26,7 +26,7 @@ class EditDeveloperForTaskHandler(Handler):
         
         # Создаем кнопки
         for dev in developers_id_and_name:
-          keyboard.append([InlineKeyboardButton(f"{dev[0]}", callback_data=f"chosenExecuter_{dev[1]}")])
+          keyboard.append([InlineKeyboardButton(f"{dev[0]}", callback_data=f"chosenDeveloper_{dev[1]}")])
         
         reply_markup = InlineKeyboardMarkup(keyboard)
 

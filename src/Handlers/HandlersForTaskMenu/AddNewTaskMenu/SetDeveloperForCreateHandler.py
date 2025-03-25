@@ -13,7 +13,7 @@ class SetDeveloperForTaskHandler(Handler):
         await query.answer()
 
         chat_id = query.message.chat_id
-        context.user_data["state"] = "setExecuterForTask"  # Сохраняем состояние пользователя
+        context.user_data["state"] = "setDeveloperForTask"  # Сохраняем состояние пользователя
 
         team = await getTeamByProjectId(context.user_data["chosenProject"])
 

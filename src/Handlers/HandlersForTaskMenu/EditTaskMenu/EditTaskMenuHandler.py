@@ -24,7 +24,7 @@ class EditTaskMenuHandler(Handler):
             [InlineKeyboardButton("Изменить дедлайн", callback_data="editTaskDeadline")],
             [InlineKeyboardButton("Изменить приоритет", callback_data="editTaskPriority")],
             [InlineKeyboardButton("Изменить статус", callback_data="editTaskStatus")],
-            [InlineKeyboardButton("Изменить исполнителя", callback_data="editTaskExecutor")],
+            [InlineKeyboardButton("Изменить исполнителя", callback_data="editTaskDeveloper")],
             [
                 InlineKeyboardButton("Отмена", callback_data="cancelEditTask"),
                 InlineKeyboardButton("Готово", callback_data="saveEditTask")

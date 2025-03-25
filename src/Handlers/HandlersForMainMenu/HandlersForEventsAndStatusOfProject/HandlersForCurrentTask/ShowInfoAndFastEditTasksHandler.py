@@ -17,7 +17,8 @@ class ShowInfoAndFastEditTasksHandler(Handler):
     await query.answer()
     task_id = context.user_data["taskInCurrentTasks"]
     task = await getTaskById(task_id)
-    developer_link = f'<a href="tg://user?id={task.developer}">{await getUserNameById(task.developer)}</a>'
+    if task.developer is not None:
+      developer_link = f'<a href="tg://user?id={task.developer}">{await getUserNameById(task.developer)}</a>'
     text_about_task = (f"Задача: {task.title}\n"
                 f"Описание: {task.description}\n"
                 f"Дедлайн: {datetime.fromisoformat(task.deadline).strftime('%d.%m.%Y')}\n"
@@ -27,9 +28,11 @@ class ShowInfoAndFastEditTasksHandler(Handler):
 
     keyboard = []
     if task.status == "in_progress":
-      keyboard.append([InlineKeyboardButton("Выполнено (не работает)", callback_data="123")])
+      keyboard.append([InlineKeyboardButton("Выполнено", callback_data="FastEditTaskForStatusDone")])
     else:
-      keyboard.append([InlineKeyboardButton("Начать работу (не работает)", callback_data="123")])
+      keyboard.append([InlineKeyboardButton("Начать работу", callback_data="FastEditTaskForStatusInProgress")])
+    if task.developer is None:
+      keyboard.append([InlineKeyboardButton("Назначить исполнителя (не работает)", callback_data="123")])
     
     keyboard.append([InlineKeyboardButton("Изменить дедлайн (не работает)", callback_data="123")])
     keyboard.append([InlineKeyboardButton("Назад", callback_data="EventsAndStatusOfProjects")])

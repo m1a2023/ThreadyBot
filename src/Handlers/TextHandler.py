@@ -226,7 +226,7 @@ class TextHandler:
             await context.bot.edit_message_text(
               chat_id=chat_id,
               message_id=bot_message_id,
-              text="Вы ввели некорректное описание. Описание проекта не может быть меньше 4 слов. Введите описание еще раз:"
+              text="Вы ввели некорректное описание. Описание проекта не может быть меньше 15 слов. Введите описание еще раз:"
             )
           except Exception as e:
             print(f"Ошибка при редактировании сообщения: {e}")
@@ -388,7 +388,7 @@ class TextHandler:
         await update.message.reply_text("Ошибка: callback_query отсутствует.")
         return
 
-      developer = update.callback_query.data[16:]
+      developer = update.callback_query.data[23:]
 
       task.developer = developer
 
@@ -499,7 +499,8 @@ class TextHandler:
         await update.message.reply_text("Ошибка: callback_query отсутствует.")
         return
 
-      developer = update.callback_query.data[16:]
+      developer = update.callback_query.data[23:]
+      print(developer)
 
       changedTask.developer = developer
 

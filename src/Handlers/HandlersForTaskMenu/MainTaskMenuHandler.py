@@ -18,7 +18,7 @@ class MainTaskMenuHandler(Handler):
         keyboard = [
             [InlineKeyboardButton("Добавить задачу", callback_data="createNewTask")],
             [InlineKeyboardButton("Редактировать задачу", callback_data="editTask")],
-            [InlineKeyboardButton("Удалить задачу", callback_data="deleteTask")],
+            [InlineKeyboardButton("Удалить задачу", callback_data="confirmationDeleteTask")],
             [InlineKeyboardButton("Показать задачи", callback_data="showTask")],
             [InlineKeyboardButton("Назад", callback_data="SettingsOfProjects")]
         ]
