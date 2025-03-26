@@ -22,48 +22,99 @@ async def get_report_by_user_id(user_id: int) -> dict:
 #
 # запросы для генерации плана
 #
-async def get_project_plan(project_id: int, iam_t: str, f_id: str):
-    description = "ThreadyServer – это планируемый многопоточный сервер, разработанный на Python с использованием FastAPI. Проект будет включать поддержку асинхронной обработки запросов, работу с базой данных PostgreSQL и удобное API для взаимодействия с клиентами" #await getProjectInfoById(project_id)
-    iam_token = iam_t
-    folder_id = f"gpt://{f_id}/yandexgpt"
+# async def get_project_plan(project_id: int, iam_t: str, f_id: str):
+#     description = "ThreadyServer – это планируемый многопоточный сервер, разработанный на Python с использованием FastAPI. Проект будет включать поддержку асинхронной обработки запросов, работу с базой данных PostgreSQL и удобное API для взаимодействия с клиентами" #await getProjectInfoById(project_id)
+#     iam_token = iam_t
+#     folder_id = f"gpt://{f_id}/yandexgpt"
 
-    """url = "http://localhost:9000/api/llm/ygpt/"
-    params = {
-        "url": "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
-        "action": "plan",
-        "project_id": project_id,
-        "context_depth": 2,
-        timeout=60
-    }"""
+#     """url = "http://localhost:9000/api/llm/ygpt/"
+#     params = {
+#         "url": "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
+#         "action": "plan",
+#         "project_id": project_id,
+#         "context_depth": 2,
+#         timeout=60
+#     }"""
 
-    body = {
-        "iam_token": iam_token,
-        "model_uri": folder_id,
-        "options": {
+#     body = {
+#         "iam_token": iam_token,
+#         "model_uri": folder_id,
+#         "options": {
+#             "stream": False,
+#             "temperature": 0.9,
+#             "max_tokens": 1200
+#           },
+#         "messages": [
+#           {
+#                 "role": "user",
+#                 "text": description
+#           }
+#         ]
+#       }
+
+#     async with httpx.AsyncClient(timeout=30.0) as client:
+#       #print(description)
+#       response = await client.post(f"http://localhost:9000/api/llm/ygpt/?url=https://llm.api.cloud.yandex.net/foundationModels/v1/completion&action=plan&project_id={project_id}&context_depth=2", json=body)
+#       """response = await client.post(
+#             url=url,
+#             params=params,
+#             json=body,
+#             headers={"Content-Type": "application/json"}
+#         )"""
+#       response.raise_for_status()
+#       plan = response.json()
+#       return plan
+
+async def get_project_plan(project_id: int, iam_token: str, folder_id: str):
+    description = "ThreadyServer – это планируемый многопоточный сервер..."  # Ваше описание
+    
+    # Формируем тело запроса согласно API Yandex GPT
+    request_body = {
+        "modelUri": f"gpt://{folder_id}/yandexgpt/latest",  # Добавлено /latest
+        "completionOptions": {
             "stream": False,
             "temperature": 0.9,
-            "max_tokens": 1200
-          },
+            "maxTokens": 1200
+        },
         "messages": [
-          {
+            {
+                "role": "system",
+                "text": "Ты - помощник для генерации технических планов проектов."
+            },
+            {
                 "role": "user",
-                "text": description
-          }
+                "text": f"Сгенерируй подробный план разработки для проекта: {description}"
+            }
         ]
-      }
+    }
+
+    headers = {
+        "Authorization": f"Bearer {iam_token}",
+        "Content-Type": "application/json"
+    }
 
     async with httpx.AsyncClient(timeout=30.0) as client:
-      #print(description)
-      response = await client.post(f"http://localhost:9000/api/llm/ygpt/?url=https://llm.api.cloud.yandex.net/foundationModels/v1/completion&action=plan&project_id={project_id}&context_depth=2", json=body)
-      """response = await client.post(
-            url=url,
-            params=params,
-            json=body,
-            headers={"Content-Type": "application/json"}
-        )"""
-      response.raise_for_status()
-      plan = response.json()
-      return plan
+        try:
+            # Отправляем запрос напрямую в Yandex API
+            response = await client.post(
+                "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
+                json=request_body,
+                headers=headers
+            )
+            
+            # Логируем запрос и ответ для отладки
+            print(f"Request: {request_body}")
+            print(f"Response: {response.text}")
+            
+            response.raise_for_status()
+            return response.json()
+            
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP Error: {e.response.text}")
+            raise
+        except Exception as e:
+            print(f"Unexpected error: {str(e)}")
+            raise
 
 #
 # Запросы для юзеров
