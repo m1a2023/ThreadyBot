@@ -52,9 +52,9 @@ class Main:
 		application.add_handler(CommandHandler("help", thready_bot.help))
 		application.add_handler(CommandHandler("end", thready_bot.end))
 
-		#application.add_handler(CallbackQueryHandler(MenuHandler.handle))
+		# application.add_handler(CallbackQueryHandler(MenuHandler.handle))
 
-		#application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, TextHandler.handle))
+		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, TextHandler.handle))
 
 		# on non command i.e message - echo the message on Telegram
 		# application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))

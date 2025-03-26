@@ -15,7 +15,7 @@ from ProjectManagment.ProjectManager import ProjectManager
 from LLMgen.GeneratePlan import generateProjectPlan
 
 
-from src.LLMgen.GenerateTasks import generateSubProjectPlan, generateProjectTasks
+from LLMgen.GenerateTasks import generateSubProjectPlan, generateProjectTasks
 
 
 class SaveGeneratedPlanHandler(Handler):

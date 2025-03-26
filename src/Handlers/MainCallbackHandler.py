@@ -14,6 +14,8 @@ from Handlers.HandlersForTaskMenu.DeleteTaskHandler import DeleteTaskHandler
 from Handlers.HandlersForTaskMenu.EditTaskMenu.EditDeveloperHandler import EditDeveloperForTaskHandler
 from Handlers.HandlersForTaskMenu.EditTaskMenu.EditTaskMenuHandler import EditTaskMenuHandler
 from Handlers.TextHandler import TextHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.SaveGeneratedPlanHandler import SaveGeneratedPlanHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.ShowCurrentPlanHandler import ShowCurrentPlanHandler
 
 """ Импорты хендлеров для главного меню """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.DeleteProjectHandler import DeleteProjectHandler
@@ -127,7 +129,8 @@ class MainCallbackHandler(Handler):
 
     #генерация плана проекта
     elif query.data == "Plan":
-      return await GeneratePlanHandler.handle(update, context)
+      context.user_data["state"] = "PLan"
+      return await ChooseProjectHandler.handle(update, context)
 
 
     #elif query.data == "generate_menu":
@@ -299,6 +302,9 @@ class MainCallbackHandler(Handler):
       elif context.user_data["state"] == "get_project_report":
         context.user_data["state"] = None
         return await ProjectReportHandler.handle(update, context)
+      
+      elif context.user_data["state"] == "Plan":
+        return await GeneratePlanHandler.handle(update, context)
 
       elif context.user_data["state"] == "chooseDeveloper":
         context.user_data["state"] =  "get_developer_report"
