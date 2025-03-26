@@ -13,6 +13,8 @@ class DeleteProjectHandler(Handler):
     await query.answer()
 
     projectId = context.user_data["chosenProject"]
+    print(projectId)
+    print("from deleteProject")
     await deleteProject(projectId)
     
     return await SettingsOfProjectsHandler.handle(update, context)

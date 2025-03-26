@@ -2,11 +2,16 @@ from datetime import datetime, timezone
 from telegram import Update
 from telegram.ext import ContextTypes
 from Handlers.Handler import Handler
-from Handlers.HandlersForTaskMenu.AddNewTaskMenu.SetExecutorForCreateHandler import SetExecutorForTaskHandler
-from Handlers.HandlersForTaskMenu.ChooseExecutorHandler import ChooseExecutorHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.CurrentTasksHandler import CurrentTasksHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.FastEditTaskForStatusDone import FastEditTaskForStatusDone
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.FastEditTaskForStatusInProgress import FastEditTaskForStatusInProgress
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.ShowInfoAndFastEditTasksHandler import ShowInfoAndFastEditTasksHandler
+from Handlers.HandlersForTaskMenu.AddNewTaskMenu.SetDeveloperForCreateHandler import SetDeveloperForTaskHandler
+from Handlers.HandlersForTaskMenu.ChooseDeveloperHandler import ChooseDeveloperHandler
 from Handlers.HandlersForTaskMenu.ChooseTaskHandler import ChooseTaskHandler
 from Handlers.HandlersForTaskMenu.ConfirmationDeleteTask import ConfirmationDeleteTaskHandler
-from Handlers.HandlersForTaskMenu.EditTaskMenu.EditExecutorHandler import EditExecutorForTaskHandler
+from Handlers.HandlersForTaskMenu.DeleteTaskHandler import DeleteTaskHandler
+from Handlers.HandlersForTaskMenu.EditTaskMenu.EditDeveloperHandler import EditDeveloperForTaskHandler
 from Handlers.HandlersForTaskMenu.EditTaskMenu.EditTaskMenuHandler import EditTaskMenuHandler
 from Handlers.TextHandler import TextHandler
 
@@ -22,12 +27,8 @@ from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.ReportHand
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.ProjectReportHandler import ProjectReportHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.UserReportHandler import UserReportHandler
 
-
-""" Иморты хендлеров для работы с ЛЛМ"""
-from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.GeneratingProjectPlanMenuHandler import GeneratingPlanMenuHandler
-from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.GenerateProjectPlanHandler import GenerateProjectPlanHandler
-from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.SaveGeneratedPlanHandler import SaveGeneratedPlanHandler
-from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.ShowCurrentPlanHandler import ShowCurrentPlanHandler
+"""для генерации плана"""
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.GeneratePlanHandler import GeneratePlanHandler
 
 """ Импорты хендлеров для управления проектами """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.CreateProjectHandler import CreateProjectHandler
@@ -103,12 +104,30 @@ class MainCallbackHandler(Handler):
       return await GeneralSettingsHandler.handle(update, context)
 
     # Обработка кнопок в "Ближайшие события и состояние проекта"
+    elif query.data == "currentTasks":
+      context.user_data["state"] = "currentTasks"
+      return await ChooseProjectHandler.handle(update, context)
+
+    elif query.data == "FastEditTaskForStatusDone":
+      return await FastEditTaskForStatusDone.handle(update, context)
+    elif query.data == "FastEditTaskForStatusInProgress":
+      return await FastEditTaskForStatusInProgress.handle(update, context)
+
     elif query.data == "reportsMenu":
-       return await ReportMenuHandler.handle(update, context)
+      return await ReportMenuHandler.handle(update, context)
     elif query.data == "get_project_report":
-       return await ProjectReportHandler.handle(update, context)
+      context.user_data["state"] = "get_project_report"
+      return await ChooseProjectHandler.handle(update, context)
     elif query.data == "get_developer_report":
-       return await UserReportHandler.handle(update, context)
+      context.user_data["state"] = "chooseDeveloper"
+      return await ChooseProjectHandler.handle(update, context)
+    elif query.data.startswith("taskInCurrentTasks_"):
+      context.user_data["taskInCurrentTasks"] = query.data[19:]
+      return await ShowInfoAndFastEditTasksHandler.handle(update, context)
+
+    #генерация плана проекта
+    elif query.data == "Plan":
+      return await GeneratePlanHandler.handle(update, context)
 
 
     #elif query.data == "generate_menu":
@@ -141,19 +160,8 @@ class MainCallbackHandler(Handler):
     elif query.data == "deleteProject":
       return await DeleteProjectHandler.handle(update, context)
 
-
-
-    elif query.data == "generate_plan":
-      context.user_data["state"] = "generate_plan"
-      return await ChooseProjectHandler.handle(update, context)
-
-    elif query.data == "ConfirmationDeleteProject":
-      context.user_data["state"] = "deleteProject"
-      return await ChooseProjectHandler.handle(update, context)
-
-    elif query.data == "deleteProject":
-      return await DeleteProjectHandler.handle(update, context)
-
+    elif query.data == "deleteTask":
+      return await DeleteTaskHandler.handle(update, context)
 
     #кнопка изменения задач (в меню изменения проекта)
     elif query.data == "changeTasks":
@@ -246,9 +254,9 @@ class MainCallbackHandler(Handler):
     elif query.data.startswith("statusTask"):
        return await TextHandler.handle(update, context)
 
-    elif query.data == "setExecutorForCreateTask":
-      return await SetExecutorForTaskHandler.handle(update, context)
-    elif query.data.startswith("chosenExecuter_"):
+    elif query.data == "setDeveloperForCreateTask":
+      return await SetDeveloperForTaskHandler.handle(update, context)
+    elif query.data.startswith("chosenDeveloperForTask_"):
        return await TextHandler.handle(update, context)
 
     elif query.data == "saveNewTaskForCreateTask":
@@ -267,8 +275,8 @@ class MainCallbackHandler(Handler):
       return await EditPriorityHandler.handle(update, context)
     elif query.data == "editTaskStatus":
       return await EditStatusHandler.handle(update, context)
-    elif query.data == "editTaskExecutor":
-      return await EditExecutorForTaskHandler.handle(update, context)
+    elif query.data == "editTaskDeveloper":
+      return await EditDeveloperForTaskHandler.handle(update, context)
     elif query.data == "saveEditTask":
       return await SaveEditTaskHandler.handle(update,context)
     elif query.data == "cancelEditTask":
@@ -288,13 +296,21 @@ class MainCallbackHandler(Handler):
         context.user_data["state"] = None
         return await ConfirmationDeleteProjectHandler.handle(update, context)
 
-
-      elif context.user_data["state"] == "generate_plan":
+      elif context.user_data["state"] == "get_project_report":
         context.user_data["state"] = None
-        return await GenerateProjectPlanHandler.handle(update, context)
+        return await ProjectReportHandler.handle(update, context)
+
+      elif context.user_data["state"] == "chooseDeveloper":
+        context.user_data["state"] =  "get_developer_report"
+        return await ChooseDeveloperHandler.handle(update, context)
+
+      elif context.user_data["state"] == "currentTasks":
+        context.user_data["state"] = None
+        return await CurrentTasksHandler.handle(update, context)
 
     elif query.data.startswith("chosenTask_"):
       context.user_data["chosenTask"] = query.data[11:]
+      print(query.data[11:])
 
       if context.user_data["state"] == "editTask":
         context.user_data["state"] = None
@@ -303,12 +319,17 @@ class MainCallbackHandler(Handler):
         context.user_data["state"] = None
         return await ConfirmationDeleteTaskHandler.handle(update, context)
 
-    # elif query.data.startswith("chosenExecuter_"):
-    #   context.user_data["chosenExecuter"] = query.data[15:]
+    elif query.data.startswith("chosenDeveloper_"):
+      context.user_data["chosenDeveloper"] = query.data[16:]
+      if context.user_data["state"] == "setDeveloperForTask":
+        return await TextHandler.handle(update, context)
 
-    #   if context.user_data["state"] == "setExecutorForTask":
-    #     context.user_data["state"] = None
-    #     return await TextHandler.handle(update, context)
+      elif context.user_data["state"] == "EditTaskDeveloper":
+        return await TextHandler.handle(update, context)
+
+      elif context.user_data["state"] == "get_developer_report":
+        context.user_data["state"] = None
+        return await UserReportHandler.handle(update, context)
 
     else:
       pass

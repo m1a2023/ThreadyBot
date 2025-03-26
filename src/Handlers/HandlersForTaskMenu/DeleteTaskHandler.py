@@ -13,6 +13,6 @@ class DeleteTaskHandler(Handler):
         await query.answer()
 
         task_id = context.user_data["chosenTask"]
-        deleteTaskById(task_id)
+        await deleteTaskById(task_id)
 
         return await SettingsOfProjectsHandler.handle(update, context)

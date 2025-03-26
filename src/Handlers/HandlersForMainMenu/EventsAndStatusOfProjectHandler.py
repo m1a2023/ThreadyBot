@@ -13,9 +13,9 @@ class EventsAndStatusOfProjectHandler(Handler):
     await query.answer()
 
     keyboard = [
-      [InlineKeyboardButton("Текущие задачи и дедлайны (Не работает)", callback_data="123")],
+      [InlineKeyboardButton("Текущие задачи", callback_data="currentTasks")],
       [InlineKeyboardButton("Отчеты (не работает)", callback_data="reportsMenu")],
-      [InlineKeyboardButton("План, созданный нейросетью", callback_data="Plan")], #generate_menu
+      [InlineKeyboardButton("План, созданный нейросетью (Не работает)", callback_data="Plan")],
       [InlineKeyboardButton("Выход в главное меню", callback_data="MoveToMainMenu")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)

@@ -19,9 +19,9 @@ from Handlers.RequestsHandler import get_report_by_project_id
 class ProjectReportHandler(Handler):
     @staticmethod
     async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        proj_id = "" #сюда надо вставить id
+        proj_id = context.user_data["chosenProject"]
 
-        report = await get_report_by_project_id(proj_id) #покатак
+        report = await get_report_by_project_id(proj_id)
 
         file_path = f"Project_report_{proj_id}.pdf"
         await ProjectReportHandler.generate_pdf(report, file_path)

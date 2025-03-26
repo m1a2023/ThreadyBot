@@ -2,7 +2,9 @@ import httpx
 from ProjectManagment.Project import Project
 from TaskManagement.Task import Task
 
-#ЗАПРОСЫ ДЛЯ ОТЧЕТОВ
+#
+# ЗАПРОСЫ ДЛЯ ОТЧЕТОВ
+#
 async def get_report_by_project_id(project_id: int) -> dict:
     async with httpx.AsyncClient() as client:
         response = await client.get(f"http://localhost:9000/api/db/reports/project/{project_id}")
@@ -17,9 +19,55 @@ async def get_report_by_user_id(user_id: int) -> dict:
         report = response.json()
         return report
 
-# 
+#
+# запросы для генерации плана
+#
+async def get_project_plan(project_id: int, iam_t: str, f_id: str):
+    #description = "ThreadyServer – это планируемый многопоточный сервер, разработанный на Python с использованием FastAPI. Проект будет включать поддержку асинхронной обработки запросов, работу с базой данных PostgreSQL и удобное API для взаимодействия с клиентами" #await getProjectInfoById(project_id)
+    iam_token = iam_t
+    folder_id = f"gpt://{f_id}/yandexgpt"
+
+    """url = "http://localhost:9000/api/llm/ygpt/"
+    params = {
+        "url": "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
+        "action": "plan",
+        "project_id": project_id,
+        "context_depth": 2,
+        timeout=60
+    }"""
+
+    body = {
+        "iam_token": iam_token,
+        "model_uri": folder_id,
+        "options": {
+            "stream": False,
+            "temperature": 0.9,
+            "max_tokens": 1200
+          },
+        #"messages": [
+        #  {
+        #        "role": "user",
+        #        "text": description
+        #  }
+        #]
+      }
+
+    async with httpx.AsyncClient(timeout=30.0) as client:
+      #print(description)
+      response = await client.post(f"http://localhost:9000/api/llm/ygpt/?url=https://llm.api.cloud.yandex.net/foundationModels/v1/completion&action=plan&project_id={project_id}&context_depth=2&timeout=60", json=body)
+      """response = await client.post(
+            url=url,
+            params=params,
+            json=body,
+            headers={"Content-Type": "application/json"}
+        )"""
+      response.raise_for_status()
+      plan = response.json()
+      return plan
+
+#
 # Запросы для юзеров
-# 
+#
 
 """ Проверка, есть ли юзер в бд """
 async def checkUserExists(user_id: int) -> bool:
@@ -60,9 +108,9 @@ async def getUserNameById(user_id: int):
       print(f"Неожиданная ошибка: {e}")
 
 
-# 
+#
 # Запросы для проектов
-# 
+#
 
 """ Запрос для сохранения проекта в бд """
 async def saveNewProject(project):
@@ -72,7 +120,7 @@ async def saveNewProject(project):
       "repo_link": project["repo_link"],
       "owner_id": project["owner_id"]
   }
-  
+
   async with httpx.AsyncClient() as client:
       response = await client.post(
           "http://localhost:9000/api/db/projects/",
@@ -101,12 +149,21 @@ async def getProjectById(project_id) -> Project:
     response.raise_for_status()
     data = response.json()
     foundProject = Project(
-      title = data["title"], 
-      description = data["description"], 
+      title = data["title"],
+      description = data["description"],
       repo_link = data["repo_link"],
     )
     return foundProject
-  
+
+async def getProjectInfoById(project_id) -> Project:
+  async with httpx.AsyncClient() as client:
+    response = await client.get(
+      f"http://localhost:9000/api/db/projects/{project_id}"
+    )
+    response.raise_for_status()
+    data = response.json()
+    return data['description']
+
 """ Сохраняет новые данные в проект """
 async def updateProjectById(project_id, newInfo: dict):
   async with httpx.AsyncClient() as client:
@@ -134,9 +191,9 @@ async def deleteProject(project_id: int):
     except Exception as e:
       print(f"Неожиданная ошибка: {e}")
 
-# 
+#
 # Запросы для тимы
-# 
+#
 
 """ Запрос для создания тимы """
 async def createNewTeams(team_data: dict):
@@ -146,18 +203,18 @@ async def createNewTeams(team_data: dict):
         "http://localhost:9000/api/db/teams/",
         json=team_data
       )
-      response.raise_for_status() 
-      return response.json()  
+      response.raise_for_status()
+      return response.json()
     except Exception as e:
       print(f"Неожиданная ошибка: {e}")
-  
+
 """ Запрос на добавление нового человека в команду """
 async def addUserToTeam(team_data: dict):
   async with httpx.AsyncClient() as client:
     try:
       # Отправляем POST-запрос
       response = await client.post(
-        "http://localhost:9000/api/db/teams/user", 
+        "http://localhost:9000/api/db/teams/user",
         json=team_data
       )
       response.raise_for_status()
@@ -204,14 +261,14 @@ async def getListDevelopersIdByProjectId(project_id: int):
       developers_id = []
       for item in data:
         developers_id.append(item["user_id"])
-      
+
       return developers_id
     except Exception as e:
       print(f"Неожиданная ошибка: {e}")
 
-# 
+#
 # Запросы для тасков
-# 
+#
 
 """ Создает задачу """
 async def createTask(task: Task, project_id: int):
@@ -222,17 +279,17 @@ async def createTask(task: Task, project_id: int):
     "priority": task.priority,
     "status": task.status,
     "project_id": project_id,
-    "user_id": task.executor
+    "user_id": task.developer
   }
   async with httpx.AsyncClient() as client:
     try:
       response = await client.post(
-        "http://localhost:9000/api/db/tasks/", 
+        "http://localhost:9000/api/db/tasks/",
         json=task_data
       )
 
-      response.raise_for_status() 
-      return response.json()  
+      response.raise_for_status()
+      return response.json()
     except Exception as e:
       print(f"Неожиданная ошибка: {e}")
 
@@ -258,7 +315,7 @@ async def getAllTasks(project_id) -> list:
     response.raise_for_status()
     tasks = response.json()
     return tasks
-  
+
 """ Запрос на удаление задачи """
 async def deleteTaskById(task_id: int):
   async with httpx.AsyncClient() as client:
@@ -280,13 +337,14 @@ async def getTaskById(task_id: int) -> Task:
       )
       response.raise_for_status()
       data = response.json()
-      
+
       task = Task(
-        title = data["title"], 
-        description = data["description"], 
+        title = data["title"],
+        description = data["description"],
         deadline = data["deadline"],
         priority = data["priority"],
-        status = data["status"]
+        status = data["status"],
+        developer = data["user_id"]
       )
 
       return task
