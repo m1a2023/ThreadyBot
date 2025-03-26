@@ -13,18 +13,16 @@ class GeneratePlanHandler(Handler):
         iam_token = ""
         folder_id = ""
 
-        MAX_MESSAGE_LENGTH = 4096  # Максимальная длина сообщения в Telegram
-
+        MAX_MESSAGE_LENGTH = 4096
         plan = await get_project_plan(proj_id, iam_token, folder_id)
 
-        # Преобразуем dict в строку (если это словарь)
         if isinstance(plan, dict):
             plan = json.dumps(plan, indent=2, ensure_ascii=False)
 
-        message_length = len(plan)  # Длина всего сообщения
+        message_length = len(plan)
 
         if message_length > MAX_MESSAGE_LENGTH:
-            parts_count = -(-message_length // MAX_MESSAGE_LENGTH)  # Округляем вверх (аналог math.ceil)
+            parts_count = -(-message_length // MAX_MESSAGE_LENGTH)
 
             for i in range(parts_count):
                 start = i * MAX_MESSAGE_LENGTH

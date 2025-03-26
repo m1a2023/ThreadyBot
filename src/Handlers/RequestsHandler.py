@@ -23,7 +23,7 @@ async def get_report_by_user_id(user_id: int) -> dict:
 # запросы для генерации плана
 #
 async def get_project_plan(project_id: int, iam_t: str, f_id: str):
-    #description = "ThreadyServer – это планируемый многопоточный сервер, разработанный на Python с использованием FastAPI. Проект будет включать поддержку асинхронной обработки запросов, работу с базой данных PostgreSQL и удобное API для взаимодействия с клиентами" #await getProjectInfoById(project_id)
+    description = "ThreadyServer – это планируемый многопоточный сервер, разработанный на Python с использованием FastAPI. Проект будет включать поддержку асинхронной обработки запросов, работу с базой данных PostgreSQL и удобное API для взаимодействия с клиентами" #await getProjectInfoById(project_id)
     iam_token = iam_t
     folder_id = f"gpt://{f_id}/yandexgpt"
 
@@ -44,17 +44,17 @@ async def get_project_plan(project_id: int, iam_t: str, f_id: str):
             "temperature": 0.9,
             "max_tokens": 1200
           },
-        #"messages": [
-        #  {
-        #        "role": "user",
-        #        "text": description
-        #  }
-        #]
+        "messages": [
+          {
+                "role": "user",
+                "text": description
+          }
+        ]
       }
 
     async with httpx.AsyncClient(timeout=30.0) as client:
       #print(description)
-      response = await client.post(f"http://localhost:9000/api/llm/ygpt/?url=https://llm.api.cloud.yandex.net/foundationModels/v1/completion&action=plan&project_id={project_id}&context_depth=2&timeout=60", json=body)
+      response = await client.post(f"http://localhost:9000/api/llm/ygpt/?url=https://llm.api.cloud.yandex.net/foundationModels/v1/completion&action=plan&project_id={project_id}&context_depth=2", json=body)
       """response = await client.post(
             url=url,
             params=params,
