@@ -109,8 +109,10 @@ class MainCallbackHandler(Handler):
        return await ProjectReportHandler.handle(update, context)
     elif query.data == "get_developer_report":
        return await UserReportHandler.handle(update, context)
-    elif query.data == "generate_menu":
-       return await GeneratingPlanMenuHandler.handle(update, context)
+
+
+    #elif query.data == "generate_menu":
+    #   return await GeneratingPlanMenuHandler.handle(update, context)
 
     # Обработка кнопок с генерацией плана
     elif query.data == "save_generated_plan":
@@ -123,11 +125,11 @@ class MainCallbackHandler(Handler):
     # Обработка кнопок в "Управление проектами"
     elif query.data == "CreateProject":
       return await CreateProjectHandler.handle(update, context)
-    
+
     elif query.data == "ChangeProject":
       context.user_data["state"] = "changeProject"
       return await ChooseProjectHandler.handle(update, context)
-    
+
     elif query.data == "ShowProjectsInfo":
       context.user_data["state"] = "showProjectsInfo"
       return await ChooseProjectHandler.handle(update, context)
@@ -135,7 +137,7 @@ class MainCallbackHandler(Handler):
     elif query.data == "ConfirmationDeleteProject":
       context.user_data["state"] = "deleteProject"
       return await ChooseProjectHandler.handle(update, context)
-    
+
     elif query.data == "deleteProject":
       return await DeleteProjectHandler.handle(update, context)
 
@@ -144,11 +146,11 @@ class MainCallbackHandler(Handler):
     elif query.data == "generate_plan":
       context.user_data["state"] = "generate_plan"
       return await ChooseProjectHandler.handle(update, context)
-    
+
     elif query.data == "ConfirmationDeleteProject":
       context.user_data["state"] = "deleteProject"
       return await ChooseProjectHandler.handle(update, context)
-    
+
     elif query.data == "deleteProject":
       return await DeleteProjectHandler.handle(update, context)
 
@@ -205,7 +207,7 @@ class MainCallbackHandler(Handler):
     elif query.data == "editTask":
       context.user_data["state"] = "editTask"
       return await ChooseTaskHandler.handle(update, context)
-    
+
     elif query.data == "confirmationDeleteTask":
       context.user_data["state"] = "deleteTask"
       return await ChooseTaskHandler.handle(update, context)
@@ -221,11 +223,11 @@ class MainCallbackHandler(Handler):
       return await SetDescriptionForCreateTaskHandler.handle(update, context)
     elif query.data == "setDeadlineForCreateTask":
       return await SetDeadlineForCreateTaskHandler.handle(update, context)
-    
+
     # Обработка кнопок календаря
     elif query.data.startswith("day_"):
       return await TextHandler.handle(update, context)
-    
+
     elif query.data.startswith("prev_") or query.data.startswith("next_"):
       _, year, month = query.data.split("_")
       year, month = int(year), int(month)
@@ -243,7 +245,7 @@ class MainCallbackHandler(Handler):
         return await SetStatusForCreateTaskHandler.handle(update, context)
     elif query.data.startswith("statusTask"):
        return await TextHandler.handle(update, context)
-    
+
     elif query.data == "setExecutorForCreateTask":
       return await SetExecutorForTaskHandler.handle(update, context)
     elif query.data.startswith("chosenExecuter_"):
@@ -271,17 +273,17 @@ class MainCallbackHandler(Handler):
       return await SaveEditTaskHandler.handle(update,context)
     elif query.data == "cancelEditTask":
       return await CancelEditTaskHandler.handle(update,context)
-    
+
     elif query.data.startswith("chosenProject_"):
       context.user_data["chosenProject"] = query.data[14:]
       if context.user_data["state"] == "showProjectsInfo":
         context.user_data["state"] = None
         return await ShowProjectsInfoHandler.handle(update, context)
-      
+
       elif context.user_data["state"] == "changeProject":
         context.user_data["state"] = None
         return await ChangeProjectHandler.handle(update, context)
-      
+
       elif context.user_data["state"] == "deleteProject":
         context.user_data["state"] = None
         return await ConfirmationDeleteProjectHandler.handle(update, context)
@@ -300,14 +302,13 @@ class MainCallbackHandler(Handler):
       elif context.user_data["state"] == "deleteTask":
         context.user_data["state"] = None
         return await ConfirmationDeleteTaskHandler.handle(update, context)
-    
+
     # elif query.data.startswith("chosenExecuter_"):
     #   context.user_data["chosenExecuter"] = query.data[15:]
 
     #   if context.user_data["state"] == "setExecutorForTask":
     #     context.user_data["state"] = None
     #     return await TextHandler.handle(update, context)
-    
+
     else:
       pass
-      
