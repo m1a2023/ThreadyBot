@@ -129,7 +129,7 @@ class MainCallbackHandler(Handler):
 
     #генерация плана проекта
     elif query.data == "Plan":
-      context.user_data["state"] = "PLan"
+      context.user_data["state"] = "generatePlan"
       return await ChooseProjectHandler.handle(update, context)
 
 
@@ -303,7 +303,8 @@ class MainCallbackHandler(Handler):
         context.user_data["state"] = None
         return await ProjectReportHandler.handle(update, context)
       
-      elif context.user_data["state"] == "Plan":
+      elif context.user_data["state"] == "generatePlan":
+        context.user_data["state"] = None
         return await GeneratePlanHandler.handle(update, context)
 
       elif context.user_data["state"] == "chooseDeveloper":

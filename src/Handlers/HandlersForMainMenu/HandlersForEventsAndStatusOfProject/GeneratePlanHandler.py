@@ -9,7 +9,6 @@ class GeneratePlanHandler(Handler):
     @staticmethod
     async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         proj_id = context.user_data["chosenProject"]
-        # print("From GeneratePlanHandler" + proj_id)
 
         iam_token = ""
         folder_id = ""
