@@ -12,6 +12,7 @@ from telegram.ext import CommandHandler, MessageHandler, filters, CallbackQueryH
 """ Thready packages """
 from Models.ThreadyBot import ThreadyBot
 
+from src.RemindersHandler import fetch_and_send_reminders
 
 # Enable logging
 logging.basicConfig(
@@ -47,6 +48,8 @@ class Main:
 		#Create the Bot
 		thready_bot = ThreadyBot()
 
+		#fetch_and_send_reminders()
+
 		# on different commands - answer in Telegram
 		application.add_handler(CommandHandler("start", thready_bot.start))
 		application.add_handler(CommandHandler("help", thready_bot.help))
@@ -54,10 +57,6 @@ class Main:
 
 		# application.add_handler(CallbackQueryHandler(MenuHandler.handle))
 
-		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, TextHandler.handle))
-
-		# on non command i.e message - echo the message on Telegram
-		# application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, TextHandler.handle))
 
 		# Обработчик кнопок

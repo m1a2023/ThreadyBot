@@ -3,6 +3,31 @@ from ProjectManagment.Project import Project
 from TaskManagement.Task import Task
 
 #
+# ЗАПРОСЫ ДЛЯ НАПОМИНАНИЙ
+#
+async def get_all_tasks_deadlines():
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"http://localhost:9000/api/db/tasks/")
+        response.raise_for_status()
+        tasks = response.json()
+
+        result = []
+        for task in tasks:
+          task_title = task.get("title")
+          task_deadline = task.get("deadline")
+          task_developer = task.get("user_id")
+
+          task_info = [task_title, task_deadline, task_developer]
+
+          if task_title and task_deadline:
+            if task_developer:
+              result.append(task_info)
+            else:
+              pass #надо придумать как разослать всем разрабам
+
+        return result
+
+#
 # ЗАПРОСЫ ДЛЯ ОТЧЕТОВ
 #
 async def get_report_by_project_id(project_id: int) -> dict:
