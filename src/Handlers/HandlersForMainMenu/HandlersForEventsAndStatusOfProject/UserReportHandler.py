@@ -11,6 +11,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.charts.barcharts import VerticalBarChart
 from reportlab.graphics.charts.legends import Legend
+from reportlab.platypus import PageBreak
 
 from Handlers.Handler import Handler
 from Handlers.RequestsHandler import get_report_by_user_id
@@ -110,15 +111,19 @@ class UserReportHandler(Handler):
             ('GRID', (0,0), (-1,-1), 1, colors.black)
         ]))
 
+
+        elements.append(Paragraph("Гистограма всех задач и времени их выполнения", header_style))
+        elements.append(Spacer(1, 1*cm))
+        await UserReportHandler.generate_vertical_bar_chart(tasks, elements, body_style)
+
+        elements.append(PageBreak())
+
         elements.append(Paragraph("Статистика задач", header_style))
         elements.append(Spacer(1, 0.3*cm))
         elements.append(task_table)
         elements.append(Spacer(1, 1*cm))
 
-        elements.append(Paragraph("Гистограма всех задач и времени их выполнения", header_style))
-        elements.append(Spacer(1, 1*cm))
-        await UserReportHandler.generate_vertical_bar_chart(tasks, elements, body_style)
-        elements.append(Spacer(1, 1*cm))
+        #elements.append(Spacer(1, 1*cm))
 
         tasks_dur = [
             [Paragraph("Категория", header_style), Paragraph("Название задачи", header_style), Paragraph("Колличество часов", header_style)],

@@ -11,6 +11,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.charts.barcharts import VerticalBarChart
 from reportlab.graphics.charts.legends import Legend
+from reportlab.platypus import PageBreak
 
 import os
 
@@ -72,7 +73,7 @@ class ProjectReportHandler(Handler):
         elements.append(Spacer(1, 0.5*cm))
 
         task_stats = [
-            [Paragraph("Категория", header_style), Paragraph("Количество", header_style), Paragraph("Доля", header_style)],
+            [Paragraph("Категория", header_style), Paragraph("Кол-во", header_style), Paragraph("Доля", header_style)],
             [Paragraph("Всего задач", body_style), report_data['total_quantity_of_tasks'], "100%"],
 
             [
@@ -102,37 +103,39 @@ class ProjectReportHandler(Handler):
             ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
             ('ALIGN', (0,0), (-1,-1), 'CENTER'),
             ('FONTNAME', (0,0), (-1,-1), 'DejaVuSans'),
+            ('ENCODING', (0,0), (-1,-1), 'UTF-8'),
             ('FONTSIZE', (0,0), (-1,-1), 12),
             ('BOTTOMPADDING', (0,0), (-1,0), 12),
             ('BACKGROUND', (0,1), (-1,-1), colors.beige),
             ('GRID', (0,0), (-1,-1), 1, colors.black)
         ]))
 
+        elements.append(Paragraph("Гистограма всех задач и времени их выполнения", header_style))
+        elements.append(Spacer(1, 1*cm))
+        await ProjectReportHandler.generate_vertical_bar_chart(tasks, elements, body_style)
+
+        elements.append(PageBreak())
+
         elements.append(Paragraph("Статистика задач", header_style))
         elements.append(Spacer(1, 0.3*cm))
         elements.append(task_table)
         elements.append(Spacer(1, 1*cm))
 
-        elements.append(Paragraph("Гистограма всех задач и времени их выполнения", header_style))
-        elements.append(Spacer(1, 1*cm))
-        await ProjectReportHandler.generate_vertical_bar_chart(tasks, elements, body_style)
-        elements.append(Spacer(1, 2*cm))
-
         devs = [
             [Paragraph("Категория", header_style), Paragraph("Имя", header_style), Paragraph("Статистика", header_style)],
             [
                 Paragraph("Самый ценный", body_style),
-                Paragraph(f"{report_data['most_valuable_developer']['name']}"),
+                Paragraph(f"{report_data['most_valuable_developer']['name']}", body_style),
                 Paragraph(f"Эффективность: {report_data['most_valuable_developer']['effectiveness']}%", body_style)
             ],
             [
                 Paragraph("Самый продуктивный", body_style),
-                Paragraph(f"{report_data['most_productive_developer']['name']}"),
+                Paragraph(f"{report_data['most_productive_developer']['name']}", body_style),
                 Paragraph(f"Завершено задач: {report_data['most_productive_developer']['quantity']}", body_style)
             ],
             [
                 Paragraph("Требует внимания", body_style),
-                Paragraph(f"{report_data['most_flawed_developer']['name']}"),
+                Paragraph(f"{report_data['most_flawed_developer']['name']}", body_style),
                 Paragraph(f"Просрочено задач: {report_data['most_flawed_developer']['quantity']}", body_style)
             ]
         ]
@@ -144,6 +147,7 @@ class ProjectReportHandler(Handler):
             ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
             ('ALIGN', (0,0), (-1,-1), 'CENTER'),
             ('FONTNAME', (0,0), (-1,-1), 'DejaVuSans'),
+            ('ENCODING', (0,0), (-1,-1), 'UTF-8'),
             ('FONTSIZE', (0,0), (-1,-1), 12),
             ('BOTTOMPADDING', (0,0), (-1,0), 12),
             ('BACKGROUND', (0,1), (-1,-1), colors.beige),
