@@ -16,14 +16,16 @@ async def get_all_tasks_deadlines():
           task_title = task.get("title")
           task_deadline = task.get("deadline")
           task_developer = task.get("user_id")
+          reminder_marker = None #надо поправить БД
+          project_id = task.get("project_id")
 
-          task_info = [task_title, task_deadline, task_developer]
+          task_info = [task_title, task_deadline, task_developer, reminder_marker,  project_id]
 
           if task_title and task_deadline:
             if task_developer:
               result.append(task_info)
             else:
-              pass #надо придумать как разослать всем разрабам
+              pass # какая-то ошибка
 
         return result
 
