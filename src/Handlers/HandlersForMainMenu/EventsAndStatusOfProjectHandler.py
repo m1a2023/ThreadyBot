@@ -21,4 +21,4 @@ class EventsAndStatusOfProjectHandler(Handler):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await query.edit_message_text("*\=\=Ближайшие события и состояние проекта\=\=*\nВыберите действие:", reply_markup=reply_markup, parse_mode="MarkdownV2")
+    await query.edit_message_text("*\=\=Состояние проекта\=\=*\nВыберите действие:", reply_markup=reply_markup, parse_mode="MarkdownV2")

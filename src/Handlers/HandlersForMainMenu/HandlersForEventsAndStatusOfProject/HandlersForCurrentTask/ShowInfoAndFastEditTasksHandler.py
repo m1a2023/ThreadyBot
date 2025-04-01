@@ -31,7 +31,7 @@ class ShowInfoAndFastEditTasksHandler(Handler):
     else:
       keyboard.append([InlineKeyboardButton("🔄 Начать работу", callback_data="FastEditTaskForStatusInProgress")])
     if task.developer is None:
-      keyboard.append([InlineKeyboardButton("🧑‍💻 Назначить исполнителя (не работает)", callback_data="123")])
+      keyboard.append([InlineKeyboardButton("🧑‍💻 Назначить исполнителя", callback_data="FastEditTaskForChangeDeveloper")])
     
     keyboard.append([InlineKeyboardButton("📅 Изменить дедлайн (не работает)", callback_data="123")])
     keyboard.append([InlineKeyboardButton("⬅️ Назад", callback_data="EventsAndStatusOfProjects")])

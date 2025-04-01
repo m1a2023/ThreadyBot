@@ -17,6 +17,7 @@ from Handlers.TextHandler import TextHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.SaveGeneratedPlanHandler import SaveGeneratedPlanHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.ShowCurrentPlanHandler import ShowCurrentPlanHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.ShowInfoAboutTeamHandler import ShowInfoAboutTeamHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.FastEditTaskForChangeDeveloper import FastEditTaskForChangeDeveloper
 
 """ Импорты хендлеров для главного меню """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.DeleteProjectHandler import DeleteProjectHandler
@@ -115,6 +116,9 @@ class MainCallbackHandler(Handler):
       return await FastEditTaskForStatusDone.handle(update, context)
     elif query.data == "FastEditTaskForStatusInProgress":
       return await FastEditTaskForStatusInProgress.handle(update, context)
+    elif query.data == "FastEditTaskForChangeDeveloper":
+      context.user_data["state"] = "FastEditTaskDeveloper"
+      return await ChooseDeveloperHandler.handle(update, context)
 
     elif query.data == "reportsMenu":
       return await ReportMenuHandler.handle(update, context)
@@ -346,6 +350,10 @@ class MainCallbackHandler(Handler):
       elif context.user_data["state"] == "get_developer_report":
         context.user_data["state"] = None
         return await UserReportHandler.handle(update, context)
+      
+      elif context.user_data["state"] == "FastEditTaskDeveloper":
+        context.user_data["state"] = ""
+        return await FastEditTaskForChangeDeveloper.handle(update, context)
 
     else:
       pass
