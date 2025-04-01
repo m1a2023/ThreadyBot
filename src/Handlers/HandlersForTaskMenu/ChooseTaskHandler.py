@@ -17,8 +17,8 @@ class ChooseTaskHandler(Handler):
 
     if context.user_data["task_manager"].tasks == []:
       keyboard = [
-        [InlineKeyboardButton(f"Создать задачу", callback_data="createNewTask")],
-        [InlineKeyboardButton("Назад", callback_data="SettingsOfProjects")]
+        [InlineKeyboardButton(f"🆕 Создать задачу", callback_data="createNewTask")],
+        [InlineKeyboardButton("⬅️ Назад", callback_data="SettingsOfProjects")]
       ]
       reply_markup = InlineKeyboardMarkup(keyboard)
       await query.edit_message_text(text="Нет задач по выбранному проекту", reply_markup=reply_markup)
@@ -30,7 +30,7 @@ class ChooseTaskHandler(Handler):
         tasks = await context.user_data["task_manager"].get_tasks_names_and_id()
         for task in tasks:
           keyboard.append([InlineKeyboardButton(f"{task[0]}", callback_data=f"chosenTask_{task[1]}")])
-        keyboard.append([InlineKeyboardButton("Назад", callback_data="SettingsOfProjects")])
+        keyboard.append([InlineKeyboardButton("⬅️ Назад", callback_data="changeTasks")])
 
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(text="Выберите задачу: ", reply_markup=reply_markup)
+        await query.edit_message_text(text="Выберите задачу:", reply_markup=reply_markup)

@@ -36,19 +36,21 @@ class ChangeInfoAboutTeamHandler(Handler):
     for dev_id in dev_id_list:
       dev_name = await getUserNameById(dev_id)
       dev_link = f'<a href="tg://user?id={dev_id}">{dev_name}</a>'
-      dev_links.append(f"{dev_link} - {dev_id}")
+      dev_links.append(f"🔹 {dev_link} - {dev_id}")
 
     dev_links_text = "\n".join(dev_links)
-    team_text = f"Владелец проекта:\n{owner_link}\nРазработчики проекта:\n{dev_links_text}"
-
+    if dev_id_list:
+      team_text = f"Владелец проекта: {owner_link}\nРазработчики проекта:\n{dev_links_text}"
+    else:
+      team_text = f"Владелец проекта: {owner_link}"
     keyboard = [
-        [InlineKeyboardButton("Добавить нового разработчика", callback_data="addNewDeveloper")],
-        [InlineKeyboardButton("Удалить разработчика", callback_data="deleteDeveloper")],
+        [InlineKeyboardButton("🧑‍💻 Добавить нового разработчика", callback_data="addNewDeveloper")],
+        [InlineKeyboardButton("🔫 Удалить разработчика", callback_data="deleteDeveloper")],
         [
-          InlineKeyboardButton("Отмена", callback_data="cancelChangeTeam"),
-          InlineKeyboardButton("Сохранить", callback_data="saveChangeTeam")
+          InlineKeyboardButton("❌ Отмена", callback_data="cancelChangeTeam"),
+          InlineKeyboardButton("✅ Сохранить", callback_data="saveChangeTeam")
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await query.edit_message_text(f"Изменение команды.\n\nВаша команда на данный момент:\n{team_text}\n\n\nВыберите действие", reply_markup=reply_markup, parse_mode="HTML")
+    await query.edit_message_text(f"<b>==Изменение команды==</b>\n{team_text}\n\n\nВыберите действие:", reply_markup=reply_markup, parse_mode="HTML")

@@ -11,11 +11,13 @@ class ConfirmationDeleteTaskHandler(Handler):
         await query.answer()
 
         keyboard = [
-            [InlineKeyboardButton("Удалить", callback_data="deleteTask")],
-            [InlineKeyboardButton("Отмена", callback_data="SettingsOfProjects")]
+            [InlineKeyboardButton("🗑️ Удалить", callback_data="deleteTask")],
+            [InlineKeyboardButton("❌ Отмена", callback_data="SettingsOfProjects")]
         ]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         dataTask = await getTaskById(context.user_data["chosenTask"])
-        await query.edit_message_text(f"{dataTask.__str__()}\n\nВы уверены, что хотите удалить задачу?", reply_markup=reply_markup)
+        deadline = dataTask.deadline.split("T")[0]
+        textForOutput = f"Название: {dataTask.title}\nОписание: {dataTask.description}\nДедлайн: {deadline}\nСтатус: {dataTask.status}\nПриоритет: {dataTask.priority}\nИсполнитель: {dataTask.developer}"
+        await query.edit_message_text(f"{textForOutput}\n\nВы уверены, что хотите удалить задачу?", reply_markup=reply_markup)

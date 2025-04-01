@@ -21,19 +21,19 @@ class CreateProjectHandler(Handler):
       context.user_data["projectInfoForCreateProject"] = ["Вы ввели:"]
 
     keyboard = [
-      [InlineKeyboardButton("Добавить название", callback_data="setNameForCreateProject")],
-      [InlineKeyboardButton("Добавить описание", callback_data="setDescriptionForCreateProject")],
-      [InlineKeyboardButton("Добавить разработчиков", callback_data="setTeamForCreateProject")],
-      [InlineKeyboardButton("Добавить ссылку на репозиторий", callback_data="setLinkForCreateProject")],
+      [InlineKeyboardButton("🏷️ Добавить название", callback_data="setNameForCreateProject")],
+      [InlineKeyboardButton("📝 Добавить описание", callback_data="setDescriptionForCreateProject")],
+      [InlineKeyboardButton("🧑‍💻 Добавить разработчиков", callback_data="setTeamForCreateProject")],
+      [InlineKeyboardButton("📎 Добавить ссылку на репозиторий", callback_data="setLinkForCreateProject")],
       [
-        InlineKeyboardButton("Отмена", callback_data="CancelCreateProject"),
-        InlineKeyboardButton("Создать", callback_data="SaveNewProject")
+        InlineKeyboardButton("❌ Отмена", callback_data="CancelCreateProject"),
+        InlineKeyboardButton("✅ Создать", callback_data="SaveNewProject")
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     # Отправляем сообщение с кнопками
-    await query.edit_message_text("Заполните поля по порядку:", reply_markup=reply_markup)
+    await query.edit_message_text("*\=\=Создание проекта\=\=*\nДобавьте информацию о новом проекте:", reply_markup=reply_markup, parse_mode="MarkdownV2")
 
 
 

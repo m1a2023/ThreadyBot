@@ -18,18 +18,18 @@ class CreateNewTaskHandler(Handler):
             context.user_data["taskInfoForCreateTask"] = ["Вы ввели:"]
 
         keyboard = [
-            [InlineKeyboardButton("Добавить имя", callback_data="setNameForCreateTask")],
-            [InlineKeyboardButton("Добавить описание", callback_data="setDescriptionForCreateTask")],
-            [InlineKeyboardButton("Назначить дедлайн", callback_data="setDeadlineForCreateTask")],
-            [InlineKeyboardButton("Назначить приоритет", callback_data="setPriorityForCreateTask")],
-            [InlineKeyboardButton("Назначить статус", callback_data="setStatusForCreateTask")],
-            [InlineKeyboardButton("Назначить исполнителя", callback_data="setDeveloperForCreateTask")],
+            [InlineKeyboardButton("🏷️ Добавить название", callback_data="setNameForCreateTask")],
+            [InlineKeyboardButton("📝 Добавить описание", callback_data="setDescriptionForCreateTask")],
+            [InlineKeyboardButton("📅 Назначить дедлайн", callback_data="setDeadlineForCreateTask")],
+            [InlineKeyboardButton("🚥 Назначить приоритет", callback_data="setPriorityForCreateTask")],
+            [InlineKeyboardButton("❕ Назначить статус", callback_data="setStatusForCreateTask")],
+            [InlineKeyboardButton("🧑‍💻 Назначить исполнителя", callback_data="setDeveloperForCreateTask")],
             [
-                InlineKeyboardButton("Отмена", callback_data="cancelCreateTask"),
-                InlineKeyboardButton("Сохранить", callback_data="saveNewTaskForCreateTask")
+                InlineKeyboardButton("❌ Отмена", callback_data="cancelCreateTask"),
+                InlineKeyboardButton("✅ Сохранить", callback_data="saveNewTaskForCreateTask")
             ]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         # Отправляем сообщение с кнопками
-        await query.edit_message_text("Выберите действие:", reply_markup=reply_markup)
+        await query.edit_message_text("*\=\=Добавление задачи\=\=*\nВыберите действие:", reply_markup=reply_markup, parse_mode="MarkdownV2")
