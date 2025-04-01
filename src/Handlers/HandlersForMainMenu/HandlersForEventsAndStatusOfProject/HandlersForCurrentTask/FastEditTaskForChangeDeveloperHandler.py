@@ -12,8 +12,6 @@ class FastEditTaskForChangeDeveloper(Handler):
     query = update.callback_query
     await query.answer()
 
-    # тут должны считывать дату и записывать ее в бд
-
     task_id = context.user_data["taskInCurrentTasks"]
     dev_id = context.user_data["chosenDeveloper"]
     await updateTaskById(task_id, {"user_id": dev_id})

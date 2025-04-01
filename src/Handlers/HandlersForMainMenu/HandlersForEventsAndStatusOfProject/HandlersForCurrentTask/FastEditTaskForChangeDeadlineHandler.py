@@ -5,7 +5,7 @@ from typing import Any
 
 from Handlers.Handler import Handler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.CurrentTasksHandler import CurrentTasksHandler
-from Handlers.RequestsHandler import updateTaskById
+from Handlers.RequestsHandler import getTaskById, updateTaskById
 
 class FastEditTaskForChangeDeadlineHandler(Handler):
   @staticmethod
@@ -18,7 +18,6 @@ class FastEditTaskForChangeDeadlineHandler(Handler):
     selected_date = datetime.strptime(selected_date_str, "%Y-%m-%d")
 
     if selected_date < datetime.now():
-      await update.callback_query.message.reply_text("Выбранная дата уже прошла, повторите выбор")
       return
 
     task_id = context.user_data["taskInCurrentTasks"]

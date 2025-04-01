@@ -29,7 +29,6 @@ class SaveEditTaskHandler(Handler):
       except BadRequest as e:
         print(f"Ошибка при удалении последнего сообщения бота: {e}")
 
-    print ("from save changes task")
     changed_task = context.user_data["changedTask"].to_dict()
     new_info = {}
     for key in changed_task:
@@ -39,7 +38,6 @@ class SaveEditTaskHandler(Handler):
           new_info[key] = changed_task[key].isoformat()
         else:
           new_info[key] = changed_task[key]
-    print(new_info)
     await updateTaskById(int(context.user_data["chosenTask"]), new_info)
 
     # Очищаем все данные, связанные с редактированием задачи

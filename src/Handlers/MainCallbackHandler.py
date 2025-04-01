@@ -357,7 +357,7 @@ class MainCallbackHandler(Handler):
         return await UserReportHandler.handle(update, context)
       
       elif context.user_data["state"] == "FastEditTaskDeveloper":
-        context.user_data["state"] = ""
+        context.user_data["state"] = None
         return await FastEditTaskForChangeDeveloper.handle(update, context)
 
     else:
