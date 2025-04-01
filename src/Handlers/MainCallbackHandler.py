@@ -16,6 +16,7 @@ from Handlers.HandlersForTaskMenu.EditTaskMenu.EditTaskMenuHandler import EditTa
 from Handlers.TextHandler import TextHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.SaveGeneratedPlanHandler import SaveGeneratedPlanHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.ShowCurrentPlanHandler import ShowCurrentPlanHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.ShowInfoAboutTeamHandler import ShowInfoAboutTeamHandler
 
 """ Импорты хендлеров для главного меню """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.DeleteProjectHandler import DeleteProjectHandler
@@ -160,6 +161,10 @@ class MainCallbackHandler(Handler):
       context.user_data["state"] = "deleteProject"
       return await ChooseProjectHandler.handle(update, context)
 
+    elif query.data == "showTeam":
+      context.user_data["state"] = "showTeamInfo"
+      return await ChooseProjectHandler.handle(update, context)
+
     elif query.data == "deleteProject":
       return await DeleteProjectHandler.handle(update, context)
 
@@ -290,6 +295,10 @@ class MainCallbackHandler(Handler):
       if context.user_data["state"] == "showProjectsInfo":
         context.user_data["state"] = None
         return await ShowProjectsInfoHandler.handle(update, context)
+      
+      elif context.user_data["state"] == "showTeamInfo":
+        context.user_data["state"] = ""
+        return await ShowInfoAboutTeamHandler.handle(update, context)
 
       elif context.user_data["state"] == "changeProject":
         context.user_data["state"] = None
