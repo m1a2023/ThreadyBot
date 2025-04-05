@@ -5,29 +5,35 @@ from TaskManagement.Task import Task
 #
 # ЗАПРОСЫ ДЛЯ НАПОМИНАНИЙ
 #
-async def get_all_tasks_deadlines():
+async def get_all_reminders():
     async with httpx.AsyncClient() as client:
-        response = await client.get(f"http://localhost:9000/api/db/tasks/")
+        response = await client.get(f"http://localhost:9000/api/db/reminders/")
         response.raise_for_status()
-        tasks = response.json()
+        reminders = response.json()
 
         result = []
-        for task in tasks:
-          task_title = task.get("title")
-          task_deadline = task.get("deadline")
-          task_developer = task.get("user_id")
-          reminder_marker = None #надо поправить БД
-          project_id = task.get("project_id")
+        for remind in reminders:
+          remind_title = remind.get("title")
+          remind_deadline = remind.get("send_time")
+          remind_developer = remind.get("user_id")
+          project_id = remind.get("project_id")
+          task_id = remind.get("task_id")
 
-          task_info = [task_title, task_deadline, task_developer, reminder_marker,  project_id]
+          remind_info = [remind_title, remind_deadline, remind_developer, project_id, task_id]
 
-          if task_title and task_deadline:
-            if task_developer:
-              result.append(task_info)
+          if remind_title and remind_deadline:
+            if remind_developer:
+              result.append(remind_info)
             else:
               pass # какая-то ошибка
 
         return result
+
+async def delete_remind_by_task_id(task_id: int):
+   async with httpx.AsyncClient() as client:
+     response = await client.delete(f"http://localhost:9000/api/db/reminders/{task_id}")
+     response.raise_for_status()
+
 
 #
 # ЗАПРОСЫ ДЛЯ ОТЧЕТОВ

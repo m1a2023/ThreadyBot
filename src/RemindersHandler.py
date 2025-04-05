@@ -9,17 +9,17 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime, timezone, timedelta
 
 from Handlers.Handler import Handler
-from Handlers.RequestsHandler import get_all_tasks_deadlines, getTeamByProjectId
+from Handlers.RequestsHandler import get_all_reminders, getTeamByProjectId
 
 class RemindersHandler(Handler):
     async def handle(context: ContextTypes.DEFAULT_TYPE):
-        tasks = await get_all_tasks_deadlines()
+        tasks = await get_all_reminders()
         for task in tasks:
-            if (task[1] - datetime.now(timezone.utc)).total_seconds() / 3600 <= 24 and task[3]: # task[3] - это маркер отправлено/неотправлено напоминнаине
+            if (task[1] - datetime.now(timezone.utc)).total_seconds() / 3600 <= 24:
                 if task[2]: # task[2] - это id разраба
                     RemindersHandler.fetch_and_send_reminders(context, task[0], task[2])
                 else:
-                    proj_id = task[4]
+                    proj_id = task[3]
                     teams = getTeamByProjectId(proj_id)
 
                     for team in teams:
