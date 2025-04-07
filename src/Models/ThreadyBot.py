@@ -7,6 +7,11 @@ from Models.Bot import Bot
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
+
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+from RemindersHandler import RemindersHandler
+
 """
   Class methods are representation of bot commands.
   Inherited from abstract class 'Bot'.
@@ -21,6 +26,11 @@ class ThreadyBot(Bot):
       update: Update,
       context: ContextTypes.DEFAULT_TYPE
       ) -> None:
+    # Create scheduler
+    scheduler = AsyncIOScheduler()
+
+    scheduler.add_job(RemindersHandler.handle, "interval", seconds=10, args=[update, context])
+    scheduler.start()
     await StartHandler.handle(update, context)
 
   """

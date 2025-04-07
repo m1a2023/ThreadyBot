@@ -12,9 +12,6 @@ from telegram.ext import CommandHandler, MessageHandler, filters, CallbackQueryH
 """ Thready packages """
 from Models.ThreadyBot import ThreadyBot
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
-from RemindersHandler import RemindersHandler
 
 # Enable logging
 logging.basicConfig(
@@ -47,11 +44,7 @@ class Main:
 		# Create the Application and pass it your bot's token.
 		application = Application.builder().token(TG_TOKEN).build()
 
-		# Create scheduler
-		scheduler = AsyncIOScheduler()
 
-		scheduler.add_job(RemindersHandler.handle, "interval", hours=1, args=[None, application.bot])
-		scheduler.start()
 
 		#Create the Bot
 		thready_bot = ThreadyBot()
