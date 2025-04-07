@@ -25,6 +25,10 @@ class RemindersHandler(Handler):
         print(project_ids)
 
         tasks = await get_reminders_by_project_ids(project_ids)
+
+        if tasks is None:
+            return
+
         print(tasks)
         for task in tasks:
             reminder_time = datetime.fromisoformat(task[1]).replace(tzinfo=timezone.utc)
