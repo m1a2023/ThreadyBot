@@ -25,7 +25,7 @@ class ChooseDeveloperHandler(Handler):
     # Создаем кнопки
     for dev in developers_id_and_name:
       keyboard.append([InlineKeyboardButton(f"{dev[0]}", callback_data=f"chosenDeveloper_{dev[1]}")])
-    keyboard.append([InlineKeyboardButton("Назад", callback_data="reportsMenu")])
+    keyboard.append([InlineKeyboardButton("⬅️ Назад", callback_data="reportsMenu")])
 
     reply_markup = InlineKeyboardMarkup(keyboard)
     await query.edit_message_text(text="Выберите разработчика: ", reply_markup=reply_markup)

@@ -182,7 +182,7 @@ class TextHandler:
         project.set_title(user_text)
         await TextHandler.processMessage(
           context, chat_id, user_message_id, bot_message_id,
-          f"Имя проекта: {user_text}", "projectInfoForCreateProject"
+          f"Название проекта: {user_text}", "projectInfoForCreateProject"
         )
 
         # Сохраняем id пользователя как владельца проекта
@@ -196,7 +196,7 @@ class TextHandler:
             await context.bot.edit_message_text(
               chat_id=chat_id,
               message_id=bot_message_id,
-              text="Вы ввели некорректное название проекта: имя проекта не может короче 4 символов и не может начинаться с числа. Также, названия проектов не должны повторяться.\nВведите имя еще раз:"
+              text="❌ Вы ввели некорректное название проекта: имя проекта не может быть короче 4 символов или начинаться с числа. Возможно, у вас уже есть проект с таким названием.\nВведите имя еще раз:"
             )
           except Exception as e:
             print(f"Ошибка при редактировании сообщения: {e}")
@@ -226,7 +226,7 @@ class TextHandler:
             await context.bot.edit_message_text(
               chat_id=chat_id,
               message_id=bot_message_id,
-              text="Вы ввели некорректное описание. Описание проекта не может быть меньше 15 слов. Введите описание еще раз:"
+              text="❌ Вы ввели некорректное описание. Описание проекта не может быть короче 15 слов.\nВведите описание еще раз:"
             )
           except Exception as e:
             print(f"Ошибка при редактировании сообщения: {e}")
@@ -246,7 +246,7 @@ class TextHandler:
           project.addDeveloper(developer)
         await TextHandler.processMessage(
           context, chat_id, user_message_id, bot_message_id,
-          f"Группа разработчиков: {', '.join(set_of_team)}", "projectInfoForCreateProject"
+          f"Разработчики: {', '.join(set_of_team)}", "projectInfoForCreateProject"
         )
       except ValueError:
         if bot_message_id:
@@ -254,7 +254,7 @@ class TextHandler:
             await context.bot.edit_message_text(
               chat_id=chat_id,
               message_id=bot_message_id,
-              text="Ошибка: Введенные данные должны быть целыми числами (ID пользователей). Введите данные еще раз:"
+              text="❌ Вы ввели неправильный ID.\nВведите данные еще раз:"
             )
           except Exception as e:
             print(f"Ошибка при редактировании сообщения: {e}")
@@ -280,7 +280,7 @@ class TextHandler:
             await context.bot.edit_message_text(
               chat_id=chat_id,
               message_id=bot_message_id,
-              text="Введенная ссылка недействительна. Попробуйте еще раз:"
+              text="❌ Введенная ссылка недействительна. Попробуйте еще раз:"
             )
           except Exception as e:
             print(f"Ошибка при редактировании сообщения: {e}")

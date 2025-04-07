@@ -7,7 +7,6 @@ from typing import Any
 from Handlers.Handler import Handler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.CreateKeyboardForCurrentTasks import CreateKeyboardForCurrentTasks
 from Handlers.RequestsHandler import getTaskById, getUserNameById
-from TaskManagement.TaskManager import TaskManager
 
 class ShowInfoAndFastEditTasksHandler(Handler): 
   @staticmethod
@@ -28,14 +27,14 @@ class ShowInfoAndFastEditTasksHandler(Handler):
 
     keyboard = []
     if task.status == "in_progress":
-      keyboard.append([InlineKeyboardButton("Выполнено", callback_data="FastEditTaskForStatusDone")])
+      keyboard.append([InlineKeyboardButton("✅ Выполнено", callback_data="FastEditTaskForStatusDone")])
     else:
-      keyboard.append([InlineKeyboardButton("Начать работу", callback_data="FastEditTaskForStatusInProgress")])
+      keyboard.append([InlineKeyboardButton("🔄 Начать работу", callback_data="FastEditTaskForStatusInProgress")])
     if task.developer is None:
-      keyboard.append([InlineKeyboardButton("Назначить исполнителя (не работает)", callback_data="123")])
+      keyboard.append([InlineKeyboardButton("🧑‍💻 Назначить исполнителя", callback_data="FastEditTaskForChangeDeveloper")])
     
-    keyboard.append([InlineKeyboardButton("Изменить дедлайн (не работает)", callback_data="123")])
-    keyboard.append([InlineKeyboardButton("Назад", callback_data="EventsAndStatusOfProjects")])
+    keyboard.append([InlineKeyboardButton("📅 Изменить дедлайн", callback_data="FastEditTaskForChangeDeadline")])
+    keyboard.append([InlineKeyboardButton("⬅️ Назад", callback_data="EventsAndStatusOfProjects")])
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 

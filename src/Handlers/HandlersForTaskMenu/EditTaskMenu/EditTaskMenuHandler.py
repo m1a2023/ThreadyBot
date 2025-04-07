@@ -19,17 +19,17 @@ class EditTaskMenuHandler(Handler):
             context.user_data["TaskInfoForChangeTask"] = ["Вы ввели:"]
         
         keyboard = [
-            [InlineKeyboardButton("Изменить имя", callback_data="editTaskName")],
-            [InlineKeyboardButton("Изменить описание", callback_data="editTaskDescription")],
-            [InlineKeyboardButton("Изменить дедлайн", callback_data="editTaskDeadline")],
-            [InlineKeyboardButton("Изменить приоритет", callback_data="editTaskPriority")],
-            [InlineKeyboardButton("Изменить статус", callback_data="editTaskStatus")],
-            [InlineKeyboardButton("Изменить исполнителя", callback_data="editTaskDeveloper")],
+            [InlineKeyboardButton("🏷️ Изменить название", callback_data="editTaskName")],
+            [InlineKeyboardButton("📝 Изменить описание", callback_data="editTaskDescription")],
+            [InlineKeyboardButton("📅 Изменить дедлайн", callback_data="editTaskDeadline")],
+            [InlineKeyboardButton("🚥 Изменить приоритет", callback_data="editTaskPriority")],
+            [InlineKeyboardButton("❕ Изменить статус", callback_data="editTaskStatus")],
+            [InlineKeyboardButton("🧑‍💻 Изменить исполнителя", callback_data="editTaskDeveloper")],
             [
-                InlineKeyboardButton("Отмена", callback_data="cancelEditTask"),
-                InlineKeyboardButton("Готово", callback_data="saveEditTask")
+                InlineKeyboardButton("❌ Отмена", callback_data="cancelEditTask"),
+                InlineKeyboardButton("✅ Сохранить", callback_data="saveEditTask")
             ]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
-        await query.edit_message_text("Изменение данных задачи. Выберите действие", reply_markup=reply_markup)
+        await query.edit_message_text("*\=\=Изменение данных задачи\=\=*\nВыберите действие:", reply_markup=reply_markup, parse_mode="MarkdownV2")

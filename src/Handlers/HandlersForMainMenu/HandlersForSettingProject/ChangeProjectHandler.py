@@ -17,11 +17,11 @@ class ChangeProjectHandler(Handler):
     await ProjectManager.get_and_update_list_projects(update, context)
 
     keyboard = [
-        [InlineKeyboardButton("Изменение задач", callback_data="changeTasks")],
-        [InlineKeyboardButton("Изменение данных проекта", callback_data="editProject")],
-        [InlineKeyboardButton("Изменение данных о команде", callback_data="changeTeam")],
-        [InlineKeyboardButton("Отмена", callback_data="SettingsOfProjects")]
+        [InlineKeyboardButton("✏️ Изменение задач", callback_data="changeTasks")],
+        [InlineKeyboardButton("✏️ Изменение данных проекта", callback_data="editProject")],
+        [InlineKeyboardButton("🧑‍💻 Изменение данных о команде", callback_data="changeTeam")],
+        [InlineKeyboardButton("❌ Отмена", callback_data="SettingsOfProjects")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await query.edit_message_text("Изменение существующего проекта. Выберите действие", reply_markup=reply_markup)
+    await query.edit_message_text("*\=\=Изменение существующего проекта\=\=*\nВыберите действие:", reply_markup=reply_markup, parse_mode="MarkdownV2")

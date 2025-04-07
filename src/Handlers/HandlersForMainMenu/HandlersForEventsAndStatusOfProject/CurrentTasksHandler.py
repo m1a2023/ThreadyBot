@@ -29,8 +29,8 @@ class CurrentTasksHandler(Handler):
     all_tasks = context.user_data["task_manager"].tasks
     if all_tasks == []:
       keyboard = [
-        [InlineKeyboardButton(f"Создать задачу", callback_data="createNewTask")],
-        [InlineKeyboardButton("Назад", callback_data="EventsAndStatusOfProjects")]
+        [InlineKeyboardButton(f"🆕 Создать задачу", callback_data="createNewTask")],
+        [InlineKeyboardButton("⬅️ Назад", callback_data="EventsAndStatusOfProjects")]
       ]
       reply_markup = InlineKeyboardMarkup(keyboard)
       await query.edit_message_text(text="Нет задач по выбранному проекту", reply_markup=reply_markup)
@@ -45,7 +45,7 @@ class CurrentTasksHandler(Handler):
           in_progress_tasks.append(task)
       
       keyboard = await CreateKeyboardForCurrentTasks.create_tasks_keyboard(todo_tasks, in_progress_tasks)
-      keyboard.append([InlineKeyboardButton("Назад", callback_data="EventsAndStatusOfProjects")])
+      keyboard.append([InlineKeyboardButton("⬅️ Назад", callback_data="EventsAndStatusOfProjects")])
       reply_markup = InlineKeyboardMarkup(keyboard)
 
       await query.edit_message_text("Выберите задачу для просмотра информации:", reply_markup=reply_markup)

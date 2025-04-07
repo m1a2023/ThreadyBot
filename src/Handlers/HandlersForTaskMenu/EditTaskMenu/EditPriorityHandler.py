@@ -15,9 +15,9 @@ class EditPriorityHandler(Handler):
         context.user_data["state"] = "editTaskPriority"  # Сохраняем состояние пользователя
 
         keyboard = [
-            [InlineKeyboardButton("Низкий", callback_data="priorityTaskLow")],
-            [InlineKeyboardButton("Средний", callback_data="priorityTaskMedium")],
-            [InlineKeyboardButton("Высокий", callback_data="priorityTaskHigh")],
+            [InlineKeyboardButton("🟢 Низкий", callback_data="priorityTaskLow")],
+            [InlineKeyboardButton("🟡 Средний", callback_data="priorityTaskMedium")],
+            [InlineKeyboardButton("🔴 Высокий", callback_data="priorityTaskHigh")],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
 

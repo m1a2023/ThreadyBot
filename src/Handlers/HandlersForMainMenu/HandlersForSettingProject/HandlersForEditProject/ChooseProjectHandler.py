@@ -18,8 +18,8 @@ class ChooseProjectHandler(Handler):
         await ProjectManager.get_and_update_list_projects(update, context)
         if context.user_data["project_manager"].projects == []:
             keyboard = [
-                [InlineKeyboardButton(f"Создать проект", callback_data="CreateProject")],
-                [InlineKeyboardButton("Назад", callback_data="SettingsOfProjects")]
+                [InlineKeyboardButton(f"🆕 Создать проект", callback_data="CreateProject")],
+                [InlineKeyboardButton("⬅️ Назад", callback_data="SettingsOfProjects")]
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
             await query.edit_message_text(text="Ваш список проектов пустой", reply_markup=reply_markup)
@@ -30,7 +30,7 @@ class ChooseProjectHandler(Handler):
             projects = await context.user_data["project_manager"].get_projects_names_and_id()
             for project in projects:
                 keyboard.append([InlineKeyboardButton(f"{project[0]}", callback_data=f"chosenProject_{project[1]}")])
-            keyboard.append([InlineKeyboardButton("Назад", callback_data="SettingsOfProjects")])
+            keyboard.append([InlineKeyboardButton("⬅️ Назад", callback_data="SettingsOfProjects")])
 
             reply_markup = InlineKeyboardMarkup(keyboard)
-            await query.edit_message_text(text="Выберите проект: ", reply_markup=reply_markup)
+            await query.edit_message_text(text="Выберите проект:", reply_markup=reply_markup)

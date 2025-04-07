@@ -9,8 +9,8 @@ class CreateKeyboardForCurrentTasks:
         
         # Добавляем заголовки столбцов
         keyboard.append([
-            InlineKeyboardButton("В процессе", callback_data="none"),
-            InlineKeyboardButton("TODO", callback_data="none")
+            InlineKeyboardButton("🔄 В процессе", callback_data="none"),
+            InlineKeyboardButton("◽️ TODO", callback_data="none")
         ])
         
         # Определяем максимальное количество строк

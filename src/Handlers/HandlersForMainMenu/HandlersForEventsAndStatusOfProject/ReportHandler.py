@@ -13,10 +13,10 @@ class ReportMenuHandler(Handler):
     await query.answer()
 
     keyboard = [
-      [InlineKeyboardButton("Сделать отчет по сотруднику", callback_data="get_developer_report")],
-      [InlineKeyboardButton("Сделать отчет о проекте", callback_data="get_project_report")],
-      [InlineKeyboardButton("Выход в главное меню", callback_data="MoveToMainMenu")]
+      [InlineKeyboardButton("🧑‍💻 Сделать отчет по сотруднику", callback_data="get_developer_report")],
+      [InlineKeyboardButton("📈 Сделать отчет о проекте", callback_data="get_project_report")],
+      [InlineKeyboardButton("🏠 Выход в главное меню", callback_data="MoveToMainMenu")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await query.edit_message_text("Генерация отчетов. Выберите вид отчетов:", reply_markup=reply_markup)
+    await query.edit_message_text("*\=\=Генерация отчетов\=\=*\nВыберите вид отчетов:", reply_markup=reply_markup, parse_mode="MarkdownV2")

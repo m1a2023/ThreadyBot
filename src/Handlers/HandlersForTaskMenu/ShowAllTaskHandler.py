@@ -56,7 +56,7 @@ class ShowAllTaskHandler(Handler):
         formatted_list_task = "\n".join(ShowAllTaskHandler.format_tasks_by_status(tasks))
 
         keyboard = [
-            [InlineKeyboardButton("Назад", callback_data="SettingsOfProjects")]
+            [InlineKeyboardButton("⬅️ Назад", callback_data="SettingsOfProjects")]
         ]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
