@@ -69,6 +69,14 @@ async def get_project_plan(project_id: int, iam_t: str, f_id: str):
 # Запросы для юзеров
 #
 
+""" TODO Проверка прав доступа пользователя """
+# True - пользователь админ
+# False - пользователь разраб
+async def checkUsersRole(user_id: int) -> bool:
+  return
+  # async with httpx.AsyncClient() as client:
+  #   response = await client.get()
+
 """ Проверка, есть ли юзер в бд """
 async def checkUserExists(user_id: int) -> bool:
   async with httpx.AsyncClient() as client:
@@ -130,11 +138,21 @@ async def saveNewProject(project):
       print("Проект успешно создан! ID проекта:", response.json())
       return response.json()
 
-""" Запрос для получения всех проектов конкретного челика. Возвращает список словарей со всеми данными"""
-async def getAllProjects(owner_id) -> list:
+""" Запрос для получения всех проектов конкретного челика, где он админ. Возвращает список словарей со всеми данными"""
+async def getAllProjectsByOwnerId(owner_id) -> list:
   async with httpx.AsyncClient() as client:
     response = await client.get(
       f"http://localhost:9000/api/db/projects/owner/{owner_id}"
+    )
+    response.raise_for_status()
+    projects = response.json()
+    return projects
+
+""" Запрос для получения всех проектов конкретного челика, где он разраб. Возвращает список словарей со всеми данными"""
+async def getAllProjectsByDevId(dev_id) -> list:
+  async with httpx.AsyncClient() as client:
+    response = await client.get(
+      f"http://localhost:9000/api/db/projects/bat/user/{dev_id}"
     )
     response.raise_for_status()
     projects = response.json()
@@ -197,10 +215,12 @@ async def deleteProject(project_id: int):
 
 """ Запрос для создания тимы """
 async def createNewTeams(team_data: dict):
+  owner_id = team_data["user_id"]
+  project_id = team_data["project_id"]
   async with httpx.AsyncClient() as client:
     try:
       response = await client.post(
-        "http://localhost:9000/api/db/teams/",
+        f"http://localhost:9000/api/db/teams/owner/{owner_id}/project/{project_id}",
         json=team_data
       )
       response.raise_for_status()
@@ -209,13 +229,15 @@ async def createNewTeams(team_data: dict):
       print(f"Неожиданная ошибка: {e}")
 
 """ Запрос на добавление нового человека в команду """
-async def addUserToTeam(team_data: dict):
+async def addUserToTeam(dev_data: dict):
   async with httpx.AsyncClient() as client:
+    user_id = dev_data["user_id"]
+    project_id = dev_data["project_id"]
     try:
       # Отправляем POST-запрос
       response = await client.post(
-        "http://localhost:9000/api/db/teams/user",
-        json=team_data
+        f"http://localhost:9000/api/db/teams/user/{user_id}/project/{project_id}",
+        json=dev_data
       )
       response.raise_for_status()
       return response.json()

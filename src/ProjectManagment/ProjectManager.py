@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from Handlers.RequestsHandler import getAllProjects
+from Handlers.RequestsHandler import getAllProjectsByOwnerId
 
 class ProjectManager:
     def __init__(self):
@@ -16,15 +16,23 @@ class ProjectManager:
         if "project_manager" not in context.user_data:
             context.user_data["project_manager"] = ProjectManager()
         if update.message:
-            context.user_data["project_manager"].projects = await getAllProjects(update.message.from_user.id)
+            context.user_data["project_manager"].projects = await getAllProjectsByOwnerId(update.message.from_user.id)
         else:
-            context.user_data["project_manager"].projects = await getAllProjects(update.callback_query.from_user.id)
+            context.user_data["project_manager"].projects = await getAllProjectsByOwnerId(update.callback_query.from_user.id)
 
     async def get_projects_names_and_id(self): # Вернет список кортежей, с именами проектов и их id
         list_of_projects = []
         if not self.projects:
            return []
         for project in self.projects:
+            list_of_projects.append((project["title"], project["id"]))
+        return list_of_projects
+    
+    async def get_projects_names_and_id_from_list(projects_id: list): # Вернет список кортежей, с именами проектов и их id
+        list_of_projects = []
+        if not projects_id:
+           return []
+        for project in projects_id:
             list_of_projects.append((project["title"], project["id"]))
         return list_of_projects
     
