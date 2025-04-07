@@ -21,17 +21,14 @@ async def get_reminders_by_project_ids(project_ids: List[int]):
         for remind in reminders:
           remind_title = remind.get("title")
           remind_deadline = remind.get("send_time")
-          #remind_developer = remind.get("user_id")
+          remind_developer = remind.get("user_id")
           project_id = remind.get("project_id")
           task_id = remind.get("task_id")
 
-          remind_info = [remind_title, remind_deadline, 5170918361, project_id, task_id]
+          remind_info = [remind_title, remind_deadline, remind_developer, project_id, task_id]
 
           if remind_title and remind_deadline:
-            if True: #remind_developer:
               result.append(remind_info)
-            else:
-              pass # какая-то ошибка
 
         return result
 
