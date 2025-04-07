@@ -44,6 +44,8 @@ class Main:
 		# Create the Application and pass it your bot's token.
 		application = Application.builder().token(TG_TOKEN).build()
 
+
+
 		#Create the Bot
 		thready_bot = ThreadyBot()
 
@@ -54,10 +56,6 @@ class Main:
 
 		# application.add_handler(CallbackQueryHandler(MenuHandler.handle))
 
-		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, TextHandler.handle))
-
-		# on non command i.e message - echo the message on Telegram
-		# application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, TextHandler.handle))
 
 		# Обработчик кнопок
