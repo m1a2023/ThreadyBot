@@ -16,7 +16,8 @@ class EventsAndStatusOfProjectHandler(Handler):
       [InlineKeyboardButton("📌 Текущие задачи", callback_data="currentTasks")],
       [InlineKeyboardButton("🧑‍💻 Просмотр данных о команде", callback_data="showTeam")],
       [InlineKeyboardButton("📊 Отчеты", callback_data="reportsMenu")],
-      [InlineKeyboardButton("🤖 План, созданный нейросетью", callback_data="Plan")],
+      # [InlineKeyboardButton("🤖 План, созданный нейросетью", callback_data="Plan")],
+      [InlineKeyboardButton("🤖 План, созданный нейросетью", callback_data="GeneratingPlanMenu")],
       [InlineKeyboardButton("🏠 Выход в главное меню", callback_data="MoveToMainMenu")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)

@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 from telegram import Update
 from telegram.ext import ContextTypes
 from Handlers.Handler import Handler
@@ -14,14 +13,16 @@ from Handlers.HandlersForTaskMenu.DeleteTaskHandler import DeleteTaskHandler
 from Handlers.HandlersForTaskMenu.EditTaskMenu.EditDeveloperHandler import EditDeveloperForTaskHandler
 from Handlers.HandlersForTaskMenu.EditTaskMenu.EditTaskMenuHandler import EditTaskMenuHandler
 from Handlers.TextHandler import TextHandler
-from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.SaveGeneratedPlanHandler import SaveGeneratedPlanHandler
-from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.ShowCurrentPlanHandler import ShowCurrentPlanHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.HandlersForGenerateProjectPlan.CancelGenerateProjectPlanHandler import CancelGenerateProjectPlanHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.HandlersForGenerateProjectPlan.SaveGeneratedPlanHandler import SaveGeneratedPlanHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.ShowInfoAboutTeamHandler import ShowInfoAboutTeamHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.FastEditTaskForChangeDeveloperHandler import FastEditTaskForChangeDeveloper
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.CalendarForFastEditTaskForChangeDeadlineHandler import CalendarForFastEditTaskForChangeDeadlineHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.FastEditTaskForChangeDeadlineHandler import FastEditTaskForChangeDeadlineHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.ChooseProjectForAllHandler import ChooseProjectForAllHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.FastEditTaskSetYourselfDeveloperHandler import FastEditTaskSetYourselfDeveloper
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.GeneratingProjectPlanMenuHandler import GeneratingPlanMenuHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.HandlersForGenerateProjectPlan.GenerateProjectPlanHandler import GenerateProjectPlanHandler
 
 """ Импорты хендлеров для главного меню """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.DeleteProjectHandler import DeleteProjectHandler
@@ -143,15 +144,15 @@ class MainCallbackHandler(Handler):
       return await ShowInfoAndFastEditTasksHandler.handle(update, context)
 
     #генерация плана проекта
-    elif query.data == "Plan":
+    elif query.data == "GeneratingPlanMenu":
       context.user_data["state"] = "generatePlan"
       return await ChooseProjectForOwnerHandler.handle(update, context)
-
-    # Обработка кнопок с генерацией плана
-    elif query.data == "save_generated_plan":
+    elif query.data == "generateNewPlan":
+      return await GenerateProjectPlanHandler.handle(update, context)
+    elif query.data == "cancelGenerateProjectPlan":
+      return await CancelGenerateProjectPlanHandler.handle(update, context)
+    elif query.data == "saveGeneratedPlan":
       return await SaveGeneratedPlanHandler.handle(update, context)
-    elif query.data == "show_current_plan":
-      return await ShowCurrentPlanHandler.handle(update, context)
 
     # Обработка кнопок в "Управление проектами"
     elif query.data == "CreateProject":
@@ -320,7 +321,7 @@ class MainCallbackHandler(Handler):
       
       elif context.user_data["state"] == "generatePlan":
         context.user_data["state"] = None
-        return await GeneratePlanHandler.handle(update, context)
+        return await GeneratingPlanMenuHandler.handle(update, context)
 
       elif context.user_data["state"] == "chooseDeveloper":
         context.user_data["state"] =  "get_developer_report"
