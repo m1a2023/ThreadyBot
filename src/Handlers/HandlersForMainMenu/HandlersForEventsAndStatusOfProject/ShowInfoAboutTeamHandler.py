@@ -42,7 +42,7 @@ class ShowInfoAboutTeamHandler(Handler):
     else:
       team_text = f"Владелец проекта: {owner_link}"
     keyboard = [
-        [InlineKeyboardButton("Назад", callback_data="EventsAndStatusOfProjects")]]
+        [InlineKeyboardButton("⬅️ Назад", callback_data="EventsAndStatusOfProjects")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     await query.edit_message_text(f"<b>==Просмотр команды==</b>\n{team_text}", reply_markup=reply_markup, parse_mode="HTML")

@@ -23,6 +23,7 @@ from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersFo
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.FastEditTaskSetYourselfDeveloperHandler import FastEditTaskSetYourselfDeveloper
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.GeneratingProjectPlanMenuHandler import GeneratingPlanMenuHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.HandlersForGenerateProjectPlan.GenerateProjectPlanHandler import GenerateProjectPlanHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.ShowCurrentPlanHandler import ShowCurrentPlanHandler
 
 """ Импорты хендлеров для главного меню """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.DeleteProjectHandler import DeleteProjectHandler
@@ -153,6 +154,11 @@ class MainCallbackHandler(Handler):
       return await CancelGenerateProjectPlanHandler.handle(update, context)
     elif query.data == "saveGeneratedPlan":
       return await SaveGeneratedPlanHandler.handle(update, context)
+    elif query.data == "showPlan":
+      # project_id = context.user_data["chosenProject"]
+      # context.user_data["current_plan"] = 
+      # return await ShowCurrentPlanHandler.handle(update, context)
+      return
 
     # Обработка кнопок в "Управление проектами"
     elif query.data == "CreateProject":
