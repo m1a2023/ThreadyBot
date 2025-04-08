@@ -121,7 +121,7 @@ class MainCallbackHandler(Handler):
     elif query.data == "FastEditTaskForChangeDeveloper":
       context.user_data["state"] = "FastEditTaskDeveloper"
       return await ChooseDeveloperHandler.handle(update, context)
-    
+
     elif query.data == "FastEditTaskForChangeDeadline":
       context.user_data["state"] = "fastEditTaskDeadline"
       return await CalendarForFastEditTaskForChangeDeadlineHandler.handle(update, context)
@@ -247,7 +247,7 @@ class MainCallbackHandler(Handler):
     # Обработка кнопок календаря
     elif query.data.startswith("day_") and context.user_data["state"] != "fastEditTaskDeadline":
       return await TextHandler.handle(update, context)
-    
+
     elif query.data.startswith("day_") and context.user_data["state"] == "fastEditTaskDeadline":
       return await FastEditTaskForChangeDeadlineHandler.handle(update, context)
 
@@ -304,7 +304,7 @@ class MainCallbackHandler(Handler):
       if context.user_data["state"] == "showProjectsInfo":
         context.user_data["state"] = None
         return await ShowProjectsInfoHandler.handle(update, context)
-      
+
       elif context.user_data["state"] == "showTeamInfo":
         context.user_data["state"] = ""
         return await ShowInfoAboutTeamHandler.handle(update, context)
@@ -320,7 +320,7 @@ class MainCallbackHandler(Handler):
       elif context.user_data["state"] == "get_project_report":
         context.user_data["state"] = None
         return await ProjectReportHandler.handle(update, context)
-      
+
       elif context.user_data["state"] == "generatePlan":
         context.user_data["state"] = None
         return await GeneratePlanHandler.handle(update, context)
@@ -355,10 +355,32 @@ class MainCallbackHandler(Handler):
       elif context.user_data["state"] == "get_developer_report":
         context.user_data["state"] = None
         return await UserReportHandler.handle(update, context)
-      
+
       elif context.user_data["state"] == "FastEditTaskDeveloper":
         context.user_data["state"] = None
         return await FastEditTaskForChangeDeveloper.handle(update, context)
+
+
+    elif query.data == "OK_user_report":
+      chat_id = update.callback_query.message.chat_id
+      bot_message_id = context.user_data.get("bot_message_id")
+
+      if bot_message_id:
+        await context.bot.delete_message(chat_id, bot_message_id)
+
+    elif query.data == "OK_project_report":
+      chat_id = update.callback_query.message.chat_id
+      bot_message_id = context.user_data.get("bot_message_id")
+
+      if bot_message_id:
+        await context.bot.delete_message(chat_id, bot_message_id)
+
+    elif query.data == "OK_remind":
+      chat_id = update.callback_query.message.chat_id
+      bot_message_id = context.user_data.get("bot_message_id")
+
+      if bot_message_id:
+        await context.bot.delete_message(chat_id, bot_message_id)
 
     else:
       pass

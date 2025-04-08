@@ -21,6 +21,14 @@ import os
 class UserReportHandler(Handler):
     @staticmethod
     async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+        #context.user_data["state"] = "OK_user_report"
+
+        keyboard = [
+            [InlineKeyboardButton("Ок", callback_data="OK_user_report")],
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
         user_id = context.user_data["chosenDeveloper"] # id выбранного разработчика для формирования отчета
         project_id = context.user_data["chosenProject"] # id выбранного проекта для формирования отчета
 
@@ -30,10 +38,11 @@ class UserReportHandler(Handler):
         await UserReportHandler.generate_pdf(report, file_path)
 
         # Отправляем пользователю
+        sent_message = ""
         with open(file_path, "rb") as pdf_file:
             print("done")
-            await update.callback_query.message.reply_document(document=pdf_file, filename=f"Developer_report_{user_id}.pdf")
-
+            sent_message = await update.callback_query.message.reply_document(document=pdf_file, filename=f"Developer_report_{user_id}.pdf",reply_markup=reply_markup)
+            context.user_data["bot_message_id"] = sent_message.message_id
         # Можно удалить файл после отправки (если не нужен локально)
         os.remove(file_path)
 
