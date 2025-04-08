@@ -112,7 +112,7 @@ async def isAdmin(user_id: int, project_id) -> bool:
     response = await client.get(
       f"http://localhost:9000/api/db/teams/is/admin/{user_id}/project/{project_id}"
     )
-    content = response.text.strip().lower()
+    content = response.text.lower()
     return content == "true"
 
 """ Проверка, есть ли юзер в бд """
@@ -358,7 +358,7 @@ async def updateTaskById(task_id, newInfo: dict):
   async with httpx.AsyncClient() as client:
     try:
       response = await client.put(
-        f"http://localhost:9000/api/db/tasks/{task_id}",
+        f"http://localhost:9000/api/db/tasks/{int(task_id)}",
         json=newInfo
       )
       response.raise_for_status()

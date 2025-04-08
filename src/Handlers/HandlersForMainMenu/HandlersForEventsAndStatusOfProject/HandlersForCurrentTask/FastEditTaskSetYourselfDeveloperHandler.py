@@ -12,6 +12,8 @@ class FastEditTaskSetYourselfDeveloper(Handler):
       await query.answer()
 
       user_id = update.effective_user.id
-      await updateTaskById(context.user_data["taskInCurrentTasks"], {"user_id": user_id})
+      print("from fast edit")
+      print(user_id)
+      await updateTaskById(context.user_data["taskInCurrentTasks"], {"user_id": int(user_id)})
 
       return await CurrentTasksHandler.handle(update, context)

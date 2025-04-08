@@ -400,7 +400,7 @@ class TextHandler:
         await update.message.reply_text("Ошибка: callback_query отсутствует.")
         return
 
-      developer = update.callback_query.data[23:]
+      developer = context.user_data["chosenDeveloper"]
 
       task.developer = developer
 
@@ -511,8 +511,7 @@ class TextHandler:
         await update.message.reply_text("Ошибка: callback_query отсутствует.")
         return
 
-      developer = update.callback_query.data[23:]
-      print(developer)
+      developer = context.user_data["chosenDeveloper"]
 
       changedTask.developer = developer
 

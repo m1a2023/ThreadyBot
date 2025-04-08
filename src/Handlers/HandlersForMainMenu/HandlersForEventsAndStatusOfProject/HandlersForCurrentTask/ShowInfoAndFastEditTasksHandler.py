@@ -20,8 +20,7 @@ class ShowInfoAndFastEditTasksHandler(Handler):
     project_id = context.user_data["chosenProject"]
     
     # Получаем информацию об админских правах один раз
-    admin_check = await isAdmin(project_id, user_id)
-    print(admin_check)
+    admin_check = await isAdmin(user_id, project_id)
     
     # Формируем текст о задаче
     developer_link = ''
