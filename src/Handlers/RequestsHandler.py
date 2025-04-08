@@ -9,6 +9,9 @@ from TaskManagement.Task import Task
 # ЗАПРОСЫ ДЛЯ НАПОМИНАНИЙ
 #
 async def get_reminders_by_project_ids(project_ids: List[int]):
+    if len(project_ids) == 0:
+      return None
+
     async with httpx.AsyncClient() as client:
         ids = "&project_ids=".join(str(project_id) for project_id in project_ids)
         route = "http://localhost:9000/api/db/reminders/bat/?project_ids=" + ids
@@ -60,7 +63,7 @@ async def get_report_by_user_id(user_id: int) -> dict:
 async def get_project_plan(project_id: int, iam_t: str, f_id: str):
     description = "ThreadyServer – это планируемый многопоточный сервер, разработанный на Python с использованием FastAPI. Проект будет включать поддержку асинхронной обработки запросов, работу с базой данных PostgreSQL и удобное API для взаимодействия с клиентами" #await getProjectInfoById(project_id)
     iam_token = iam_t
-    folder_id = f"gpt://{f_id}/yandexgpt"
+    folder_id = f"gpt://{f_id}/llama/latest"
 
     url = "http://localhost:9000/api/llm/ygpt/"
     params = {
@@ -74,20 +77,9 @@ async def get_project_plan(project_id: int, iam_t: str, f_id: str):
     body = {
         "iam_token": iam_token,
         "model_uri": folder_id,
-        "options": {
-            "stream": False,
-            "temperature": 0.9,
-            "max_tokens": 1200
-          },
-        "messages": [
-          {
-                "role": "user",
-                "text": description
-          }
-        ]
       }
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    async with httpx.AsyncClient(timeout=90.0) as client:
       #print(description)
       #response = await client.post(f"http://localhost:9000/api/llm/ygpt/?url=https://llm.api.cloud.yandex.net/foundationModels/v1/completion&action=plan&project_id={project_id}&context_depth=2&timeout=60", json=body)
       response = await client.post(
@@ -256,10 +248,11 @@ async def createNewTeams(team_data: dict):
   owner_id = team_data["user_id"]
   project_id = team_data["project_id"]
   async with httpx.AsyncClient() as client:
+    user_id = team_data["user_id"]
+    project_id = team_data["project_id"]
     try:
       response = await client.post(
-        f"http://localhost:9000/api/db/teams/owner/{owner_id}/project/{project_id}",
-        json=team_data
+        f"http://localhost:9000/api/db/teams/owner/{user_id}/project/{project_id}"
       )
       response.raise_for_status()
       return response.json()
