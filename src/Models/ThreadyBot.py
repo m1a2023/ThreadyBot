@@ -29,7 +29,7 @@ class ThreadyBot(Bot):
     # Create scheduler
     scheduler = AsyncIOScheduler()
 
-    scheduler.add_job(RemindersHandler.handle, "interval", seconds=30, args=[update, context])
+    scheduler.add_job(RemindersHandler.handle, "interval", seconds=10, args=[update, context])
     scheduler.start()
     await StartHandler.handle(update, context)
 

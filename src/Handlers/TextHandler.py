@@ -15,8 +15,9 @@ from Handlers.HandlersForMainMenu.HandlersForSettingProject.ChangeProjectHandler
 
 import re
 
-from Handlers.RequestsHandler import addUserToTeam, checkUserExists, deleteUserFromTeam, getListDevelopersIdByProjectId, getProjectById
+from Handlers.RequestsHandler import addUserToTeam, checkUserExists, deleteUserFromTeam, getListDevelopersIdByProjectId, getProjectById, updateProjectById
 from ProjectManagment.Developer import Developer
+from Handlers.HandlersForMainMenu.GeneralSettingsHandler import GeneralSettingsHandler
 
 class TextHandler:
   @staticmethod
@@ -400,7 +401,7 @@ class TextHandler:
         await update.message.reply_text("Ошибка: callback_query отсутствует.")
         return
 
-      developer = context.user_data["chosenDeveloper"]
+      developer = update.callback_query.data[23:] 
 
       task.developer = developer
 
@@ -511,7 +512,8 @@ class TextHandler:
         await update.message.reply_text("Ошибка: callback_query отсутствует.")
         return
 
-      developer = context.user_data["chosenDeveloper"]
+      developer = update.callback_query.data[23:]
+      print(developer)
 
       changedTask.developer = developer
 
@@ -620,4 +622,39 @@ class TextHandler:
             except Exception as e:
               print(f"Ошибка при удалении сообщения пользователя: {e}")
         return
-
+    
+    elif state == "setChatLink":
+      parsed_url = urlparse(user_text)
+      if all([parsed_url.scheme, parsed_url.netloc]):
+        # Если ссылка валидна
+        await updateProjectById(int(context.user_data["chosenProject"]), {"chat_link": user_text})
+        # Удаляем сообщение бота
+        if bot_message_id:
+            await context.bot.delete_message(chat_id, bot_message_id)
+        
+        # Удаляем сообщение пользователя
+        if user_message_id:
+            try:
+                await context.bot.delete_message(chat_id, user_message_id)
+            except Exception as e:
+                print(f"Ошибка при удалении сообщения пользователя: {e}")
+        
+        context.user_data["state"] = None
+      else:
+        # Если ссылка невалидна
+        try:
+            await context.bot.edit_message_text(
+                chat_id=chat_id,
+                message_id=bot_message_id,
+                text="❌ Ссылка недействительна. Попробуйте еще раз:"
+            )
+        except Exception as e:
+            print(f"Ошибка при редактировании сообщения: {e}")
+        
+        # Удаляем невалидное сообщение пользователя
+        if user_message_id:
+            try:
+                await context.bot.delete_message(chat_id, user_message_id)
+            except Exception as e:
+                print(f"Ошибка при удалении сообщения пользователя: {e}")
+        return

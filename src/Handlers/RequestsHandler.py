@@ -209,8 +209,7 @@ async def getProjectInfoById(project_id) -> Project:
       f"http://localhost:9000/api/db/projects/{project_id}"
     )
     response.raise_for_status()
-    data = response.json()
-    return data['description']
+    return response.json()
 
 """ Сохраняет новые данные в проект """
 async def updateProjectById(project_id, newInfo: dict):
