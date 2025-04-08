@@ -40,6 +40,7 @@ class UserReportHandler(Handler):
     @staticmethod
     async def generate_pdf(report_data: dict, file_path: str):
         tasks = report_data['all_users_tasks_duration']
+        print(len(tasks))
 
         doc = SimpleDocTemplate(file_path, pagesize=A4)
         elements = []
@@ -74,30 +75,60 @@ class UserReportHandler(Handler):
         elements.append(title)
         elements.append(Spacer(1, 0.5*cm))
 
-        task_stats = [
+        quantity: int
+
+        if report_data['all_tasks'] == 0:
+            quantity = 0
+            task_stats = [
             [Paragraph("Категория", header_style), Paragraph("Количество", header_style), Paragraph("Доля", header_style)],
-            [Paragraph("Всего задач", body_style), report_data['all_tasks'], "100%"],
+            [Paragraph("Всего задач", body_style), quantity, "-"],
 
             [
-            Paragraph("Завершено", body_style), report_data['total_completed_tasks'],
-            f"{int(report_data['total_completed_tasks']/report_data['all_tasks']*100)}%"
+            Paragraph("Завершено", body_style), quantity,
+            f"-"
             ],
 
             [
-            Paragraph("В процессе", body_style), report_data['total_in_progress_tasks'],
-            f"{int(report_data['total_in_progress_tasks']/report_data['all_tasks']*100)}%"
+            Paragraph("В процессе", body_style), quantity,
+            f"-"
             ],
 
             [
-            Paragraph("Ожидают выполнения", body_style), report_data['total_todo_tasks'],
-            f"{int(report_data['total_todo_tasks']/report_data['all_tasks']*100)}%"
+            Paragraph("Ожидают выполнения", body_style), quantity,
+            f"-"
             ],
 
             [
-            Paragraph("Просрочено", body_style), report_data['total_overdue_tasks'],
-            f"{int(report_data['total_overdue_tasks']/report_data['all_tasks']*100)}%"
+            Paragraph("Просрочено", body_style), quantity,
+            f"-"
             ]
         ]
+
+        else:
+            task_stats = [
+                [Paragraph("Категория", header_style), Paragraph("Количество", header_style), Paragraph("Доля", header_style)],
+                [Paragraph("Всего задач", body_style), report_data['all_tasks'], "100%"],
+
+                [
+                Paragraph("Завершено", body_style), report_data['total_completed_tasks'],
+                f"{int(report_data['total_completed_tasks']/report_data['all_tasks']*100)}%"
+                ],
+
+                [
+                Paragraph("В процессе", body_style), report_data['total_in_progress_tasks'],
+                f"{int(report_data['total_in_progress_tasks']/report_data['all_tasks']*100)}%"
+                ],
+
+                [
+                Paragraph("Ожидают выполнения", body_style), report_data['total_todo_tasks'],
+                f"{int(report_data['total_todo_tasks']/report_data['all_tasks']*100)}%"
+                ],
+
+                [
+                Paragraph("Просрочено", body_style), report_data['total_overdue_tasks'],
+                f"{int(report_data['total_overdue_tasks']/report_data['all_tasks']*100)}%"
+                ]
+            ]
 
         task_table = Table(task_stats, colWidths=[8*cm, 4*cm, 4*cm])
         task_table.setStyle(TableStyle([
@@ -111,12 +142,12 @@ class UserReportHandler(Handler):
             ('GRID', (0,0), (-1,-1), 1, colors.black)
         ]))
 
+        if len(tasks) != 0:
+            elements.append(Paragraph("Гистограма всех задач и времени их выполнения", header_style))
+            elements.append(Spacer(1, 1*cm))
+            await UserReportHandler.generate_vertical_bar_chart(tasks, elements, body_style)
+            elements.append(PageBreak())
 
-        elements.append(Paragraph("Гистограма всех задач и времени их выполнения", header_style))
-        elements.append(Spacer(1, 1*cm))
-        await UserReportHandler.generate_vertical_bar_chart(tasks, elements, body_style)
-
-        elements.append(PageBreak())
 
         elements.append(Paragraph("Статистика задач", header_style))
         elements.append(Spacer(1, 0.3*cm))
