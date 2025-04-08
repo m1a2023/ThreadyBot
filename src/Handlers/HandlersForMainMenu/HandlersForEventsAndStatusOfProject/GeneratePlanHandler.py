@@ -10,11 +10,13 @@ class GeneratePlanHandler(Handler):
     async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         proj_id = context.user_data["chosenProject"]
 
-        iam_token = "t1.9euelZqWzs3Oic-dnpOWjcqNkZyUnu3rnpWanoyPkpnJzs2TmcmUz8fGncvl8_c3MS9A-e8zekIv_t3z93dfLED57zN6Qi_-zef1656Vms6Qko-RmYudmZiTmImWm4_K7_zF656Vms6Qko-RmYudmZiTmImWm4_K.O4II8BcwMK_OJnsptJLlIIrDNpYL7TYt8qmgEbDqdy5ttc-GbPyKdW7Hrmo1Ft1gHgySEOVqqSWTb0zA4UDUCQ"
+        iam_token = "t1.9euelZrNz8iQycaSm86PmpvGicnIzO3rnpWanoyPkpnJzs2TmcmUz8fGncvl8_dRFyxA-e8Tf2tt_t3z9xFGKUD57xN_a23-zef1656VmpnJz5POxpaLyMiZyMiYk53L7_zF656VmpnJz5POxpaLyMiZyMiYk53L._XvvSoGbd9ue_9bwBRXZESvAeUE0P445j1s_khiDZqwL9hxTI46OfmEMONt2rOiUYKq5mY6KlNyCz4q_5RMVBA"
         folder_id = "b1gc80aslek1slbmcvj9"
 
         MAX_MESSAGE_LENGTH = 4096
-        plan = await get_project_plan(proj_id, iam_token, folder_id)
+        resp = await get_project_plan(proj_id, iam_token, folder_id)
+        plan = resp["result"]["alternatives"][0]["message"]["text"]
+
 
         if isinstance(plan, dict):
             plan = json.dumps(plan, indent=2, ensure_ascii=False)
