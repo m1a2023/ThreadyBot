@@ -40,26 +40,24 @@ class ShowInfoAndFastEditTasksHandler(Handler):
     
     if task.developer is None:
       if admin_check:
-        keyboard.append([InlineKeyboardButton("🧑‍💻 Назначить исполнителя", 
-          callback_data="FastEditTaskForChangeDeveloper")])
+        keyboard.append([InlineKeyboardButton("🧑‍💻 Назначить исполнителя", callback_data="FastEditTaskForChangeDeveloper")])
       else:
-        keyboard.append([InlineKeyboardButton("🧑‍💻 Назначить себя исполнителем", 
-          callback_data="FastEditTaskSetYourselfDeveloper")])
+        keyboard.append([InlineKeyboardButton("🧑‍💻 Назначить себя исполнителем", callback_data="FastEditTaskSetYourselfDeveloper")])
     
     # Блок управления задачей
     is_developer = task.developer == user_id
     can_edit = is_developer or (task.developer is None) or admin_check
     
+    if is_developer or admin_check:
+      keyboard.append([InlineKeyboardButton("🤖 Помощь от нейросети", callback_data="generateSubtask")])
+
     if can_edit:
       if task.status == "in_progress":
-        keyboard.append([InlineKeyboardButton("✅ Выполнено", 
-          callback_data="FastEditTaskForStatusDone")])
+        keyboard.append([InlineKeyboardButton("✅ Выполнено", callback_data="FastEditTaskForStatusDone")])
       else:
-        keyboard.append([InlineKeyboardButton("🔄 Начать работу", 
-          callback_data="FastEditTaskForStatusInProgress")])
+        keyboard.append([InlineKeyboardButton("🔄 Начать работу", callback_data="FastEditTaskForStatusInProgress")])
       
-      keyboard.append([InlineKeyboardButton("📅 Изменить дедлайн", 
-        callback_data="FastEditTaskForChangeDeadline")])
+      keyboard.append([InlineKeyboardButton("📅 Изменить дедлайн", callback_data="FastEditTaskForChangeDeadline")])
     
     keyboard.append([InlineKeyboardButton("⬅️ Назад", 
       callback_data="EventsAndStatusOfProjects")])
