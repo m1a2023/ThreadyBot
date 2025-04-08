@@ -10,6 +10,8 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.charts.barcharts import VerticalBarChart
+from reportlab.graphics.charts.legends import Legend
+from reportlab.platypus import PageBreak
 
 import os
 
@@ -71,7 +73,7 @@ class ProjectReportHandler(Handler):
         elements.append(Spacer(1, 0.5*cm))
 
         task_stats = [
-            [Paragraph("Категория", header_style), Paragraph("Количество", header_style), Paragraph("Доля", header_style)],
+            [Paragraph("Категория", header_style), Paragraph("Кол-во", header_style), Paragraph("Доля", header_style)],
             [Paragraph("Всего задач", body_style), report_data['total_quantity_of_tasks'], "100%"],
 
             [
@@ -101,37 +103,39 @@ class ProjectReportHandler(Handler):
             ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
             ('ALIGN', (0,0), (-1,-1), 'CENTER'),
             ('FONTNAME', (0,0), (-1,-1), 'DejaVuSans'),
+            ('ENCODING', (0,0), (-1,-1), 'UTF-8'),
             ('FONTSIZE', (0,0), (-1,-1), 12),
             ('BOTTOMPADDING', (0,0), (-1,0), 12),
             ('BACKGROUND', (0,1), (-1,-1), colors.beige),
             ('GRID', (0,0), (-1,-1), 1, colors.black)
         ]))
 
+        elements.append(Paragraph("Гистограма всех задач и времени их выполнения", header_style))
+        elements.append(Spacer(1, 1*cm))
+        await ProjectReportHandler.generate_vertical_bar_chart(tasks, elements, body_style)
+
+        elements.append(PageBreak())
+
         elements.append(Paragraph("Статистика задач", header_style))
         elements.append(Spacer(1, 0.3*cm))
         elements.append(task_table)
         elements.append(Spacer(1, 1*cm))
 
-        elements.append(Paragraph("Гистограма всех задач и времени их выполнения", header_style))
-        elements.append(Spacer(1, 1*cm))
-        await ProjectReportHandler.generate_vertical_bar_chart(tasks, elements)
-        elements.append(Spacer(1, 2*cm))
-
         devs = [
             [Paragraph("Категория", header_style), Paragraph("Имя", header_style), Paragraph("Статистика", header_style)],
             [
                 Paragraph("Самый ценный", body_style),
-                Paragraph(f"{report_data['most_valuable_developer']['name']}"),
+                Paragraph(f"{report_data['most_valuable_developer']['name']}", body_style),
                 Paragraph(f"Эффективность: {report_data['most_valuable_developer']['effectiveness']}%", body_style)
             ],
             [
                 Paragraph("Самый продуктивный", body_style),
-                Paragraph(f"{report_data['most_productive_developer']['name']}"),
+                Paragraph(f"{report_data['most_productive_developer']['name']}", body_style),
                 Paragraph(f"Завершено задач: {report_data['most_productive_developer']['quantity']}", body_style)
             ],
             [
                 Paragraph("Требует внимания", body_style),
-                Paragraph(f"{report_data['most_flawed_developer']['name']}"),
+                Paragraph(f"{report_data['most_flawed_developer']['name']}", body_style),
                 Paragraph(f"Просрочено задач: {report_data['most_flawed_developer']['quantity']}", body_style)
             ]
         ]
@@ -143,6 +147,7 @@ class ProjectReportHandler(Handler):
             ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
             ('ALIGN', (0,0), (-1,-1), 'CENTER'),
             ('FONTNAME', (0,0), (-1,-1), 'DejaVuSans'),
+            ('ENCODING', (0,0), (-1,-1), 'UTF-8'),
             ('FONTSIZE', (0,0), (-1,-1), 12),
             ('BOTTOMPADDING', (0,0), (-1,0), 12),
             ('BACKGROUND', (0,1), (-1,-1), colors.beige),
@@ -157,42 +162,77 @@ class ProjectReportHandler(Handler):
         doc.build(elements)
 
     @staticmethod
-    async def generate_vertical_bar_chart(tasks: dict, elements):
+    async def generate_vertical_bar_chart(tasks: dict, elements, style):
         ready_times = []
         not_ready_times = []
-        category_names = []
+        allotted_times = []
+        task_numbers = []  # Номера задач вместо названий
+        task_names = {}    # Соответствие номеров и названий
 
-        for task_name, task_info in tasks.items():
-            category_names.append(task_name)
+        # Генерируем нумерацию задач
+        for idx, (task_name, task_info) in enumerate(tasks.items(), 1):
+            task_numbers.append(str(idx))
+            task_names[str(idx)] = task_name  # Сохраняем соответствие номер-название
+
+            # Заполняем данные
+            actual_time = task_info['duration']
+            allotted_time = task_info['allotted_time']
+
             if task_info['is_done'] == "true":
-                ready_times.append(task_info['duration'])
-                not_ready_times.append(0)  # Для неготовых задач ставим 0
+                ready_times.append(actual_time)
+                not_ready_times.append(0)
             else:
-                not_ready_times.append(task_info['duration'])
-                ready_times.append(0)  # Для готовых задач ставим 0
+                not_ready_times.append(actual_time)
+                ready_times.append(0)
 
-        drawing = Drawing(400, 170)
+            allotted_times.append(allotted_time)
 
-        # Создаем гистограмму
+        drawing = Drawing(500, 400)
+
+        # Гистограмма
         chart = VerticalBarChart()
-        chart.width = 350
-        chart.height = 150
-        chart.x = 30
-        chart.y = 30
+        chart.width = 450
+        chart.height = 200
+        chart.x = 20
+        chart.y = 170
 
-        # Данные для графика (две серии)
-        chart.data = [ready_times, not_ready_times]
+        # Настройка данных
+        chart.data = [ready_times, not_ready_times, allotted_times]
 
-        # Настройка категорий
-        chart.categoryAxis.categoryNames = category_names
-        chart.categoryAxis.labels.angle = 45
-        chart.categoryAxis.labels.dy = -15
+        # Нумерованные категории
+        chart.categoryAxis.categoryNames = task_numbers
+        chart.categoryAxis.labels.fontSize = 8
+        chart.categoryAxis.labels.angle = 0  # Горизонтальные подписи
 
-        # Настройка цветов
-        chart.bars[0].fillColor = colors.blue  # Готовые задачи
-        chart.bars[1].fillColor = colors.red   # Неготовые задачи
+        # Цвета столбцов
+        chart.bars[0].fillColor = colors.green
+        chart.bars[1].fillColor = colors.red
+        chart.bars[2].fillColor = colors.blue
 
-        # Добавляем график на холст
+        # Легенда с нумерацией задач
+        legend = Legend()
+        legend.x = 20
+        legend.y = 100
+        legend.colorNamePairs = [
+
+            (colors.green, 'Фактическое (выполнено)'),
+            (colors.red, 'Фактическое (не выполнено)'),
+            (colors.blue, 'Плановое время')
+        ]
+        legend.fontName = 'DejaVuSans'
+        legend.fontSize = 8
+        legend.columnMaximum = 3  # Колонки для компактного отображения
+
+        tasks_text = [
+            "Нумерация задач:",
+            *[f"{num}. {name}" for num, name in task_names.items()],
+        ]
+
         drawing.add(chart)
-
+        drawing.add(legend)
         elements.append(drawing)
+
+        for line in tasks_text:
+            p = Paragraph(line, style)
+            elements.append(p)
+            elements.append(Spacer(1, 5))
