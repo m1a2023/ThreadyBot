@@ -3,11 +3,10 @@ from telegram.ext import ContextTypes
 from typing import Any
 
 from Handlers.Handler import Handler
-from Handlers.RequestsHandler import getAllProjects
+from Handlers.RequestsHandler import getAllProjectsByOwnerId
 from ProjectManagment.ProjectManager import ProjectManager
 
-
-class ChooseProjectHandler(Handler):
+class ChooseProjectForOwnerHandler(Handler):
     @staticmethod
     async def handle(update, context):
 

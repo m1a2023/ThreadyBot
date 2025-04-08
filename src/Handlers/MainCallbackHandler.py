@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 from telegram import Update
 from telegram.ext import ContextTypes
 from Handlers.Handler import Handler
@@ -14,15 +13,18 @@ from Handlers.HandlersForTaskMenu.DeleteTaskHandler import DeleteTaskHandler
 from Handlers.HandlersForTaskMenu.EditTaskMenu.EditDeveloperHandler import EditDeveloperForTaskHandler
 from Handlers.HandlersForTaskMenu.EditTaskMenu.EditTaskMenuHandler import EditTaskMenuHandler
 from Handlers.TextHandler import TextHandler
-from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.SaveGeneratedPlanHandler import SaveGeneratedPlanHandler
-from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.ShowCurrentPlanHandler import ShowCurrentPlanHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.HandlersForGenerateProjectPlan.CancelGenerateProjectPlanHandler import CancelGenerateProjectPlanHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.HandlersForGenerateProjectPlan.SaveGeneratedPlanHandler import SaveGeneratedPlanHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.ShowInfoAboutTeamHandler import ShowInfoAboutTeamHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.FastEditTaskForChangeDeveloperHandler import FastEditTaskForChangeDeveloper
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.CalendarForFastEditTaskForChangeDeadlineHandler import CalendarForFastEditTaskForChangeDeadlineHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.FastEditTaskForChangeDeadlineHandler import FastEditTaskForChangeDeadlineHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.ChooseProjectForAllHandler import ChooseProjectForAllHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.FastEditTaskSetYourselfDeveloperHandler import FastEditTaskSetYourselfDeveloper
-
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.GeneratingProjectPlanMenuHandler import GeneratingPlanMenuHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.HandlersForGenerateProjectPlan.GenerateProjectPlanHandler import GenerateProjectPlanHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.ShowCurrentPlanHandler import ShowCurrentPlanHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.GenerateSubtaskHandler import GenerateSubtaskHandler
 
 """ Импорты хендлеров для главного меню """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.DeleteProjectHandler import DeleteProjectHandler
@@ -54,7 +56,7 @@ from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangePro
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangeProject.HandlersForChangeInfoAboutTeam.DeleteDeveloperHandler import DeleteDeveloperHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangeProject.HandlersForChangeInfoAboutTeam.CancelChangeTeamHandler import CancelChangeTeamHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForChangeProject.HandlersForChangeInfoAboutTeam.SaveChangeTeamHandler import SaveChangeTeamHandler
-from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.ChooseProjectHandler import ChooseProjectHandler
+from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.ChooseProjectForOwnerHandler import ChooseProjectForOwnerHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.ShowProjectsInfoHandler import ShowProjectsInfoHandler
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.ConfirmationDeleteProjectHandler import ConfirmationDeleteProjectHandler
 
@@ -117,8 +119,8 @@ class MainCallbackHandler(Handler):
 
     # Обработка кнопок в "Состояние проекта"
     elif query.data == "currentTasks":
-      context.user_data["state"] = "currentTasks"
-      return await ChooseProjectHandler.handle(update, context)
+      context.user_data["state"] = "current_tasks"
+      return await ChooseProjectForAllHandler.handle(update, context)
 
     elif query.data == "FastEditTaskForStatusDone":
       return await FastEditTaskForStatusDone.handle(update, context)
@@ -138,16 +140,16 @@ class MainCallbackHandler(Handler):
       return await ReportMenuHandler.handle(update, context)
     elif query.data == "get_project_report":
       context.user_data["state"] = "get_project_report"
-      return await ChooseProjectHandler.handle(update, context)
+      return await ChooseProjectForOwnerHandler.handle(update, context)
     elif query.data == "get_developer_report":
       context.user_data["state"] = "chooseDeveloper"
-      return await ChooseProjectHandler.handle(update, context)
+      return await ChooseProjectForOwnerHandler.handle(update, context)
     elif query.data.startswith("taskInCurrentTasks_"):
       context.user_data["taskInCurrentTasks"] = query.data[19:]
       return await ShowInfoAndFastEditTasksHandler.handle(update, context)
 
     #генерация плана проекта
-    elif query.data == "Plan":
+    elif query.data == "GeneratingPlanMenu":
       context.user_data["state"] = "generatePlan"
       return await ChooseProjectForOwnerHandler.handle(update, context)
     elif query.data == "generateNewPlan":
@@ -160,8 +162,13 @@ class MainCallbackHandler(Handler):
       return await CancelGenerateProjectPlanHandler.handle(update, context)
     elif query.data == "saveGeneratedPlan":
       return await SaveGeneratedPlanHandler.handle(update, context)
-    elif query.data == "show_current_plan":
-      return await ShowCurrentPlanHandler.handle(update, context)
+    elif query.data == "showPlan":
+      # project_id = context.user_data["chosenProject"]
+      # context.user_data["current_plan"] = 
+      # return await ShowCurrentPlanHandler.handle(update, context)
+      return
+    elif query.data == "generateSubtask":
+      return await GenerateSubtaskHandler.handle(update, context)
 
     # Обработка кнопок в "Управление проектами"
     elif query.data == "CreateProject":
@@ -169,19 +176,19 @@ class MainCallbackHandler(Handler):
 
     elif query.data == "ChangeProject":
       context.user_data["state"] = "changeProject"
-      return await ChooseProjectHandler.handle(update, context)
+      return await ChooseProjectForOwnerHandler.handle(update, context)
 
     elif query.data == "ShowProjectsInfo":
       context.user_data["state"] = "showProjectsInfo"
-      return await ChooseProjectHandler.handle(update, context)
+      return await ChooseProjectForAllHandler.handle(update, context)
 
     elif query.data == "ConfirmationDeleteProject":
       context.user_data["state"] = "deleteProject"
-      return await ChooseProjectHandler.handle(update, context)
+      return await ChooseProjectForOwnerHandler.handle(update, context)
 
     elif query.data == "showTeam":
       context.user_data["state"] = "showTeamInfo"
-      return await ChooseProjectHandler.handle(update, context)
+      return await ChooseProjectForAllHandler.handle(update, context)
 
     elif query.data == "deleteProject":
       return await DeleteProjectHandler.handle(update, context)
@@ -323,7 +330,7 @@ class MainCallbackHandler(Handler):
         context.user_data["state"] = ""
         return await ShowInfoAboutTeamHandler.handle(update, context)
 
-      elif context.user_data["state"] == "changeProject":
+      if context.user_data["state"] == "changeProject":
         context.user_data["state"] = None
         return await ChangeProjectHandler.handle(update, context)
 
@@ -337,7 +344,7 @@ class MainCallbackHandler(Handler):
 
       elif context.user_data["state"] == "generatePlan":
         context.user_data["state"] = None
-        return await GeneratePlanHandler.handle(update, context)
+        return await GeneratingPlanMenuHandler.handle(update, context)
 
       elif context.user_data["state"] == "chooseDeveloper":
         context.user_data["state"] =  "get_developer_report"
@@ -348,6 +355,14 @@ class MainCallbackHandler(Handler):
       if context.user_data["state"] == "current_tasks":
         context.user_data["state"] = None
         return await CurrentTasksHandler.handle(update, context)
+      
+      elif context.user_data["state"] == "showTeamInfo":
+        context.user_data["state"] = None
+        return await ShowInfoAboutTeamHandler.handle(update, context)
+      
+      elif context.user_data["state"] == "showProjectsInfo":
+        context.user_data["state"] = None
+        return await ShowProjectsInfoHandler.handle(update, context)
 
       elif context.user_data["state"] == "showTeamInfo":
         context.user_data["state"] = None

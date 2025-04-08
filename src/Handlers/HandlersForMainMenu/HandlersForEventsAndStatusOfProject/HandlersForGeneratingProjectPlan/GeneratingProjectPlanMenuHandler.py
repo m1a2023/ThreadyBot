@@ -5,9 +5,6 @@ from telegram.ext import ContextTypes
 
 from Handlers.Handler import Handler
 
-from LLMgen.GeneratePlan import generateProjectPlan
-
-
 class GeneratingPlanMenuHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -16,12 +13,10 @@ class GeneratingPlanMenuHandler(Handler):
     await query.answer()
 
     keyboard = [
-      [InlineKeyboardButton("Сгенерировть(перегенерировать) план", callback_data="generate_plan")],
-      [InlineKeyboardButton("Посмотреть текущий", callback_data="show_current_plan")],
-      [InlineKeyboardButton("Назад", callback_data="EventsAndStatusOfProjects")]
+      [InlineKeyboardButton("🔍 Посмотреть план", callback_data="showPlan")],
+      [InlineKeyboardButton("🆕 Сгенерировать план", callback_data="generateNewPlan")],
+      [InlineKeyboardButton("⬅️ Назад", callback_data="EventsAndStatusOfProjects")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    #plan = await generateProjectPlan()
-
-    await query.edit_message_text(f"Работа с генерацией плана: ", reply_markup=reply_markup)
+    await query.edit_message_text("*\=\=План, созданный нейросетью\=\=*\nВыберите действие:", reply_markup=reply_markup, parse_mode="MarkdownV2")

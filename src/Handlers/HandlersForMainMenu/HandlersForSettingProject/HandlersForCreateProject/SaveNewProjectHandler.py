@@ -42,10 +42,6 @@ class SaveCreateProjectHandler(Handler):
     # Сохраняем проект
     project_id = await saveNewProject(new_project)
 
-    # Добавляем владельца в команду (и создаем команду)
-    owner = Developer(update.callback_query.message.chat_id, project_id, "admin")
-    await createNewTeams(owner.to_dict())
-
     # Добавляем разрабов
     for developer in new_project["team"]:
       developer["project_id"] = project_id

@@ -15,7 +15,7 @@ from Handlers.HandlersForMainMenu.HandlersForSettingProject.ChangeProjectHandler
 
 import re
 
-from Handlers.RequestsHandler import addUserToTeam, deleteUserFromTeam, getListDevelopersIdByProjectId, getProjectById
+from Handlers.RequestsHandler import addUserToTeam, checkUserExists, deleteUserFromTeam, getListDevelopersIdByProjectId, getProjectById
 from ProjectManagment.Developer import Developer
 
 class TextHandler:
@@ -247,15 +247,27 @@ class TextHandler:
 
     elif state == "setTeamForCreateProject":
       set_of_team = set((re.sub(r'[^\w\s@]', '', user_text)).split())
+      valid_dev_id = []
+      invalid_dev_id = []
       try:
         for dev_id in set_of_team:
           dev_id_int = int(dev_id)
-          developer = Developer(dev_id_int, 0, "user")
-          project.addDeveloper(developer)
-        await TextHandler.processMessage(
-          context, chat_id, user_message_id, bot_message_id,
-          f"Разработчики: {', '.join(set_of_team)}", "projectInfoForCreateProject"
-        )
+          if await checkUserExists(dev_id_int):
+            developer = Developer(dev_id_int, 0, "user")
+            project.addDeveloper(developer)
+            valid_dev_id.append(str(dev_id_int))
+          else:
+            invalid_dev_id.append(str(dev_id_int))
+        if invalid_dev_id == [] and valid_dev_id != []:
+          await TextHandler.processMessage(
+            context, chat_id, user_message_id, bot_message_id,
+            f"Добавленные разработчики: {', '.join(valid_dev_id)}", "projectInfoForCreateProject"
+          )
+        elif invalid_dev_id != [] and valid_dev_id == []:
+          await TextHandler.processMessage(
+            context, chat_id, user_message_id, bot_message_id,
+            f"⚠️ Разработчики не были добавлены: {','.join(invalid_dev_id)}\n❗️ Чтобы добавить их, нужно, чтобы они написали мне команду /start", "projectInfoForCreateProject"
+          )
       except ValueError:
         if bot_message_id:
           try:
@@ -396,7 +408,7 @@ class TextHandler:
         await update.message.reply_text("Ошибка: callback_query отсутствует.")
         return
 
-      developer = update.callback_query.data[23:]
+      developer = context.user_data["chosenDeveloper"]
 
       task.developer = developer
 
@@ -507,8 +519,7 @@ class TextHandler:
         await update.message.reply_text("Ошибка: callback_query отсутствует.")
         return
 
-      developer = update.callback_query.data[23:]
-      print(developer)
+      developer = context.user_data["chosenDeveloper"]
 
       changedTask.developer = developer
 
@@ -531,7 +542,7 @@ class TextHandler:
 
     if state == "addNewDeveloper":
       # Если нет такого пользователя в списке тимы
-      if user_text not in team:
+      if user_text not in team and await checkUserExists(int(user_text)):
         new_developer = Developer(int(user_text), context.user_data["chosenProject"], "user")
         await addUserToTeam(new_developer.to_dict())
         # Удаляем сообщение бота
@@ -548,7 +559,7 @@ class TextHandler:
         context.user_data["state"] = None
 
       # Если такой пользователь уже есть в тиме
-      else:
+      elif user_text in team:
         if bot_message_id:
           try:
             await context.bot.edit_message_text(
