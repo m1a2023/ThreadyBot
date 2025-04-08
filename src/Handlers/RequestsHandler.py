@@ -8,6 +8,7 @@ from TaskManagement.Task import Task
 #
 # ЗАПРОСЫ ДЛЯ НАПОМИНАНИЙ
 #
+
 async def get_reminders_by_project_ids(project_ids: List[int]):
     if len(project_ids) == 0:
       return None
@@ -50,9 +51,9 @@ async def get_report_by_project_id(project_id: int) -> dict:
         report = response.json()
         return report
 
-async def get_report_by_user_id(user_id: int) -> dict:
+async def get_report_by_user_id(user_id: int, project_id: int) -> dict:
     async with httpx.AsyncClient() as client:
-        response = await client.get(f"http://localhost:9000/api/db/reports/developer/{user_id}")
+        response = await client.get(f"http://localhost:9000/api/db/reports/project/{project_id}/developer/{user_id}")
         response.raise_for_status()
         report = response.json()
         return report
@@ -61,7 +62,6 @@ async def get_report_by_user_id(user_id: int) -> dict:
 # запросы для генерации плана
 #
 async def get_project_plan(project_id: int, iam_t: str, f_id: str):
-    description = "ThreadyServer – это планируемый многопоточный сервер, разработанный на Python с использованием FastAPI. Проект будет включать поддержку асинхронной обработки запросов, работу с базой данных PostgreSQL и удобное API для взаимодействия с клиентами" #await getProjectInfoById(project_id)
     iam_token = iam_t
     folder_id = f"gpt://{f_id}/llama/latest"
 
@@ -71,7 +71,7 @@ async def get_project_plan(project_id: int, iam_t: str, f_id: str):
         "action": "plan",
         "project_id": project_id,
         "context_depth": 2,
-        "timeout" : 60
+        "timeout" : 90
     }
 
     body = {
@@ -80,8 +80,6 @@ async def get_project_plan(project_id: int, iam_t: str, f_id: str):
       }
 
     async with httpx.AsyncClient(timeout=90.0) as client:
-      #print(description)
-      #response = await client.post(f"http://localhost:9000/api/llm/ygpt/?url=https://llm.api.cloud.yandex.net/foundationModels/v1/completion&action=plan&project_id={project_id}&context_depth=2&timeout=60", json=body)
       response = await client.post(
             url=url,
             params=params,
@@ -91,6 +89,93 @@ async def get_project_plan(project_id: int, iam_t: str, f_id: str):
       response.raise_for_status()
       plan = response.json()
       return plan
+
+async def get_project_re_plan(project_id: int, iam_t: str, f_id: str):
+    iam_token = iam_t
+    folder_id = f"gpt://{f_id}/llama/latest"
+
+    url = "http://localhost:9000/api/llm/ygpt/"
+    params = {
+        "url": "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
+        "action": "re_plan",
+        "project_id": project_id,
+        "context_depth": 2,
+        "timeout" : 90
+    }
+
+    body = {
+        "iam_token": iam_token,
+        "model_uri": folder_id,
+      }
+
+    async with httpx.AsyncClient(timeout=90.0) as client:
+      response = await client.post(
+            url=url,
+            params=params,
+            json=body,
+            headers={"Content-Type": "application/json"}
+        )
+      response.raise_for_status()
+      plan = response.json()
+      return plan
+
+async def get_project_re_plan_with_problem(problem: str, project_id: int, iam_t: str, f_id: str):
+    iam_token = iam_t
+    folder_id = f"gpt://{f_id}/llama/latest"
+
+    url = "http://localhost:9000/api/llm/ygpt/"
+    params = {
+        "url": "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
+        "action": "re_plan",
+        "project_id": project_id,
+        "context_depth": 2,
+        "timeout" : 90
+    }
+
+    body = {
+        "iam_token": iam_token,
+        "model_uri": folder_id,
+        "problem": problem
+      }
+
+    async with httpx.AsyncClient(timeout=90.0) as client:
+      response = await client.post(
+            url=url,
+            params=params,
+            json=body,
+            headers={"Content-Type": "application/json"}
+        )
+      response.raise_for_status()
+      plan = response.json()
+      return plan
+
+async def save_tasks_fom_plan(project_id: int, iam_t: str, f_id: str):
+    iam_token = iam_t
+    folder_id = f"gpt://{f_id}/llama/latest"
+
+    url = "http://localhost:9000/api/llm/ygpt/"
+    params = {
+        "url": "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
+        "action": "task",
+        "project_id": project_id,
+        "context_depth": 1,
+        "timeout" : 90
+    }
+
+    body = {
+        "iam_token": iam_token,
+        "model_uri": folder_id,
+      }
+
+    async with httpx.AsyncClient(timeout=90.0) as client:
+      response = await client.post(
+            url=url,
+            params=params,
+            json=body,
+            headers={"Content-Type": "application/json"}
+        )
+      response.raise_for_status()
+
 
 #
 # Запросы для юзеров

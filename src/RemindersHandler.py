@@ -67,7 +67,7 @@ class RemindersHandler(Handler):
                 sent_message = await context.bot.send_message(chat_id=user_id, text=message, parse_mode="Markdown", reply_markup=reply_markup)
                 context.user_data["bot_message_id"] = sent_message.message_id
                 # Отмечаем в БД, что уведомление отправлено
-                #await delete_remind_by_task_id(task_id)
+                await delete_remind_by_task_id(task_id)
             except Exception as e:
                 print(f"Ошибка при отправке напоминания: {e}")
         else:

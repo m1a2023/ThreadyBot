@@ -32,7 +32,7 @@ class UserReportHandler(Handler):
         user_id = context.user_data["chosenDeveloper"] # id выбранного разработчика для формирования отчета
         project_id = context.user_data["chosenProject"] # id выбранного проекта для формирования отчета
 
-        report = await get_report_by_user_id(user_id) #покатак
+        report = await get_report_by_user_id(user_id, project_id) #покатак
 
         file_path = f"Developer_report_{user_id}.pdf"
         await UserReportHandler.generate_pdf(report, file_path)

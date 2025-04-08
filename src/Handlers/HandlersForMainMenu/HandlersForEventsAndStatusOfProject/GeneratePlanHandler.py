@@ -5,6 +5,7 @@ from Handlers.Handler import Handler
 from Handlers.RequestsHandler import get_project_plan
 
 import json
+
 class GeneratePlanHandler(Handler):
     @staticmethod
     async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):

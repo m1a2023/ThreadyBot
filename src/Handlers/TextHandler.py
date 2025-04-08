@@ -84,11 +84,19 @@ class TextHandler:
     # Получаем текущее состояние
     state = context.user_data.get("state")
 
+    if state == "generateRePlanWithProblem":
+      context.user_data["problem"] = user_text
+
+      await TextHandler.processMessage(
+        context, chat_id, user_message_id, bot_message_id,
+        f"Замечания: {user_text}", "PlanInfo"
+      )
+
     #
     # Обработка статусов для редактирования проектов
     #
 
-    if state == "editProjectName":
+    elif state == "editProjectName":
       if (len(user_text) >= 4 and not user_text[0].isdigit() and user_text not in users_project):
         changedProject.title = user_text
         await TextHandler.processMessage(
@@ -547,6 +555,24 @@ class TextHandler:
             chat_id=chat_id,
             message_id=bot_message_id,
             text="Такой пользователь уже есть в команде. Попробуйте еще раз:"
+          )
+          except Exception as e:
+            print(f"Ошибка при редактировании сообщения: {e}")
+          # Удаляем сообщение пользователя
+          if user_message_id:
+            try:
+              await context.bot.delete_message(chat_id, user_message_id)
+            except Exception as e:
+              print(f"Ошибка при удалении сообщения пользователя: {e}")
+        return
+      # Если пользователя с таким id нет в бд
+      elif not (await checkUserExists(int(user_text))):
+        if bot_message_id:
+          try:
+            await context.bot.edit_message_text(
+            chat_id=chat_id,
+            message_id=bot_message_id,
+            text="Такого пользователя нет в базе данных.\nЧтобы добавить его, нужно, чтобы он написал мне команду /start.\nПопробуйте еще раз:"
           )
           except Exception as e:
             print(f"Ошибка при редактировании сообщения: {e}")
