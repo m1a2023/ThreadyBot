@@ -21,6 +21,7 @@ from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersFo
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.CalendarForFastEditTaskForChangeDeadlineHandler import CalendarForFastEditTaskForChangeDeadlineHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.FastEditTaskForChangeDeadlineHandler import FastEditTaskForChangeDeadlineHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.ChooseProjectForAllHandler import ChooseProjectForAllHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.FastEditTaskSetYourselfDeveloperHandler import FastEditTaskSetYourselfDeveloper
 
 """ Импорты хендлеров для главного меню """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.DeleteProjectHandler import DeleteProjectHandler
@@ -112,7 +113,7 @@ class MainCallbackHandler(Handler):
 
     # Обработка кнопок в "Состояние проекта"
     elif query.data == "currentTasks":
-      context.user_data["state"] = "currentTasks"
+      context.user_data["state"] = "current_tasks"
       return await ChooseProjectForAllHandler.handle(update, context)
 
     elif query.data == "FastEditTaskForStatusDone":
@@ -122,6 +123,8 @@ class MainCallbackHandler(Handler):
     elif query.data == "FastEditTaskForChangeDeveloper":
       context.user_data["state"] = "FastEditTaskDeveloper"
       return await ChooseDeveloperHandler.handle(update, context)
+    elif query.data == "FastEditTaskSetYourselfDeveloper":
+      return await FastEditTaskSetYourselfDeveloper.handle(update, context)
     
     elif query.data == "FastEditTaskForChangeDeadline":
       context.user_data["state"] = "fastEditTaskDeadline"
@@ -160,7 +163,7 @@ class MainCallbackHandler(Handler):
 
     elif query.data == "ShowProjectsInfo":
       context.user_data["state"] = "showProjectsInfo"
-      return await ChooseProjectForOwnerHandler.handle(update, context)
+      return await ChooseProjectForAllHandler.handle(update, context)
 
     elif query.data == "ConfirmationDeleteProject":
       context.user_data["state"] = "deleteProject"
@@ -168,7 +171,7 @@ class MainCallbackHandler(Handler):
 
     elif query.data == "showTeam":
       context.user_data["state"] = "showTeamInfo"
-      return await ChooseProjectForOwnerHandler.handle(update, context)
+      return await ChooseProjectForAllHandler.handle(update, context)
 
     elif query.data == "deleteProject":
       return await DeleteProjectHandler.handle(update, context)
@@ -302,15 +305,8 @@ class MainCallbackHandler(Handler):
 
     elif query.data.startswith("chosenProject_"):
       context.user_data["chosenProject"] = query.data[14:]
-      if context.user_data["state"] == "showProjectsInfo":
-        context.user_data["state"] = None
-        return await ShowProjectsInfoHandler.handle(update, context)
-      
-      elif context.user_data["state"] == "showTeamInfo":
-        context.user_data["state"] = ""
-        return await ShowInfoAboutTeamHandler.handle(update, context)
 
-      elif context.user_data["state"] == "changeProject":
+      if context.user_data["state"] == "changeProject":
         context.user_data["state"] = None
         return await ChangeProjectHandler.handle(update, context)
 
@@ -331,11 +327,18 @@ class MainCallbackHandler(Handler):
         return await ChooseDeveloperHandler.handle(update, context)
     
     elif query.data.startswith("chosenFromAllProjects"):
-      context.user_data["chosenFromAllProjects"] = query.data[22:]
-      print("from callback menu, chosenFromAllProjects")
-      if context.user_data["state"] == "currentTasks":
+      context.user_data["chosenProject"] = query.data[22:]
+      if context.user_data["state"] == "current_tasks":
         context.user_data["state"] = None
         return await CurrentTasksHandler.handle(update, context)
+      
+      elif context.user_data["state"] == "showTeamInfo":
+        context.user_data["state"] = None
+        return await ShowInfoAboutTeamHandler.handle(update, context)
+      
+      elif context.user_data["state"] == "showProjectsInfo":
+        context.user_data["state"] = None
+        return await ShowProjectsInfoHandler.handle(update, context)
 
     elif query.data.startswith("chosenTask_"):
       context.user_data["chosenTask"] = query.data[11:]

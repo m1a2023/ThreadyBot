@@ -69,13 +69,16 @@ async def get_project_plan(project_id: int, iam_t: str, f_id: str):
 # Запросы для юзеров
 #
 
-""" TODO Проверка прав доступа пользователя """
+""" Проверка прав доступа пользователя """
 # True - пользователь админ
 # False - пользователь разраб
-async def checkUsersRole(user_id: int) -> bool:
-  return
-  # async with httpx.AsyncClient() as client:
-  #   response = await client.get()
+async def isAdmin(user_id: int, project_id) -> bool:
+  async with httpx.AsyncClient() as client:
+    response = await client.get(
+      f"http://localhost:9000/api/db/teams/is/admin/{user_id}/project/{project_id}"
+    )
+    content = response.text.strip().lower()
+    return content == "true"
 
 """ Проверка, есть ли юзер в бд """
 async def checkUserExists(user_id: int) -> bool:

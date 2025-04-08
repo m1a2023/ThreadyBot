@@ -51,7 +51,7 @@ class ChooseProjectForAllHandler(Handler):
 
           if i < len(dev_names):
               row.append(InlineKeyboardButton(dev_names[i][0], callback_data=f"chosenFromAllProjects_{dev_names[i][1]}"))
-          elif dev_names:  # Если есть dev-проекты, но текущей строки нет - добавляем пустую кнопку
+          elif dev_names:  # Если есть пользовательские проекты, но текущей строки нет - добавляем пустую кнопку
               row.append(InlineKeyboardButton(" ", callback_data="no_action"))
 
           if row:
@@ -62,4 +62,3 @@ class ChooseProjectForAllHandler(Handler):
 
       reply_markup = InlineKeyboardMarkup(keyboard)
       await query.edit_message_text(text="Выберите проект", reply_markup=reply_markup)
-      context.user_data["state"] = None
