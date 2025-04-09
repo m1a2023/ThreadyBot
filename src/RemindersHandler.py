@@ -50,6 +50,10 @@ class RemindersHandler(Handler):
 
     @staticmethod
     async def fetch_and_send_reminders(context: ContextTypes.DEFAULT_TYPE, task_title: str, user_id: int, task_id: int):
+        keyboard = [
+            [InlineKeyboardButton("Ок", callback_data="OK_reminder")],
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
         print("send")
         if task_title:
 
@@ -60,9 +64,10 @@ class RemindersHandler(Handler):
             )
 
             try:
-                await context.bot.send_message(chat_id=user_id, text=message, parse_mode="Markdown")
+                sent_message = await context.bot.send_message(chat_id=user_id, text=message, parse_mode="Markdown", reply_markup=reply_markup)
+                context.user_data["bot_message_id"] = sent_message.message_id
                 # Отмечаем в БД, что уведомление отправлено
-                #await delete_remind_by_task_id(task_id)
+                await delete_remind_by_task_id(task_id)
             except Exception as e:
                 print(f"Ошибка при отправке напоминания: {e}")
         else:

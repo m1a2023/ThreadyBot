@@ -4,17 +4,17 @@ from typing import Any
 from Handlers.Handler import Handler
 import json
 
-from Handlers.RequestsHandler import get_project_plan
+from Handlers.RequestsHandler import get_project_re_plan_with_problem
 
-class GenerateProjectPlanHandler(Handler):
+class ReGenerateProjectPlanHandler(Handler):
 
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any:
-    context.user_data["PlanInfo"] = ["Вы ввели:"]
+    problem = context.user_data["problem"]
     query = update.callback_query
     await query.answer()
 
-    await query.edit_message_text("🔄 Идет генерация плана, это может занять некоторое время...")
+    await query.edit_message_text("🔄 Идет перегенерация плана, это может занять некоторое время...")
 
     keyboard = [
       [InlineKeyboardButton("✅ Принять план", callback_data="saveGeneratedPlan")], # Сохраняем план и уточняем по генерации задач
@@ -27,11 +27,11 @@ class GenerateProjectPlanHandler(Handler):
 
     proj_id = context.user_data["chosenProject"]
 
-    iam_token = "t1.9euelZqdkZvMj8iWm5mXno2TmJCJju3rnpWanoyPkpnJzs2TmcmUz8fGncvl8_d4PylA-e8kS348_d3z9zhuJkD57yRLfjz9zef1656Vmoyek8zNlZiQjI3Jy4_HlpKR7_zF656Vmoyek8zNlZiQjI3Jy4_HlpKR.qkn44r7OuaM8AL3sNH7hXdjuUk00yaRG4EQoMzlW-hBg-z7El6OTiLYr7vyRWN_6JoehuRBtMZq4TVeG9NiWAg"
+    iam_token = "t1.9euelZrNz8iQycaSm86PmpvGicnIzO3rnpWanoyPkpnJzs2TmcmUz8fGncvl8_dRFyxA-e8Tf2tt_t3z9xFGKUD57xN_a23-zef1656VmpnJz5POxpaLyMiZyMiYk53L7_zF656VmpnJz5POxpaLyMiZyMiYk53L._XvvSoGbd9ue_9bwBRXZESvAeUE0P445j1s_khiDZqwL9hxTI46OfmEMONt2rOiUYKq5mY6KlNyCz4q_5RMVBA"
     folder_id = "b1gc80aslek1slbmcvj9"
 
     MAX_MESSAGE_LENGTH = 4096
-    resp = await get_project_plan(proj_id, iam_token, folder_id)
+    resp = await get_project_re_plan_with_problem(problem, proj_id, iam_token, folder_id)
     plan = resp["result"]["alternatives"][0]["message"]["text"]
 
 

@@ -4,17 +4,21 @@ from typing import Any
 from Handlers.Handler import Handler
 import json
 
-from Handlers.RequestsHandler import get_project_plan
+from Handlers.RequestsHandler import get_project_re_plan_with_problem
 
-class GenerateProjectPlanHandler(Handler):
+class ReGenerateProjectPlanHandler(Handler):
 
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any:
-    context.user_data["PlanInfo"] = ["Вы ввели:"]
     query = update.callback_query
     await query.answer()
 
-    await query.edit_message_text("🔄 Идет генерация плана, это может занять некоторое время...")
+    problem = context.user_data["problem"]
+    if problem is None:
+       problem = ""
+    print(f"problem - {problem}")
+
+    await query.edit_message_text("🔄 Идет перегенерация плана, это может занять некоторое время...")
 
     keyboard = [
       [InlineKeyboardButton("✅ Принять план", callback_data="saveGeneratedPlan")], # Сохраняем план и уточняем по генерации задач
@@ -31,7 +35,11 @@ class GenerateProjectPlanHandler(Handler):
     folder_id = "b1gc80aslek1slbmcvj9"
 
     MAX_MESSAGE_LENGTH = 4096
-    resp = await get_project_plan(proj_id, iam_token, folder_id)
+    resp = await get_project_re_plan_with_problem(problem, proj_id, iam_token, folder_id)
+
+    context.user_data["problem"] = None
+    print(f"problem - {context.user_data["problem"]}")
+
     plan = resp["result"]["alternatives"][0]["message"]["text"]
 
 

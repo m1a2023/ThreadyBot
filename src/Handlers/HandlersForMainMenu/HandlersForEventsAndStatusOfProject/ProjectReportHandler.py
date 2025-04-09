@@ -21,6 +21,11 @@ from Handlers.RequestsHandler import get_report_by_project_id
 class ProjectReportHandler(Handler):
     @staticmethod
     async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        keyboard = [
+            [InlineKeyboardButton("Ок", callback_data="OK_project_report")],
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
         proj_id = context.user_data["chosenProject"]
 
         report = await get_report_by_project_id(proj_id)
@@ -31,8 +36,8 @@ class ProjectReportHandler(Handler):
         # Отправляем пользователю
         with open(file_path, "rb") as pdf_file:
             print("done")
-            await update.callback_query.message.reply_document(document=pdf_file, filename=f"Project_report_{proj_id}.pdf")
-
+            sent_message = await update.callback_query.message.reply_document(document=pdf_file, filename=f"Project_report_{proj_id}.pdf", reply_markup=reply_markup)
+            context.user_data["bot_message_id"] = sent_message.message_id
         os.remove(file_path)
 
     @staticmethod
