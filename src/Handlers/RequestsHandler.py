@@ -177,6 +177,18 @@ async def save_tasks_fom_plan(project_id: int, iam_t: str, f_id: str):
       response.raise_for_status()
 
 
+async def show_plan(project_id: int):
+  async with httpx.AsyncClient() as client:
+    response = await client.get(
+      f"http://localhost:9000/api/db/plans/project/{project_id}"
+    )
+
+    response.raise_for_status()
+    resp = response.json()
+    plan = resp["text"]
+    return plan
+
+
 #
 # Запросы для юзеров
 #

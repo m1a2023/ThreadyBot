@@ -43,6 +43,7 @@ from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersFo
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.GeneratingProjectPlanMenuHandler import GeneratingPlanMenuHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.HandlersForGenerateProjectPlan.GenerateProjectPlanHandler import GenerateProjectPlanHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.HandlersForGenerateProjectPlan.GetProblemHandler import GetProblemHandler
+from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.ShowCurrentPlanHandler import ShowCurrentPlanHandler
 
 """ Импорты хендлеров для управления проектами """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.CreateProjectHandler import CreateProjectHandler
@@ -164,8 +165,9 @@ class MainCallbackHandler(Handler):
       return await SaveGeneratedPlanHandler.handle(update, context)
     elif query.data == "showPlan":
       # project_id = context.user_data["chosenProject"]
-      # context.user_data["current_plan"] = 
+      # context.user_data["current_plan"] =
       # return await ShowCurrentPlanHandler.handle(update, context)
+      await ShowCurrentPlanHandler.handle(update, context)
       return
     elif query.data == "generateSubtask":
       return await GenerateSubtaskHandler.handle(update, context)
@@ -355,11 +357,11 @@ class MainCallbackHandler(Handler):
       if context.user_data["state"] == "current_tasks":
         context.user_data["state"] = None
         return await CurrentTasksHandler.handle(update, context)
-      
+
       elif context.user_data["state"] == "showTeamInfo":
         context.user_data["state"] = None
         return await ShowInfoAboutTeamHandler.handle(update, context)
-      
+
       elif context.user_data["state"] == "showProjectsInfo":
         context.user_data["state"] = None
         return await ShowProjectsInfoHandler.handle(update, context)
