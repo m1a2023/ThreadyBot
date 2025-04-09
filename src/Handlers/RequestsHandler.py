@@ -188,6 +188,35 @@ async def show_plan(project_id: int):
     plan = resp["text"]
     return plan
 
+async def div_task(project_id: int, problem: str, iam_t: str, f_id: str):
+  iam_token = iam_t
+  folder_id = f"gpt://{f_id}/llama/latest"
+
+  url = "http://localhost:9000/api/llm/ygpt/"
+  params = {
+      "url": "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
+      "action": "div_task",
+      "project_id": project_id,
+      "context_depth": 2,
+      "timeout" : 90
+  }
+
+  body = {
+      "iam_token": iam_token,
+      "model_uri": folder_id,
+      "problem": problem
+    }
+
+  async with httpx.AsyncClient(timeout=90.0) as client:
+    response = await client.post(
+          url=url,
+          params=params,
+          json=body,
+          headers={"Content-Type": "application/json"}
+      )
+    response.raise_for_status()
+    plan = response.json()
+    return plan
 
 #
 # Запросы для юзеров

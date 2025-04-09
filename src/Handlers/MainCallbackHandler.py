@@ -119,7 +119,7 @@ class MainCallbackHandler(Handler):
       return await EventsAndStatusOfProjectHandler.handle(update, context)
     elif query.data == "GeneralSettings":
       return await GeneralSettingsHandler.handle(update, context)
-    
+
     # Обработка кнопок в настройках
     elif query.data == "setChatLink":
       context.user_data["state"] = "SetChatLink"
@@ -361,11 +361,11 @@ class MainCallbackHandler(Handler):
       elif context.user_data["state"] == "chooseDeveloper":
         context.user_data["state"] =  "get_developer_report"
         return await ChooseDeveloperHandler.handle(update, context)
-      
+
       elif context.user_data["state"] == "SetChatLink":
         context.user_data["state"] = None
         return await SetChatLinkHandler.handle(update, context)
-    
+
     elif query.data.startswith("chosenFromAllProjects"):
       context.user_data["chosenProject"] = query.data[22:]
       if context.user_data["state"] == "current_tasks":
@@ -387,7 +387,7 @@ class MainCallbackHandler(Handler):
       elif context.user_data["state"] == "showProjectsInfo":
         context.user_data["state"] = None
         return await ShowProjectsInfoHandler.handle(update, context)
-      
+
       elif context.user_data["state"] == "ShowChatLink":
         context.user_data["state"] = None
         return await ShowChatLinkHandler.handle(update, context)
@@ -434,7 +434,7 @@ class MainCallbackHandler(Handler):
       if bot_message_id:
         await context.bot.delete_message(chat_id, bot_message_id)
 
-    elif query.data == "OK_remind":
+    elif query.data == "OK_reminder":
       chat_id = update.callback_query.message.chat_id
       bot_message_id = context.user_data.get("bot_message_id")
 

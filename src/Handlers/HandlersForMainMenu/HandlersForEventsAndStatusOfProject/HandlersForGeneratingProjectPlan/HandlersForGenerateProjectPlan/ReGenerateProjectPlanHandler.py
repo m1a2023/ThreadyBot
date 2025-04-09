@@ -13,8 +13,8 @@ class ReGenerateProjectPlanHandler(Handler):
     query = update.callback_query
     await query.answer()
 
-    problem = context.user_data["problem"]
-    if problem is None:
+    #problem = context.user_data["problem"]
+    if not context.user_data["problem"]:
        problem = ""
     print(f"problem - {problem}")
 
@@ -30,6 +30,7 @@ class ReGenerateProjectPlanHandler(Handler):
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     proj_id = context.user_data["chosenProject"]
+    print(f"proj - {proj_id}")
 
     iam_token = "t1.9euelZqdkZvMj8iWm5mXno2TmJCJju3rnpWanoyPkpnJzs2TmcmUz8fGncvl8_d4PylA-e8kS348_d3z9zhuJkD57yRLfjz9zef1656Vmoyek8zNlZiQjI3Jy4_HlpKR7_zF656Vmoyek8zNlZiQjI3Jy4_HlpKR.qkn44r7OuaM8AL3sNH7hXdjuUk00yaRG4EQoMzlW-hBg-z7El6OTiLYr7vyRWN_6JoehuRBtMZq4TVeG9NiWAg"
     folder_id = "b1gc80aslek1slbmcvj9"
@@ -56,6 +57,8 @@ class ReGenerateProjectPlanHandler(Handler):
             end = (i + 1) * MAX_MESSAGE_LENGTH
             part = plan[start:end]
 
-            await update.effective_message.reply_markdown(part,reply_markup=reply_markup)
+            #await update.effective_message.reply_markdown(part,reply_markup=reply_markup)
+            await query.edit_message_text(part,reply_markup=reply_markup)
     else:
-        await update.effective_message.reply_markdown(plan,reply_markup=reply_markup)
+        #await update.effective_message.reply_markdown(plan,reply_markup=reply_markup)
+        await query.edit_message_text(plan,reply_markup=reply_markup)
