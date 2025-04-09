@@ -8,7 +8,11 @@ from TaskManagement.Task import Task
 #
 # ЗАПРОСЫ ДЛЯ НАПОМИНАНИЙ
 #
+
 async def get_reminders_by_project_ids(project_ids: List[int]):
+    if len(project_ids) == 0:
+      return None
+
     async with httpx.AsyncClient() as client:
         ids = "&project_ids=".join(str(project_id) for project_id in project_ids)
         route = "http://localhost:9000/api/db/reminders/bat/?project_ids=" + ids
@@ -47,9 +51,9 @@ async def get_report_by_project_id(project_id: int) -> dict:
         report = response.json()
         return report
 
-async def get_report_by_user_id(user_id: int) -> dict:
+async def get_report_by_user_id(user_id: int, project_id: int) -> dict:
     async with httpx.AsyncClient() as client:
-        response = await client.get(f"http://localhost:9000/api/db/reports/developer/{user_id}")
+        response = await client.get(f"http://localhost:9000/api/db/reports/project/{project_id}/developer/{user_id}")
         response.raise_for_status()
         report = response.json()
         return report
@@ -58,9 +62,8 @@ async def get_report_by_user_id(user_id: int) -> dict:
 # запросы для генерации плана
 #
 async def get_project_plan(project_id: int, iam_t: str, f_id: str):
-    description = "ThreadyServer – это планируемый многопоточный сервер, разработанный на Python с использованием FastAPI. Проект будет включать поддержку асинхронной обработки запросов, работу с базой данных PostgreSQL и удобное API для взаимодействия с клиентами" #await getProjectInfoById(project_id)
     iam_token = iam_t
-    folder_id = f"gpt://{f_id}/yandexgpt"
+    folder_id = f"gpt://{f_id}/llama/latest"
 
     url = "http://localhost:9000/api/llm/ygpt/"
     params = {
@@ -68,28 +71,15 @@ async def get_project_plan(project_id: int, iam_t: str, f_id: str):
         "action": "plan",
         "project_id": project_id,
         "context_depth": 2,
-        "timeout" : 60
+        "timeout" : 90
     }
 
     body = {
         "iam_token": iam_token,
         "model_uri": folder_id,
-        "options": {
-            "stream": False,
-            "temperature": 0.9,
-            "max_tokens": 1200
-          },
-        "messages": [
-          {
-                "role": "user",
-                "text": description
-          }
-        ]
       }
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
-      #print(description)
-      #response = await client.post(f"http://localhost:9000/api/llm/ygpt/?url=https://llm.api.cloud.yandex.net/foundationModels/v1/completion&action=plan&project_id={project_id}&context_depth=2&timeout=60", json=body)
+    async with httpx.AsyncClient(timeout=90.0) as client:
       response = await client.post(
             url=url,
             params=params,
@@ -100,9 +90,119 @@ async def get_project_plan(project_id: int, iam_t: str, f_id: str):
       plan = response.json()
       return plan
 
+async def get_project_re_plan(project_id: int, iam_t: str, f_id: str):
+    iam_token = iam_t
+    folder_id = f"gpt://{f_id}/llama/latest"
+
+    url = "http://localhost:9000/api/llm/ygpt/"
+    params = {
+        "url": "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
+        "action": "re_plan",
+        "project_id": project_id,
+        "context_depth": 2,
+        "timeout" : 90
+    }
+
+    body = {
+        "iam_token": iam_token,
+        "model_uri": folder_id,
+      }
+
+    async with httpx.AsyncClient(timeout=90.0) as client:
+      response = await client.post(
+            url=url,
+            params=params,
+            json=body,
+            headers={"Content-Type": "application/json"}
+        )
+      response.raise_for_status()
+      plan = response.json()
+      return plan
+
+async def get_project_re_plan_with_problem(problem: str, project_id: int, iam_t: str, f_id: str):
+    iam_token = iam_t
+    folder_id = f"gpt://{f_id}/llama/latest"
+
+    url = "http://localhost:9000/api/llm/ygpt/"
+    params = {
+        "url": "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
+        "action": "re_plan",
+        "project_id": project_id,
+        "context_depth": 2,
+        "timeout" : 90
+    }
+
+    body = {
+        "iam_token": iam_token,
+        "model_uri": folder_id,
+        "problem": problem
+      }
+
+    async with httpx.AsyncClient(timeout=90.0) as client:
+      response = await client.post(
+            url=url,
+            params=params,
+            json=body,
+            headers={"Content-Type": "application/json"}
+        )
+      response.raise_for_status()
+      plan = response.json()
+      return plan
+
+async def save_tasks_fom_plan(project_id: int, iam_t: str, f_id: str):
+    iam_token = iam_t
+    folder_id = f"gpt://{f_id}/llama/latest"
+
+    url = "http://localhost:9000/api/llm/ygpt/"
+    params = {
+        "url": "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
+        "action": "task",
+        "project_id": project_id,
+        "context_depth": 1,
+        "timeout" : 90
+    }
+
+    body = {
+        "iam_token": iam_token,
+        "model_uri": folder_id,
+      }
+
+    async with httpx.AsyncClient(timeout=90.0) as client:
+      response = await client.post(
+            url=url,
+            params=params,
+            json=body,
+            headers={"Content-Type": "application/json"}
+        )
+      response.raise_for_status()
+
+
+async def show_plan(project_id: int):
+  async with httpx.AsyncClient() as client:
+    response = await client.get(
+      f"http://localhost:9000/api/db/plans/project/{project_id}"
+    )
+
+    response.raise_for_status()
+    resp = response.json()
+    plan = resp["text"]
+    return plan
+
+
 #
 # Запросы для юзеров
 #
+
+""" Проверка прав доступа пользователя """
+# True - пользователь админ
+# False - пользователь разраб
+async def isAdmin(user_id: int, project_id) -> bool:
+  async with httpx.AsyncClient() as client:
+    response = await client.get(
+      f"http://localhost:9000/api/db/teams/is/admin/{user_id}/project/{project_id}"
+    )
+    content = response.text.lower()
+    return content == "true"
 
 """ Проверка, есть ли юзер в бд """
 async def checkUserExists(user_id: int) -> bool:
@@ -165,11 +265,21 @@ async def saveNewProject(project):
       print("Проект успешно создан! ID проекта:", response.json())
       return response.json()
 
-""" Запрос для получения всех проектов конкретного челика. Возвращает список словарей со всеми данными"""
-async def getAllProjects(owner_id) -> list:
+""" Запрос для получения всех проектов конкретного челика, где он админ. Возвращает список словарей со всеми данными"""
+async def getAllProjectsByOwnerId(owner_id) -> list:
   async with httpx.AsyncClient() as client:
     response = await client.get(
       f"http://localhost:9000/api/db/projects/owner/{owner_id}"
+    )
+    response.raise_for_status()
+    projects = response.json()
+    return projects
+
+""" Запрос для получения всех проектов конкретного челика, где он разраб. Возвращает список словарей со всеми данными"""
+async def getAllProjectsByDevId(dev_id) -> list:
+  async with httpx.AsyncClient() as client:
+    response = await client.get(
+      f"http://localhost:9000/api/db/projects/bat/user/{dev_id}"
     )
     response.raise_for_status()
     projects = response.json()
@@ -196,8 +306,7 @@ async def getProjectInfoById(project_id) -> Project:
       f"http://localhost:9000/api/db/projects/{project_id}"
     )
     response.raise_for_status()
-    data = response.json()
-    return data['description']
+    return response.json()
 
 """ Сохраняет новые данные в проект """
 async def updateProjectById(project_id, newInfo: dict):
@@ -232,11 +341,14 @@ async def deleteProject(project_id: int):
 
 """ Запрос для создания тимы """
 async def createNewTeams(team_data: dict):
+  owner_id = team_data["user_id"]
+  project_id = team_data["project_id"]
   async with httpx.AsyncClient() as client:
+    user_id = team_data["user_id"]
+    project_id = team_data["project_id"]
     try:
       response = await client.post(
-        "http://localhost:9000/api/db/teams/",
-        json=team_data
+        f"http://localhost:9000/api/db/teams/owner/{user_id}/project/{project_id}"
       )
       response.raise_for_status()
       return response.json()
@@ -244,13 +356,15 @@ async def createNewTeams(team_data: dict):
       print(f"Неожиданная ошибка: {e}")
 
 """ Запрос на добавление нового человека в команду """
-async def addUserToTeam(team_data: dict):
+async def addUserToTeam(dev_data: dict):
   async with httpx.AsyncClient() as client:
+    user_id = dev_data["user_id"]
+    project_id = dev_data["project_id"]
     try:
       # Отправляем POST-запрос
       response = await client.post(
-        "http://localhost:9000/api/db/teams/user",
-        json=team_data
+        f"http://localhost:9000/api/db/teams/user/{user_id}/project/{project_id}",
+        json=dev_data
       )
       response.raise_for_status()
       return response.json()
@@ -333,7 +447,7 @@ async def updateTaskById(task_id, newInfo: dict):
   async with httpx.AsyncClient() as client:
     try:
       response = await client.put(
-        f"http://localhost:9000/api/db/tasks/{task_id}",
+        f"http://localhost:9000/api/db/tasks/{int(task_id)}",
         json=newInfo
       )
       response.raise_for_status()

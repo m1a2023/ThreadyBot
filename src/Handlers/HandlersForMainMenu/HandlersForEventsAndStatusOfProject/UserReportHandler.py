@@ -21,25 +21,35 @@ import os
 class UserReportHandler(Handler):
     @staticmethod
     async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+        #context.user_data["state"] = "OK_user_report"
+
+        keyboard = [
+            [InlineKeyboardButton("Ок", callback_data="OK_user_report")],
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
         user_id = context.user_data["chosenDeveloper"] # id выбранного разработчика для формирования отчета
         project_id = context.user_data["chosenProject"] # id выбранного проекта для формирования отчета
 
-        report = await get_report_by_user_id(user_id) #покатак
+        report = await get_report_by_user_id(user_id, project_id) #покатак
 
         file_path = f"Developer_report_{user_id}.pdf"
         await UserReportHandler.generate_pdf(report, file_path)
 
         # Отправляем пользователю
+        sent_message = ""
         with open(file_path, "rb") as pdf_file:
             print("done")
-            await update.callback_query.message.reply_document(document=pdf_file, filename=f"Developer_report_{user_id}.pdf")
-
+            sent_message = await update.callback_query.message.reply_document(document=pdf_file, filename=f"Developer_report_{user_id}.pdf",reply_markup=reply_markup)
+            context.user_data["bot_message_id"] = sent_message.message_id
         # Можно удалить файл после отправки (если не нужен локально)
         os.remove(file_path)
 
     @staticmethod
     async def generate_pdf(report_data: dict, file_path: str):
         tasks = report_data['all_users_tasks_duration']
+        print(len(tasks))
 
         doc = SimpleDocTemplate(file_path, pagesize=A4)
         elements = []
@@ -74,30 +84,60 @@ class UserReportHandler(Handler):
         elements.append(title)
         elements.append(Spacer(1, 0.5*cm))
 
-        task_stats = [
+        quantity: int
+
+        if report_data['all_tasks'] == 0:
+            quantity = 0
+            task_stats = [
             [Paragraph("Категория", header_style), Paragraph("Количество", header_style), Paragraph("Доля", header_style)],
-            [Paragraph("Всего задач", body_style), report_data['all_tasks'], "100%"],
+            [Paragraph("Всего задач", body_style), quantity, "-"],
 
             [
-            Paragraph("Завершено", body_style), report_data['total_completed_tasks'],
-            f"{int(report_data['total_completed_tasks']/report_data['all_tasks']*100)}%"
+            Paragraph("Завершено", body_style), quantity,
+            f"-"
             ],
 
             [
-            Paragraph("В процессе", body_style), report_data['total_in_progress_tasks'],
-            f"{int(report_data['total_in_progress_tasks']/report_data['all_tasks']*100)}%"
+            Paragraph("В процессе", body_style), quantity,
+            f"-"
             ],
 
             [
-            Paragraph("Ожидают выполнения", body_style), report_data['total_todo_tasks'],
-            f"{int(report_data['total_todo_tasks']/report_data['all_tasks']*100)}%"
+            Paragraph("Ожидают выполнения", body_style), quantity,
+            f"-"
             ],
 
             [
-            Paragraph("Просрочено", body_style), report_data['total_overdue_tasks'],
-            f"{int(report_data['total_overdue_tasks']/report_data['all_tasks']*100)}%"
+            Paragraph("Просрочено", body_style), quantity,
+            f"-"
             ]
         ]
+
+        else:
+            task_stats = [
+                [Paragraph("Категория", header_style), Paragraph("Количество", header_style), Paragraph("Доля", header_style)],
+                [Paragraph("Всего задач", body_style), report_data['all_tasks'], "100%"],
+
+                [
+                Paragraph("Завершено", body_style), report_data['total_completed_tasks'],
+                f"{int(report_data['total_completed_tasks']/report_data['all_tasks']*100)}%"
+                ],
+
+                [
+                Paragraph("В процессе", body_style), report_data['total_in_progress_tasks'],
+                f"{int(report_data['total_in_progress_tasks']/report_data['all_tasks']*100)}%"
+                ],
+
+                [
+                Paragraph("Ожидают выполнения", body_style), report_data['total_todo_tasks'],
+                f"{int(report_data['total_todo_tasks']/report_data['all_tasks']*100)}%"
+                ],
+
+                [
+                Paragraph("Просрочено", body_style), report_data['total_overdue_tasks'],
+                f"{int(report_data['total_overdue_tasks']/report_data['all_tasks']*100)}%"
+                ]
+            ]
 
         task_table = Table(task_stats, colWidths=[8*cm, 4*cm, 4*cm])
         task_table.setStyle(TableStyle([
@@ -111,12 +151,12 @@ class UserReportHandler(Handler):
             ('GRID', (0,0), (-1,-1), 1, colors.black)
         ]))
 
+        if len(tasks) != 0:
+            elements.append(Paragraph("Гистограма всех задач и времени их выполнения", header_style))
+            elements.append(Spacer(1, 1*cm))
+            await UserReportHandler.generate_vertical_bar_chart(tasks, elements, body_style)
+            elements.append(PageBreak())
 
-        elements.append(Paragraph("Гистограма всех задач и времени их выполнения", header_style))
-        elements.append(Spacer(1, 1*cm))
-        await UserReportHandler.generate_vertical_bar_chart(tasks, elements, body_style)
-
-        elements.append(PageBreak())
 
         elements.append(Paragraph("Статистика задач", header_style))
         elements.append(Spacer(1, 0.3*cm))

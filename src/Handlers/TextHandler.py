@@ -15,8 +15,9 @@ from Handlers.HandlersForMainMenu.HandlersForSettingProject.ChangeProjectHandler
 
 import re
 
-from Handlers.RequestsHandler import addUserToTeam, deleteUserFromTeam, getListDevelopersIdByProjectId, getProjectById
+from Handlers.RequestsHandler import addUserToTeam, checkUserExists, deleteUserFromTeam, getListDevelopersIdByProjectId, getProjectById, updateProjectById
 from ProjectManagment.Developer import Developer
+from Handlers.HandlersForMainMenu.GeneralSettingsHandler import GeneralSettingsHandler
 
 class TextHandler:
   @staticmethod
@@ -74,21 +75,28 @@ class TextHandler:
 
     if "project_manager" in context.user_data:
       users_project = await context.user_data["project_manager"].get_projects_names()
-    
+
     if "changedProject" in context.user_data:
       changedProject = context.user_data["changedProject"]
-    
+
     if "changedTask" in context.user_data:
       changedTask = context.user_data["changedTask"]
 
     # Получаем текущее состояние
     state = context.user_data.get("state")
 
-    # 
-    # Обработка статусов для редактирования проектов
-    # 
+    if state == "generateRePlanWithProblem":
+      context.user_data["problem"] = user_text
+      await TextHandler.processMessage(
+        context, chat_id, user_message_id, bot_message_id,
+        f"Замечания: {user_text}", "PlanInfo"
+      )
 
-    if state == "editProjectName":
+    #
+    # Обработка статусов для редактирования проектов
+    #
+
+    elif state == "editProjectName":
       if (len(user_text) >= 4 and not user_text[0].isdigit() and user_text not in users_project):
         changedProject.title = user_text
         await TextHandler.processMessage(
@@ -113,7 +121,7 @@ class TextHandler:
           except Exception as e:
             print(f"Ошибка при удалении сообщения пользователя: {e}")
         return
-      
+
     elif state == "editProjectDescription":
       description = (re.sub(r'[^\w\s]', '', user_text)).split()
       if len(description) >= 2:
@@ -142,7 +150,7 @@ class TextHandler:
         except Exception as e:
           print(f"Ошибка при удалении сообщения пользователя: {e}")
         return
-      
+
     elif state == "editProjectLink":
       parsed_url = urlparse(user_text)
       if (all([parsed_url.scheme, parsed_url.netloc])):
@@ -168,11 +176,11 @@ class TextHandler:
         except Exception as e:
           print(f"Ошибка при удалении сообщения пользователя: {e}")
         return
-      
-    # 
+
+    #
     # Обработка статусов для создания проектов
-    # 
-      
+    #
+
     elif state == "setNameForCreateProject":
       # Требования к названию проекта: длина названия не менее 4 символов, не должно начинаться с цифры
       # и названия проектов не должны повторяться
@@ -239,15 +247,27 @@ class TextHandler:
 
     elif state == "setTeamForCreateProject":
       set_of_team = set((re.sub(r'[^\w\s@]', '', user_text)).split())
+      valid_dev_id = []
+      invalid_dev_id = []
       try:
         for dev_id in set_of_team:
           dev_id_int = int(dev_id)
-          developer = Developer(dev_id_int, 0, "user")
-          project.addDeveloper(developer)
-        await TextHandler.processMessage(
-          context, chat_id, user_message_id, bot_message_id,
-          f"Разработчики: {', '.join(set_of_team)}", "projectInfoForCreateProject"
-        )
+          if await checkUserExists(dev_id_int):
+            developer = Developer(dev_id_int, 0, "user")
+            project.addDeveloper(developer)
+            valid_dev_id.append(str(dev_id_int))
+          else:
+            invalid_dev_id.append(str(dev_id_int))
+        if invalid_dev_id == [] and valid_dev_id != []:
+          await TextHandler.processMessage(
+            context, chat_id, user_message_id, bot_message_id,
+            f"Добавленные разработчики: {', '.join(valid_dev_id)}", "projectInfoForCreateProject"
+          )
+        elif invalid_dev_id != [] and valid_dev_id == []:
+          await TextHandler.processMessage(
+            context, chat_id, user_message_id, bot_message_id,
+            f"⚠️ Разработчики не были добавлены: {','.join(invalid_dev_id)}\n❗️ Чтобы добавить их, нужно, чтобы они написали мне команду /start", "projectInfoForCreateProject"
+          )
       except ValueError:
         if bot_message_id:
           try:
@@ -262,7 +282,7 @@ class TextHandler:
           await context.bot.delete_message(chat_id, user_message_id)
         except Exception as e:
           print(f"Ошибка при удалении сообщения пользователя: {e}")
-        
+
         return
 
     elif state == "setLinkForCreateProject":
@@ -291,9 +311,9 @@ class TextHandler:
           print(f"Ошибка при удалении сообщения пользователя: {e}")
         return
 
-    # 
+    #
     # Обработка статусов для создания тасков
-    # 
+    #
 
     if "task" in context.user_data:
       task = context.user_data["task"]
@@ -342,7 +362,7 @@ class TextHandler:
       await TextHandler.processMessage(
         context, chat_id, user_message_id, bot_message_id,
         f"Дедлайн: {selected_date_str}", "taskInfoForCreateTask")
-      
+
     elif state == "setPriorityForTask":
       # Проверяем, есть ли callback_query
       if not update.callback_query:
@@ -362,7 +382,7 @@ class TextHandler:
       await TextHandler.processMessage(
         context, chat_id, user_message_id, bot_message_id,
         f"Приоритет: {priority}", "taskInfoForCreateTask")
-      
+
     elif state == "setStatusForTask":
       # Проверяем, есть ли callback_query
       if not update.callback_query:
@@ -382,13 +402,13 @@ class TextHandler:
       await TextHandler.processMessage(
         context, chat_id, user_message_id, bot_message_id,
         f"Статус: {status}", "taskInfoForCreateTask")
-      
+
     elif state == "setDeveloperForTask":
       if not update.callback_query:
         await update.message.reply_text("Ошибка: callback_query отсутствует.")
         return
 
-      developer = update.callback_query.data[23:]
+      developer = update.callback_query.data[23:] 
 
       task.developer = developer
 
@@ -403,13 +423,13 @@ class TextHandler:
         f"Исполнитель: {developer}", "taskInfoForCreateTask")
 
 
-    # 
+    #
     # Обработка статусов для редактирования тасков
-    # 
+    #
 
     elif state == "editTaskName":
       changedTask.title = user_text
-      
+
       await TextHandler.processMessage(
         context, chat_id, user_message_id, bot_message_id,
         f"Название задачи: {user_text}", "TaskInfoForChangeTask"
@@ -417,7 +437,7 @@ class TextHandler:
 
     elif state == "editTaskDescription":
       changedTask.description = user_text
-      
+
       await TextHandler.processMessage(
         context, chat_id, user_message_id, bot_message_id,
         f"Описание задачи задачи: {user_text}", "TaskInfoForChangeTask"
@@ -492,7 +512,7 @@ class TextHandler:
       await TextHandler.processMessage(
         context, chat_id, user_message_id, bot_message_id,
         f"Статус: {status}", "TaskInfoForChangeTask")
-      
+
     elif state == "EditTaskDeveloper":
       # Проверяем, есть ли callback_query
       if not update.callback_query:
@@ -513,17 +533,17 @@ class TextHandler:
       await TextHandler.processMessage(
         context, chat_id, user_message_id, bot_message_id,
         f"Исполнитель: {developer}", "TaskInfoForChangeTask")
-    
-    # 
+
+    #
     # Обработка статусов для команд
-    # 
+    #
 
     if "chosenProject" in context.user_data:
       team = await getListDevelopersIdByProjectId(context.user_data["chosenProject"])
-    
+
     if state == "addNewDeveloper":
       # Если нет такого пользователя в списке тимы
-      if user_text not in team:
+      if user_text not in team and await checkUserExists(int(user_text)):
         new_developer = Developer(int(user_text), context.user_data["chosenProject"], "user")
         await addUserToTeam(new_developer.to_dict())
         # Удаляем сообщение бота
@@ -536,11 +556,11 @@ class TextHandler:
             await context.bot.delete_message(chat_id, user_message_id)
           except Exception as e:
             print(f"Ошибка при удалении сообщения пользователя: {e}")
-        
+
         context.user_data["state"] = None
-        
+
       # Если такой пользователь уже есть в тиме
-      else:
+      elif user_text in team:
         if bot_message_id:
           try:
             await context.bot.edit_message_text(
@@ -557,7 +577,25 @@ class TextHandler:
             except Exception as e:
               print(f"Ошибка при удалении сообщения пользователя: {e}")
         return
-        
+      # Если пользователя с таким id нет в бд
+      elif not (await checkUserExists(int(user_text))):
+        if bot_message_id:
+          try:
+            await context.bot.edit_message_text(
+            chat_id=chat_id,
+            message_id=bot_message_id,
+            text="Такого пользователя нет в базе данных.\nЧтобы добавить его, нужно, чтобы он написал мне команду /start.\nПопробуйте еще раз:"
+          )
+          except Exception as e:
+            print(f"Ошибка при редактировании сообщения: {e}")
+          # Удаляем сообщение пользователя
+          if user_message_id:
+            try:
+              await context.bot.delete_message(chat_id, user_message_id)
+            except Exception as e:
+              print(f"Ошибка при удалении сообщения пользователя: {e}")
+        return
+
     elif state == "deleteDeveloper":
       try:
         await deleteUserFromTeam(int(user_text), context.user_data["chosenProject"])
@@ -571,9 +609,9 @@ class TextHandler:
             await context.bot.delete_message(chat_id, user_message_id)
           except Exception as e:
             print(f"Ошибка при удалении сообщения пользователя: {e}")
-        
+
         context.user_data["state"] = None
-        
+
       except ValueError as e:
         if bot_message_id:
           try:
@@ -591,4 +629,39 @@ class TextHandler:
             except Exception as e:
               print(f"Ошибка при удалении сообщения пользователя: {e}")
         return
-
+    
+    elif state == "setChatLink":
+      parsed_url = urlparse(user_text)
+      if all([parsed_url.scheme, parsed_url.netloc]):
+        # Если ссылка валидна
+        await updateProjectById(int(context.user_data["chosenProject"]), {"chat_link": user_text})
+        # Удаляем сообщение бота
+        if bot_message_id:
+            await context.bot.delete_message(chat_id, bot_message_id)
+        
+        # Удаляем сообщение пользователя
+        if user_message_id:
+            try:
+                await context.bot.delete_message(chat_id, user_message_id)
+            except Exception as e:
+                print(f"Ошибка при удалении сообщения пользователя: {e}")
+        
+        context.user_data["state"] = None
+      else:
+        # Если ссылка невалидна
+        try:
+            await context.bot.edit_message_text(
+                chat_id=chat_id,
+                message_id=bot_message_id,
+                text="❌ Ссылка недействительна. Попробуйте еще раз:"
+            )
+        except Exception as e:
+            print(f"Ошибка при редактировании сообщения: {e}")
+        
+        # Удаляем невалидное сообщение пользователя
+        if user_message_id:
+            try:
+                await context.bot.delete_message(chat_id, user_message_id)
+            except Exception as e:
+                print(f"Ошибка при удалении сообщения пользователя: {e}")
+        return
