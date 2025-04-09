@@ -50,28 +50,45 @@ class GenerateSubtaskHandler(Handler):
         await query.edit_message_text(plan,reply_markup=reply_markup)
 
 
+import re
+import json
+
 def format_task_plan(plan_text: str) -> str:
     try:
         plan_json = json.loads(plan_text)
         tasks = plan_json.get("tasks", [])
         formatted_tasks = []
 
+        # Вытаскиваем задачи
         for item in tasks:
-            # Каждая задача — это словарь с одним ключом
             for key, value in item.items():
-                formatted_tasks.append(f"📌 *Task {key}*: {value}")
+                value = restore_markdown_links(value)
+                formatted_tasks.append(f"📌 Task {key}: {value}")
 
-        # Добавим приоритизацию, если она есть
+        # Ищем приоритизацию (оставляем оригинал со ссылками)
         if "Приоритизация задач" in plan_text:
             parts = plan_text.split("Приоритизация задач")
             if len(parts) > 1:
-                prioritization = "🧩 *Приоритизация задач*:\n" + parts[1].strip()
+                prioritization = "🧩 Приоритизация задач:\n" + parts[1].strip()
+                prioritization = restore_markdown_links(prioritization)
                 formatted_tasks.append("\n" + prioritization)
+        else:
+            auto_priority = "\n🧩 Автоматическая приоритизация задач:\n"
+            auto_priority += "\n".join([
+                f"Задача {i+1} должна быть выполнена после задачи {i}."
+                if i > 0 else f"Задача {i+1} должна быть выполнена первой."
+                for i in range(len(tasks))
+            ])
+            formatted_tasks.append(auto_priority)
 
         return "\n\n".join(formatted_tasks)
 
     except Exception as e:
-        return "⚠️ Ошибка форматирования плана: " + str(e)
+        return f"⚠️ Ошибка форматирования плана: {e}"
 
 
-    #await query.edit_message_text(f"{subtaskText}", reply_markup=reply_markup)
+def restore_markdown_links(text: str) -> str:
+    # Исправляем ссылки, если они заданы явно как [text](url)
+    # Иногда парсеры заменяют их на текстовые ссылки "text: url"
+    text = re.sub(r'([^\s\]]+):\s+(https?://\S+)', r'[\1](\2)', text)
+    return text
