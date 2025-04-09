@@ -434,12 +434,22 @@ class MainCallbackHandler(Handler):
       if bot_message_id:
         await context.bot.delete_message(chat_id, bot_message_id)
 
-    elif query.data == "OK_reminder":
-      chat_id = update.callback_query.message.chat_id
-      bot_message_id = context.user_data.get("bot_message_id")
+    elif query.data.startswith("OK_reminder"):
+      data = query.data
+      try:
+        _, task_id_str, user_id_str = data.split("|")
+        task_id = int(task_id_str)
+        user_id = int(user_id_str)
 
-      if bot_message_id:
-        await context.bot.delete_message(chat_id, bot_message_id)
+        # Удаляем сообщение, если это тот пользователь
+        if update.effective_user.id == user_id:
+            await query.message.delete()
+            print(f"Сообщение удалено: task_id={task_id}, user_id={user_id}")
+        else:
+            await query.message.reply_text("⛔ Это напоминание не предназначено для вас.")
+
+      except Exception as e:
+        print(f"Ошибка при разборе callback_data: {e}")
 
     else:
       pass

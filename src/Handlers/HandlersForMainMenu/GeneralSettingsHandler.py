@@ -5,17 +5,16 @@ from typing import Any
 
 from Handlers.Handler import Handler
 
-class GeneralSettingsHandler(Handler): 
+class GeneralSettingsHandler(Handler):
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    
+
     query = update.callback_query
     await query.answer()
 
     keyboard = [
       [InlineKeyboardButton("📎 Настроить ссылку на общий чат", callback_data="setChatLink")],
       [InlineKeyboardButton("🔍 Посмотреть ссылку на общий чат", callback_data="showChatLink")],
-      [InlineKeyboardButton("🔔 Настроить уведомления о дедлайнах (Не работает)", callback_data="123")],
       [InlineKeyboardButton("🏠 Выход в главное меню", callback_data="MoveToMainMenu")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
