@@ -18,11 +18,22 @@ class ReGenerateProjectPlanHandler(Handler):
        problem = ""
     print(f"problem - {problem}")
 
-    await query.edit_message_text("🔄 Идет перегенерация плана, это может занять некоторое время...")
+    loading_message = await query.edit_message_text("🔄 Идет генерация плана, это может занять некоторое время...")
+
+    last_bot_message_id = context.user_data["IdLastMessageFromBot"]
+    if update.message:
+      chat_id = update.message.chat_id
+    else:
+      chat_id = update.callback_query.message.chat_id
+    if last_bot_message_id:
+      try:
+        await context.bot.delete_message(chat_id, last_bot_message_id)
+      except:
+        print(f"Ошибка при удалении последнего сообщения бота")
 
     keyboard = [
       [InlineKeyboardButton("✅ Принять план", callback_data="saveGeneratedPlan")], # Сохраняем план и уточняем по генерации задач
-      [InlineKeyboardButton("🔄 Указать замечания", callback_data="getProblem")],
+      [InlineKeyboardButton("✏️ Указать замечания", callback_data="getProblem")],
       [InlineKeyboardButton("🔄 Переделать", callback_data="generateRePlan")],
       [InlineKeyboardButton("❌ Отмена", callback_data="cancelGenerateProjectPlan")]
     ]
@@ -38,7 +49,7 @@ class ReGenerateProjectPlanHandler(Handler):
     resp = await get_project_re_plan_with_problem(problem, proj_id, iam_token, folder_id)
 
     context.user_data["problem"] = None
-    print(f"problem - {context.user_data["problem"]}")
+    print(f"problem - {context.user_data['problem']}")
 
     plan = resp["result"]["alternatives"][0]["message"]["text"]
 
@@ -48,14 +59,15 @@ class ReGenerateProjectPlanHandler(Handler):
 
     message_length = len(plan)
 
-    if message_length > MAX_MESSAGE_LENGTH:
-        parts_count = -(-message_length // MAX_MESSAGE_LENGTH)
-
-        for i in range(parts_count):
-            start = i * MAX_MESSAGE_LENGTH
-            end = (i + 1) * MAX_MESSAGE_LENGTH
-            part = plan[start:end]
-
-            await update.effective_message.reply_markdown(part,reply_markup=reply_markup)
+    if len(plan) > MAX_MESSAGE_LENGTH:
+      parts = [plan[i:i + MAX_MESSAGE_LENGTH] for i in range(0, len(plan), MAX_MESSAGE_LENGTH)]
+      
+      await query.edit_message_text(parts[0], reply_markup=reply_markup)
+      
+      for part in parts[1:]:
+          await context.bot.send_message(
+              chat_id=query.message.chat_id,
+              text=part
+          )
     else:
-        await update.effective_message.reply_markdown(plan,reply_markup=reply_markup)
+      await query.edit_message_text(plan, reply_markup=reply_markup)

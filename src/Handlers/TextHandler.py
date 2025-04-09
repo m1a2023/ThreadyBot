@@ -87,7 +87,6 @@ class TextHandler:
 
     if state == "generateRePlanWithProblem":
       context.user_data["problem"] = user_text
-
       await TextHandler.processMessage(
         context, chat_id, user_message_id, bot_message_id,
         f"Замечания: {user_text}", "PlanInfo"
