@@ -45,5 +45,3 @@ class ShowCurrentPlanHandler(Handler):
                     await update.effective_message.reply_markdown(part,reply_markup=reply_markup)
             else:
                 await update.effective_message.reply_markdown(planText,reply_markup=reply_markup)
-
-            #await query.edit_message_text(f"{planText}", reply_markup=reply_markup)

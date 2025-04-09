@@ -51,7 +51,7 @@ class RemindersHandler(Handler):
     @staticmethod
     async def fetch_and_send_reminders(context: ContextTypes.DEFAULT_TYPE, task_title: str, user_id: int, task_id: int):
         keyboard = [
-            [InlineKeyboardButton("Ок", callback_data="OK_reminder")],
+            [InlineKeyboardButton("Ок", callback_data=f"OK_reminder|{task_id}|{user_id}")],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         print("send")

@@ -10,6 +10,7 @@ class GenerateProjectPlanHandler(Handler):
 
   @staticmethod
   async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Any:
+    context.user_data["problem"] = None
     context.user_data["PlanInfo"] = ["Вы ввели:"]
     query = update.callback_query
     await query.answer()
