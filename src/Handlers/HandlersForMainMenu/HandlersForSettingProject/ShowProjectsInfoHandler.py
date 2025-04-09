@@ -22,7 +22,7 @@ class ShowProjectsInfoHandler(Handler):
     foundProject = await getProjectById(int(chosenProj))
 
     keyboard = [
-      [InlineKeyboardButton("Назад", callback_data="SettingsOfProjects")]
+      [InlineKeyboardButton("⬅️ Назад", callback_data="SettingsOfProjects")]
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)

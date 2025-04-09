@@ -25,6 +25,8 @@ from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersFo
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.HandlersForGenerateProjectPlan.GenerateProjectPlanHandler import GenerateProjectPlanHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForGeneratingProjectPlan.ShowCurrentPlanHandler import ShowCurrentPlanHandler
 from Handlers.HandlersForMainMenu.HandlersForEventsAndStatusOfProject.HandlersForCurrentTask.GenerateSubtaskHandler import GenerateSubtaskHandler
+from Handlers.HandlersForMainMenu.HandlersForGeneralSettings.HandlersForChatLink.SetChatLinkHandler import SetChatLinkHandler
+from Handlers.HandlersForMainMenu.HandlersForGeneralSettings.HandlersForChatLink.ShowChatLinkHandler import ShowChatLinkHandler
 
 """ Импорты хендлеров для главного меню """
 from Handlers.HandlersForMainMenu.HandlersForSettingProject.HandlersForEditProject.DeleteProjectHandler import DeleteProjectHandler
@@ -117,6 +119,14 @@ class MainCallbackHandler(Handler):
       return await EventsAndStatusOfProjectHandler.handle(update, context)
     elif query.data == "GeneralSettings":
       return await GeneralSettingsHandler.handle(update, context)
+    
+    # Обработка кнопок в настройках
+    elif query.data == "setChatLink":
+      context.user_data["state"] = "SetChatLink"
+      return await ChooseProjectForOwnerHandler.handle(update, context)
+    elif query.data == "showChatLink":
+      context.user_data["state"] = "ShowChatLink"
+      return await ChooseProjectForAllHandler.handle(update, context)
 
     # Обработка кнопок в "Состояние проекта"
     elif query.data == "currentTasks":
@@ -351,7 +361,11 @@ class MainCallbackHandler(Handler):
       elif context.user_data["state"] == "chooseDeveloper":
         context.user_data["state"] =  "get_developer_report"
         return await ChooseDeveloperHandler.handle(update, context)
-
+      
+      elif context.user_data["state"] == "SetChatLink":
+        context.user_data["state"] = None
+        return await SetChatLinkHandler.handle(update, context)
+    
     elif query.data.startswith("chosenFromAllProjects"):
       context.user_data["chosenProject"] = query.data[22:]
       if context.user_data["state"] == "current_tasks":
@@ -373,6 +387,10 @@ class MainCallbackHandler(Handler):
       elif context.user_data["state"] == "showProjectsInfo":
         context.user_data["state"] = None
         return await ShowProjectsInfoHandler.handle(update, context)
+      
+      elif context.user_data["state"] == "ShowChatLink":
+        context.user_data["state"] = None
+        return await ShowChatLinkHandler.handle(update, context)
 
     elif query.data.startswith("chosenTask_"):
       context.user_data["chosenTask"] = query.data[11:]

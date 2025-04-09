@@ -38,7 +38,6 @@ class SaveEditTaskHandler(Handler):
           new_info[key] = changed_task[key].isoformat()
         else:
           new_info[key] = changed_task[key]
-    print(new_info)
     await updateTaskById(int(context.user_data["chosenTask"]), new_info)
 
     # Очищаем все данные, связанные с редактированием задачи

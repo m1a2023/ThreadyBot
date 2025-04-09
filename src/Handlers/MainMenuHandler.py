@@ -20,11 +20,14 @@ class MainMenuHandler(Handler):
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     if update.callback_query:
-      query = update.callback_query
-      await query.answer()  # Подтверждаем callback
+      try:
+        query = update.callback_query
+        await query.answer()  # Подтверждаем callback
 
-      # Редактируем сообщение с кнопками
-      await query.edit_message_text(text="*\=\=Главное меню\=\=*\nВыберите действие:", reply_markup=reply_markup, parse_mode="MarkdownV2")
+        # Редактируем сообщение с кнопками
+        await query.edit_message_text(text="*\=\=Главное меню\=\=*\nВыберите действие:", reply_markup=reply_markup, parse_mode="MarkdownV2")
+      except:
+        await context.bot.sendMessage(update.effective_chat.id, text="*\=\=Главное меню\=\=*\nВыберите действие:", reply_markup=reply_markup, parse_mode="MarkdownV2")
     else:
       # Отправляем новое сообщение с кнопками
       await update.message.reply_text(text="*\=\=Главное меню\=\=*\nВыберите действие:", reply_markup=reply_markup, parse_mode="MarkdownV2")

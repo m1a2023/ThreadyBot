@@ -13,7 +13,8 @@ class GeneralSettingsHandler(Handler):
     await query.answer()
 
     keyboard = [
-      [InlineKeyboardButton("📎 Настроить ссылку на общий чат (Не работает)", callback_data="123")],
+      [InlineKeyboardButton("📎 Настроить ссылку на общий чат", callback_data="setChatLink")],
+      [InlineKeyboardButton("🔍 Посмотреть ссылку на общий чат", callback_data="showChatLink")],
       [InlineKeyboardButton("🔔 Настроить уведомления о дедлайнах (Не работает)", callback_data="123")],
       [InlineKeyboardButton("🏠 Выход в главное меню", callback_data="MoveToMainMenu")]
     ]
